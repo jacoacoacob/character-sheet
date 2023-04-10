@@ -2,14 +2,16 @@
 
 use actix_web::{middleware, web, App, HttpServer};
 
-mod queries;
+mod character_detail_page;
+mod character_listing_page;
 mod models;
 mod page;
-mod sheet_detail_page;
-mod sheet_listing_page;
+mod queries;
 
-use sheet_detail_page::{create_sheet_detail_page, get_sheet_detail_page};
-use sheet_listing_page::get_sheet_listing_page;
+use character_detail_page::{
+    create_character_detail_page, get_character_detail_page, update_character_detail_page,
+};
+use character_listing_page::get_character_listing_page;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -27,10 +29,14 @@ async fn main() -> std::io::Result<()> {
             .service(actix_files::Files::new("/static", "./static"))
             .service(
                 web::resource("/")
-                    .route(web::get().to(get_sheet_listing_page))
-                    .route(web::post().to(create_sheet_detail_page)),
+                    .route(web::get().to(get_character_listing_page))
+                    .route(web::post().to(create_character_detail_page)),
             )
-            .service(web::resource("/{sheet_id}").route(web::get().to(get_sheet_detail_page)))
+            .service(
+                web::resource("/{character_id}")
+                    .route(web::get().to(get_character_detail_page))
+                    .route(web::put().to(update_character_detail_page)),
+            )
     })
     .bind(("127.0.0.1", 8080))?
     .run()

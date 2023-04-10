@@ -5,9 +5,9 @@ use crate::page::{Page, PageResponse};
 use crate::queries::{execute, Query, QueryResponse};
 
 #[derive(Default)]
-struct SheetListingPage;
+struct CharacterListingPage;
 
-impl Page for SheetListingPage {
+impl Page for CharacterListingPage {
     fn context(&self) -> Result<Context> {
         let mut ctx = Context::new();
 
@@ -25,10 +25,10 @@ impl Page for SheetListingPage {
     }
 
     fn template(&self) -> String {
-        "sheet-listing.html".to_string()
+        "character-listing.html".to_string()
     }
 }
 
-pub async fn get_sheet_listing_page(tmpl: web::Data<Tera>) -> PageResponse {
-    SheetListingPage::default().render(&tmpl)
+pub async fn get_character_listing_page(tmpl: web::Data<Tera>) -> PageResponse {
+    CharacterListingPage::default().render(&tmpl)
 }
