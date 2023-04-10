@@ -1,4 +1,4 @@
-use actix_web::{web, error};
+use actix_web::{web, error, Result};
 use tera::Tera;
 
 use crate::page::{redirect, Page, PageResponse};
@@ -11,10 +11,19 @@ struct SheetDetailPage {
 }
 
 impl Page for SheetDetailPage {
-    fn context(&self) -> tera::Context {
+    fn context(&self) -> Result<tera::Context> {
         let mut ctx = tera::Context::new();
-        ctx.insert("sheet_id", &self.sheet_id);
-        ctx
+
+        let character = execute(Query::GetCharacter(self.sheet_id.to_string()))
+            .map_err(error::ErrorInternalServerError)?;
+
+        match character {
+            QueryResponse::Character(character) => {
+                ctx.insert("character", &character);
+            }
+        }
+        
+        Ok(ctx)
     }
 
     fn template(&self) -> String {

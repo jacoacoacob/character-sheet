@@ -1,6 +1,6 @@
-use actix_web::{error, http::header, Error, HttpResponse};
+use actix_web::{error, http::header, HttpResponse};
 
-pub type PageResponse = actix_web::Result<HttpResponse, Error>;
+pub type PageResponse = actix_web::Result<HttpResponse>;
 
 pub fn redirect(path: &str) -> PageResponse {
     Ok(HttpResponse::Found()
@@ -11,8 +11,8 @@ pub fn redirect(path: &str) -> PageResponse {
 pub trait Page {
     fn template(&self) -> String;
 
-    fn context(&self) -> tera::Context {
-        tera::Context::new()
+    fn context(&self) -> actix_web::Result<tera::Context> {
+        Ok(tera::Context::new())
     }
 
     fn template_root(&self) -> String {
@@ -25,7 +25,7 @@ pub trait Page {
             template = template[1..].to_string();
         }
         let template = format!("{}/{}", self.template_root(), template);
-        match tmpl.render(&template, &self.context()) {
+        match tmpl.render(&template, &self.context()?) {
             Ok(body) => Ok(HttpResponse::Ok().body(body)),
             Err(err) => {
                 println!("{:#?}", err);

@@ -4,6 +4,6 @@ use super::character_data::CharacterData;
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Character {
-    pub id: usize,
+    pub id: String,
     pub data: CharacterData,
 }

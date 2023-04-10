@@ -21,7 +21,7 @@ type DbResult<T> = Result<T>;
 pub enum Query {
     // ListCharacters,
     CreateCharacter,
-    // GetCharacter(usize),
+    GetCharacter(String),
     // ArchiveCharacter(usize),
     // UpdateCharacter(CharacterDelta),
 }
@@ -38,9 +38,45 @@ pub fn execute(query: Query) -> Result<QueryResponse, Error> {
 
     let result = match query {
         Query::CreateCharacter => create_character(conn),
+        Query::GetCharacter(character_id) => get_character(conn, &character_id),
     };
 
     result.map_err(error::ErrorInternalServerError)
+}
+
+
+fn map_character_delta(row: &rusqlite::Row) -> rusqlite::Result<CharacterDelta> {
+    let id = row.get(0)?;
+    let character_id = row.get(1)?;
+    let message = row.get(2)?;
+    let field_diffs = row.get::<_, String>(3)?;
+    let field_diffs = serde_json::from_str(&field_diffs).expect("Deserialize field_diffs");
+    Ok(CharacterDelta { id, character_id, message, field_diffs })
+}
+
+fn get_character(conn: Connection, character_id: &str) -> DbResult<QueryResponse> {
+    let mut stmt = conn.prepare(
+        "SELECT id, character_id, message, field_diffs
+        FROM character_delta
+        WHERE character_id = ?1
+        ORDER BY created ASC"
+    )?;
+
+    let rows: Vec<CharacterDelta> = stmt
+        .query_map([character_id], map_character_delta)?
+        .map(|row| row.unwrap())
+        .collect();
+
+    if rows.is_empty() {
+        return Err(rusqlite::Error::QueryReturnedNoRows);
+    }
+
+    let character = Character {
+        id: character_id.to_string(),
+        data: CharacterData::from(rows)
+    };
+
+    Ok(QueryResponse::Character(character))
 }
 
 fn create_character(conn: Connection) -> DbResult<QueryResponse> {
@@ -54,9 +90,12 @@ fn create_character(conn: Connection) -> DbResult<QueryResponse> {
         .collect();
 
     let mut stmt_insert_character_delta = conn.prepare(
-        "INSERT INTO character_delta (character_id, message, field_diffs)
-        VALUES (:character_id, :message, :field_diffs)
-        RETURNING *"
+        "INSERT INTO character_delta
+            (character_id, message, field_diffs)
+        VALUES
+            (:character_id, :message, :field_diffs)
+        RETURNING
+            id, character_id, message, field_diffs"
     )?;
 
     let character_id = rows.first().expect("Character ID");
@@ -70,21 +109,14 @@ fn create_character(conn: Connection) -> DbResult<QueryResponse> {
                 ":message": message,
                 ":field_diffs": serde_json::to_string(&field_diffs).expect("Serialize field_diffs"),
             },
-            |row| {
-                let id = row.get(0)?;
-                let character_id = row.get(1)?;
-                let message = row.get(2)?;
-                let field_diffs = row.get::<_, String>(3)?;
-                let field_diffs = serde_json::from_str(&field_diffs).expect("Deserialize field_diffs");
-                Ok(CharacterDelta { id, character_id, message, field_diffs })
-            }
+            map_character_delta
         )?
         .map(|row| row.unwrap())
         .collect();
 
     let character = Character {
-        id: *character_id,
-        data: CharacterData::from(rows)
+        id: character_id.to_string(),
+        data: CharacterData::from(rows),
     };
 
     Ok(QueryResponse::Character(character))

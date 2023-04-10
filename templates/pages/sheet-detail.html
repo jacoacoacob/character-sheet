@@ -1,7 +1,12 @@
 {% extends "layouts/base.html" %}
 
 {% block body %}
+<script type="text/javascript">
+    var INITIAL_DATA = {{ character | json_encode | safe }}
+</script>
 <h1>
-    It's a detail page 
+    It's a detail page
 </h1>
+
+<script src="/static/js/main.js"></script>
 {% endblock body %}
