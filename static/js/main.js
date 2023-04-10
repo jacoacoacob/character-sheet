@@ -2,55 +2,108 @@
 
 (function () {
 
+    const characterId = INITIAL_DATA.id;
+
     const apiModel = INITIAL_DATA.data;
-    const formModel = window.formModel = INITIAL_DATA.data;
+    const formModel = INITIAL_DATA.data;
 
     window.apiModel = apiModel;
     window.formModel = formModel;
 
-    const fields = document.querySelector(".fields-wrapper");
+    setupFields();
+    setupCommitForm();
 
-    fields.appendChild(
-        createFieldGroup(
-            "saving throws",
-            createProficiencyField,
-            [
-                ["saving_throw_strength", "Strength"],
-                ["saving_throw_dexterity", "Dexterity"],
-                ["saving_throw_constitution", "Constitution"],
-                ["saving_throw_intelligence", "Intelligence"],
-                ["saving_throw_wisdom", "Wisdom"],
-                ["saving_throw_charisma", "Charisma"],
-            ]
+    function setupFields() {
+        const fields = document.querySelector(".fields-wrapper");
+
+        fields.appendChild(
+            createFieldGroup(
+                "general",
+                createTextField,
+                [
+                    "class",
+                    "level",
+                    "background",
+                    "character_name",
+                    "player_name",
+                    "parentage",
+                    "alignment",
+                    "xp",
+                ]
+            )
         )
-    )
 
-    fields.appendChild(
-        createFieldGroup(
-            "skills",
-            createProficiencyField,
-            [
-                ["skill_acrobatics", "Acrobatics"],
-                ["skill_animal_handling", "Animal Handling"],
-                ["skill_athletics", "Athletics"],
-                ["skill_deception", "Deception"],
-                ["skill_history", "History"],
-                ["skill_insight", "Insight"],
-                ["skill_inimidation", "Intimidation"],
-                ["skill_investigation", "Investigation"],
-                ["skill_medicine", "Medicine"],
-                ["skill_nature", "Nature"],
-                ["skill_perception", "Perception"],
-                ["skill_performance", "Performance"],
-                ["skill_persuasion", "Persuasion"],
-                ["skill_religion", "Religion"],
-                ["skill_sleight_of_hand", "Sleight of Hand"],
-                ["skill_stealth", "Stealth"],
-                ["skill_survival", "Survival"],
-            ]
+        fields.appendChild(
+            createFieldGroup(
+                "saving throws",
+                createProficiencyField,
+                [
+                    ["saving_throw_strength", "Strength"],
+                    ["saving_throw_dexterity", "Dexterity"],
+                    ["saving_throw_constitution", "Constitution"],
+                    ["saving_throw_intelligence", "Intelligence"],
+                    ["saving_throw_wisdom", "Wisdom"],
+                    ["saving_throw_charisma", "Charisma"],
+                ]
+            )
         )
-    );
+    
+        fields.appendChild(
+            createFieldGroup(
+                "skills",
+                createProficiencyField,
+                [
+                    ["skill_acrobatics", "Acrobatics (dex)"],
+                    ["skill_animal_handling", "Animal Handling (wis)"],
+                    ["skill_arcana", "Arcana (int)"],
+                    ["skill_athletics", "Athletics (str)"],
+                    ["skill_deception", "Deception (dex)"],
+                    ["skill_history", "History (int)"],
+                    ["skill_insight", "Insight (wis)"],
+                    ["skill_inimidation", "Intimidation (cha)"],
+                    ["skill_investigation", "Investigation (int)"],
+                    ["skill_medicine", "Medicine (wis)"],
+                    ["skill_nature", "Nature (int)"],
+                    ["skill_perception", "Perception (wis)"],
+                    ["skill_performance", "Performance (cha)"],
+                    ["skill_persuasion", "Persuasion (cha)"],
+                    ["skill_religion", "Religion (int)"],
+                    ["skill_sleight_of_hand", "Sleight of Hand (dex)"],
+                    ["skill_stealth", "Stealth (dex)"],
+                    ["skill_survival", "Survival (wis)"],
+                ]
+            )
+        );
+    }
 
+    function setupCommitForm() {
+        const form = document.getElementById("commit-form");
+        const message = document.getElementById("commit-message");
+
+        form.addEventListener("submit", async (ev) => {
+            ev.preventDefault();
+
+            const response = await fetch(`/${characterId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    message: message.value,
+                    new_data: formModel,
+                }),
+            });
+
+            message.value = "";
+
+            const responseJson = await response.json();
+
+            Object.entries(responseJson.data).forEach(([fieldName, value]) => {
+                apiModel[fieldName] = value;
+            });
+        });
+    }
+   
     function createFieldGroup(groupName, fieldFactory, fieldNames) {
         const group = document.createElement("section");
 
@@ -73,8 +126,6 @@
 
         return group;
     }
-
-
 
     function createProficiencyField(fieldName, label) {
         const wrapper = document.createElement("div");
@@ -110,7 +161,7 @@
     }
 
     function createTextField(fieldName) {
-        const elem = document.createElement("div");
+        const wrapper = document.createElement("div");
 
         const label = document.createElement("label");
         label.setAttribute("for", fieldName);
@@ -118,15 +169,16 @@
 
         const input = document.createElement("input");
         input.id = fieldName;
+        input.value = formModel[fieldName];
 
         input.addEventListener("input", (ev) => {
             formModel[fieldName] = ev.target.value;
         });
 
-        elem.appendChild(label);
-        elem.appendChild(input);
+        wrapper.appendChild(label);
+        wrapper.appendChild(input);
 
-        return { fieldName, elem };
+        return wrapper;
     }
 
 })();

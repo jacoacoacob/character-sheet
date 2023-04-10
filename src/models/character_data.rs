@@ -23,7 +23,7 @@ pub struct CharacterData {
     pub background: Option<String>,
     pub character_name: Option<String>,
     pub player_name: Option<String>,
-    pub race: Option<String>,
+    pub parentage: Option<String>,
     pub alignment: Option<String>,
     pub xp: Option<String>,
     pub score_stength: Option<String>,
@@ -44,6 +44,7 @@ pub struct CharacterData {
     pub death_save_success: Option<String>,
     pub skill_acrobatics: Option<Proficiency>,
     pub skill_animal_handling: Option<Proficiency>,
+    pub skill_arcana: Option<Proficiency>,
     pub skill_athletics: Option<Proficiency>,
     pub skill_deception: Option<Proficiency>,
     pub skill_history: Option<Proficiency>,
@@ -108,7 +109,7 @@ impl From<Vec<CharacterDelta>> for CharacterData {
             background: get_string("background"),
             character_name: get_string("character_name"),
             player_name: get_string("player_name"),
-            race: get_string("race"),
+            parentage: get_string("parentage"),
             alignment: get_string("alignment"),
             xp: get_string("xp"),
             score_stength: get_string("score_stength"),
@@ -129,6 +130,7 @@ impl From<Vec<CharacterDelta>> for CharacterData {
             death_save_success: get_string("death_save_success"),
             skill_acrobatics: get_proficiency("skill_acrobatics"),
             skill_animal_handling: get_proficiency("skill_animal_handling"),
+            skill_arcana: get_proficiency("skill_arcana"),
             skill_athletics: get_proficiency("skill_athletics"),
             skill_deception: get_proficiency("skill_deception"),
             skill_history: get_proficiency("skill_history"),
@@ -174,7 +176,8 @@ impl From<CharacterData> for HashMap<String, FieldValue> {
         let mut data = HashMap::<String, FieldValue>::new();
 
         let fv_string = |v: Option<String>| FieldValue::String(v.unwrap_or_default());
-        let fv_proficiency = |v: Option<Proficiency>| FieldValue::Proficiency(v.unwrap_or_default());
+        let fv_proficiency =
+            |v: Option<Proficiency>| FieldValue::Proficiency(v.unwrap_or_default());
 
         data.insert("class".to_string(), fv_string(value.class));
         data.insert("level".to_string(), fv_string(value.level));
@@ -184,7 +187,7 @@ impl From<CharacterData> for HashMap<String, FieldValue> {
             fv_string(value.character_name),
         );
         data.insert("player_name".to_string(), fv_string(value.player_name));
-        data.insert("race".to_string(), fv_string(value.race));
+        data.insert("parentage".to_string(), fv_string(value.parentage));
         data.insert("alignment".to_string(), fv_string(value.alignment));
         data.insert("xp".to_string(), fv_string(value.xp));
         data.insert("score_stength".to_string(), fv_string(value.score_stength));
@@ -251,6 +254,10 @@ impl From<CharacterData> for HashMap<String, FieldValue> {
             fv_proficiency(value.skill_animal_handling),
         );
         data.insert(
+            "skill_arcana".to_string(),
+            fv_proficiency(value.skill_arcana),
+        );
+        data.insert(
             "skill_athletics".to_string(),
             fv_proficiency(value.skill_athletics),
         );
@@ -258,8 +265,14 @@ impl From<CharacterData> for HashMap<String, FieldValue> {
             "skill_deception".to_string(),
             fv_proficiency(value.skill_deception),
         );
-        data.insert("skill_history".to_string(), fv_proficiency(value.skill_history));
-        data.insert("skill_insight".to_string(), fv_proficiency(value.skill_insight));
+        data.insert(
+            "skill_history".to_string(),
+            fv_proficiency(value.skill_history),
+        );
+        data.insert(
+            "skill_insight".to_string(),
+            fv_proficiency(value.skill_insight),
+        );
         data.insert(
             "skill_inimidation".to_string(),
             fv_proficiency(value.skill_inimidation),
@@ -268,8 +281,14 @@ impl From<CharacterData> for HashMap<String, FieldValue> {
             "skill_investigation".to_string(),
             fv_proficiency(value.skill_investigation),
         );
-        data.insert("skill_medicine".to_string(), fv_proficiency(value.skill_medicine));
-        data.insert("skill_nature".to_string(), fv_proficiency(value.skill_nature));
+        data.insert(
+            "skill_medicine".to_string(),
+            fv_proficiency(value.skill_medicine),
+        );
+        data.insert(
+            "skill_nature".to_string(),
+            fv_proficiency(value.skill_nature),
+        );
         data.insert(
             "skill_perception".to_string(),
             fv_proficiency(value.skill_perception),
@@ -282,30 +301,30 @@ impl From<CharacterData> for HashMap<String, FieldValue> {
             "skill_persuasion".to_string(),
             fv_proficiency(value.skill_persuasion),
         );
-        data.insert("skill_religion".to_string(), fv_proficiency(value.skill_religion));
+        data.insert(
+            "skill_religion".to_string(),
+            fv_proficiency(value.skill_religion),
+        );
         data.insert(
             "skill_sleight_of_hand".to_string(),
             fv_proficiency(value.skill_sleight_of_hand),
         );
-        data.insert("skill_stealth".to_string(), fv_proficiency(value.skill_stealth));
-        data.insert("skill_survival".to_string(), fv_proficiency(value.skill_survival));
+        data.insert(
+            "skill_stealth".to_string(),
+            fv_proficiency(value.skill_stealth),
+        );
+        data.insert(
+            "skill_survival".to_string(),
+            fv_proficiency(value.skill_survival),
+        );
         data.insert(
             "passive_wisdom".to_string(),
             fv_string(value.passive_wisdom),
         );
-        data.insert(
-            "armor_class".to_string(),
-            fv_string(value.armor_class),
-        );
-        data.insert(
-            "initiative".to_string(),
-            fv_string(value.initiative),
-        );
+        data.insert("armor_class".to_string(), fv_string(value.armor_class));
+        data.insert("initiative".to_string(), fv_string(value.initiative));
         data.insert("speed".to_string(), fv_string(value.speed));
-        data.insert(
-            "hit_point_max".to_string(),
-            fv_string(value.hit_point_max),
-        );
+        data.insert("hit_point_max".to_string(), fv_string(value.hit_point_max));
         data.insert(
             "hit_point_current".to_string(),
             fv_string(value.hit_point_current),
