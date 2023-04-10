@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::{Serialize, Deserialize};
 
 use super::character_data::CharacterData;
@@ -6,4 +7,5 @@ use super::character_data::CharacterData;
 pub struct Character {
     pub id: String,
     pub data: CharacterData,
+    pub updated: DateTime<Utc>,
 }

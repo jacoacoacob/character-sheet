@@ -9,5 +9,27 @@
     <button type="submut">Create New Character</button>
 </form>
 
-{{ character_list | json_encode | safe }}
+
+<ul>
+    {% for x in character_list %}
+        <li>
+            <a href="/{{ x.id }}">
+                {% if x.data.character_name %}
+                    {{ x.data.character_name }}
+                {% else %}
+                    un-named
+                {% endif %}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+
+
+
+
+
 {% endblock body %}
+
+<pre>
+    {{ character_list | json_encode(pretty=true) | safe }}
+    </pre>

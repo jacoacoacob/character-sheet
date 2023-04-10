@@ -29,7 +29,7 @@ impl Page for CharacterDetailPage {
     }
 
     fn template(&self) -> String {
-        "Character-detail.html".to_string()
+        "character-detail.html".to_string()
     }
 }
 

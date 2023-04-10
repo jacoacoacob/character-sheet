@@ -1,15 +1,9 @@
-use std::{collections::HashMap, hash::Hash};
+use std::collections::HashMap;
 
 use actix_web::{error, Error};
+use chrono::{DateTime, Utc};
 use rusqlite::{named_params, params, Connection, Result};
-use serde::{Deserialize, Serialize};
 
-// use super::models::{
-//     Character,
-//     CharacterData,
-//     CharacterDelta,
-//     // FieldChanges,
-// };
 use crate::models::character::Character;
 use crate::models::character_data::CharacterData;
 use crate::models::character_delta::CharacterDelta;
@@ -49,17 +43,27 @@ pub fn execute(query: Query) -> Result<QueryResponse, Error> {
 
 fn map_character_delta(row: &rusqlite::Row) -> rusqlite::Result<CharacterDelta> {
     let id = row.get(0)?;
+    let created = row.get(1)?;
     let character_id = row.get(2)?;
     let message = row.get(3)?;
     let field_diffs = row.get::<_, String>(4)?;
     let field_diffs = serde_json::from_str(&field_diffs).expect("Deserialize field_diffs");
     Ok(CharacterDelta {
         id,
+        created,
         character_id,
         message,
         field_diffs,
     })
 }
+
+fn get_most_recent_timestamp_from(deltas: &Vec<CharacterDelta>) -> DateTime<Utc> {
+    let mut timestamps = deltas.iter().map(|x| x.created).collect::<Vec<DateTime<Utc>>>();
+
+    timestamps.sort_by(|a, b| b.cmp(&a));
+
+    timestamps.first().unwrap().clone()
+} 
 
 fn list_characters(conn: &Connection) -> DbResult<QueryResponse> {
     let mut stmt = conn.prepare(
@@ -67,7 +71,7 @@ fn list_characters(conn: &Connection) -> DbResult<QueryResponse> {
         ORDER BY created ASC",
     )?;
 
-    let character_list = stmt
+    let mut character_list = stmt
         .query_map([], map_character_delta)?
         .map(|row| row.unwrap())
         .fold(
@@ -86,11 +90,14 @@ fn list_characters(conn: &Connection) -> DbResult<QueryResponse> {
             |mut accum, (character_id, character_deltas)| {
                 accum.push(Character {
                     id: character_id.to_string(),
+                    updated: get_most_recent_timestamp_from(character_deltas),
                     data: CharacterData::from(character_deltas.clone()),
                 });
                 accum
             },
         );
+    
+    character_list.sort_by(|a, b| b.updated.cmp(&a.updated));
 
     Ok(QueryResponse::CharacterList(character_list))
 }
@@ -113,6 +120,7 @@ fn get_character(conn: &Connection, character_id: usize) -> DbResult<QueryRespon
 
     let character = Character {
         id: character_id.to_string(),
+        updated: get_most_recent_timestamp_from(&rows),
         data: CharacterData::from(rows),
     };
 
@@ -154,6 +162,7 @@ fn create_character(conn: &Connection) -> DbResult<QueryResponse> {
 
     let character = Character {
         id: character_id.to_string(),
+        updated: get_most_recent_timestamp_from(&rows),
         data: CharacterData::from(rows),
     };
 
