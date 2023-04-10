@@ -1,0 +1,40 @@
+import * as lib from "./lib.js";
+
+
+///////////////////////////////////////////////////////////////////////////////
+//    DOM Refs                                                               //
+///////////////////////////////////////////////////////////////////////////////
+
+/** @type {HTMLFormElement} */
+const formNewCharacter = document.getElementById("form-new-character");
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+//    Event Handler Registration                                             //
+///////////////////////////////////////////////////////////////////////////////
+
+formNewCharacter.addEventListener("submit", onFormNewCharacterSubmit);
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+//    Event Handlers                                                         //
+///////////////////////////////////////////////////////////////////////////////
+
+/**
+ * 
+ * @param {SubmitEvent} event 
+ */
+async function onFormNewCharacterSubmit(event) {
+    event.preventDefault();
+
+    const self = formNewCharacter;
+
+    const formData = new FormData(self);
+    
+
+    console.log(formData.get("new-character-name"))
+}
+
+
