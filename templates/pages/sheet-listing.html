@@ -8,4 +8,6 @@
 <form action="/" method="post">
     <button type="submut">Create New Character</button>
 </form>
+
+{{ character_list | json_encode | safe }}
 {% endblock body %}

@@ -1,5 +1,5 @@
 use actix_web::{web, error, Result};
-use tera::Tera;
+use tera::{Context, Tera};
 
 use crate::page::{redirect, Page, PageResponse};
 use crate::queries::{execute, Query, QueryResponse};
@@ -11,8 +11,8 @@ struct SheetDetailPage {
 }
 
 impl Page for SheetDetailPage {
-    fn context(&self) -> Result<tera::Context> {
-        let mut ctx = tera::Context::new();
+    fn context(&self) -> Result<Context> {
+        let mut ctx = Context::new();
 
         let character = execute(Query::GetCharacter(self.sheet_id.to_string()))
             .map_err(error::ErrorInternalServerError)?;
@@ -21,6 +21,7 @@ impl Page for SheetDetailPage {
             QueryResponse::Character(character) => {
                 ctx.insert("character", &character);
             }
+            _ => {}
         }
         
         Ok(ctx)
@@ -49,5 +50,6 @@ pub async fn create_sheet_detail_page() -> PageResponse {
         QueryResponse::Character(character) => {
             redirect(&format!("/{}", character.id))
         }
+        _ => redirect("/")
     }
 }

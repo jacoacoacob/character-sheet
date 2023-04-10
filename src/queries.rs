@@ -19,7 +19,7 @@ use crate::models::character_delta::CharacterDelta;
 type DbResult<T> = Result<T>;
 
 pub enum Query {
-    // ListCharacters,
+    ListCharacters,
     CreateCharacter,
     GetCharacter(String),
     // ArchiveCharacter(usize),
@@ -28,6 +28,7 @@ pub enum Query {
 
 pub enum QueryResponse {
     Character(Character),
+    CharacterList(Vec<Character>),
 }
 
 pub fn execute(query: Query) -> Result<QueryResponse, Error> {
@@ -38,6 +39,7 @@ pub fn execute(query: Query) -> Result<QueryResponse, Error> {
 
     let result = match query {
         Query::CreateCharacter => create_character(conn),
+        Query::ListCharacters => list_characters(conn),
         Query::GetCharacter(character_id) => get_character(conn, &character_id),
     };
 
@@ -47,17 +49,47 @@ pub fn execute(query: Query) -> Result<QueryResponse, Error> {
 
 fn map_character_delta(row: &rusqlite::Row) -> rusqlite::Result<CharacterDelta> {
     let id = row.get(0)?;
-    let character_id = row.get(1)?;
-    let message = row.get(2)?;
-    let field_diffs = row.get::<_, String>(3)?;
+    let character_id = row.get(2)?;
+    let message = row.get(3)?;
+    let field_diffs = row.get::<_, String>(4)?;
     let field_diffs = serde_json::from_str(&field_diffs).expect("Deserialize field_diffs");
     Ok(CharacterDelta { id, character_id, message, field_diffs })
 }
 
+fn list_characters(conn: Connection) -> DbResult<QueryResponse> {
+    let mut stmt = conn.prepare(
+        "SELECT * FROM character_delta
+        ORDER BY created ASC"
+    )?;
+
+    let character_list= stmt
+        .query_map([], map_character_delta)?
+        .map(|row| row.unwrap())
+        .fold(HashMap::<usize, Vec<CharacterDelta>>::new(), |mut accum, row| {
+            accum
+                .entry(row.character_id)
+                .and_modify(|e| e.push(row.clone()))
+                .or_insert(vec![row]);
+            accum
+        })
+        .iter()
+        .fold(
+            Vec::<Character>::new(),
+            |mut accum, (character_id, character_deltas)| {
+                accum.push(Character {
+                    id: character_id.to_string(),
+                    data: CharacterData::from(character_deltas.clone())
+                });
+                accum
+            }
+        );
+
+    Ok(QueryResponse::CharacterList(character_list))
+}
+
 fn get_character(conn: Connection, character_id: &str) -> DbResult<QueryResponse> {
     let mut stmt = conn.prepare(
-        "SELECT id, character_id, message, field_diffs
-        FROM character_delta
+        "SELECT * FROM character_delta
         WHERE character_id = ?1
         ORDER BY created ASC"
     )?;
@@ -94,8 +126,7 @@ fn create_character(conn: Connection) -> DbResult<QueryResponse> {
             (character_id, message, field_diffs)
         VALUES
             (:character_id, :message, :field_diffs)
-        RETURNING
-            id, character_id, message, field_diffs"
+        RETURNING *"
     )?;
 
     let character_id = rows.first().expect("Character ID");

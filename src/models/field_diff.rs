@@ -21,7 +21,7 @@ impl FieldDiff {
     }
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 pub struct FieldDiffs {
     pub data: Vec<FieldDiff>,
 }
