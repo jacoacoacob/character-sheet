@@ -4,6 +4,18 @@ use serde::{Deserialize, Serialize};
 
 use super::character_delta::CharacterDelta;
 
+#[derive(Default, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub struct Skill {
+    pub proficient: bool,
+    pub modifier: usize,
+}
+
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub enum FieldValue {
+    String(String),
+    Skill(Skill),
+}
+
 #[derive(Default, Serialize, Deserialize)]
 pub struct CharacterData {
     pub class: Option<String>,
@@ -30,23 +42,23 @@ pub struct CharacterData {
     pub saving_throw_charisma: Option<String>,
     pub death_save_fail: Option<String>,
     pub death_save_success: Option<String>,
-    pub skill_acrobatics: Option<String>,
-    pub skill_animal_handling: Option<String>,
-    pub skill_athletics: Option<String>,
-    pub skill_deception: Option<String>,
-    pub skill_history: Option<String>,
-    pub skill_insight: Option<String>,
-    pub skill_inimidation: Option<String>,
-    pub skill_investigation: Option<String>,
-    pub skill_medicine: Option<String>,
-    pub skill_nature: Option<String>,
-    pub skill_perception: Option<String>,
-    pub skill_performance: Option<String>,
-    pub skill_persuasion: Option<String>,
-    pub skill_religion: Option<String>,
-    pub skill_sleight_of_hand: Option<String>,
-    pub skill_stealth: Option<String>,
-    pub skill_survival: Option<String>,
+    pub skill_acrobatics: Option<Skill>,
+    pub skill_animal_handling: Option<Skill>,
+    pub skill_athletics: Option<Skill>,
+    pub skill_deception: Option<Skill>,
+    pub skill_history: Option<Skill>,
+    pub skill_insight: Option<Skill>,
+    pub skill_inimidation: Option<Skill>,
+    pub skill_investigation: Option<Skill>,
+    pub skill_medicine: Option<Skill>,
+    pub skill_nature: Option<Skill>,
+    pub skill_perception: Option<Skill>,
+    pub skill_performance: Option<Skill>,
+    pub skill_persuasion: Option<Skill>,
+    pub skill_religion: Option<Skill>,
+    pub skill_sleight_of_hand: Option<Skill>,
+    pub skill_stealth: Option<Skill>,
+    pub skill_survival: Option<Skill>,
     pub passive_wisdom: Option<String>,
     pub armor_class: Option<String>,
     pub initiative: Option<String>,
@@ -72,7 +84,7 @@ pub struct CharacterData {
 
 impl From<Vec<CharacterDelta>> for CharacterData {
     fn from(value: Vec<CharacterDelta>) -> Self {
-        let mut data = HashMap::new();
+        let mut data = HashMap::<String, FieldValue>::new();
 
         for delta in value {
             for diff in delta.field_diffs.data {
@@ -80,280 +92,253 @@ impl From<Vec<CharacterDelta>> for CharacterData {
             }
         }
 
-        let get_field = |field_name: &str| match &data.get(field_name) {
-            Some(value) => Some(value.to_string()),
-            None => None,
+        let get_string = |field_name: &str| match &data.get(field_name) {
+            Some(FieldValue::String(value)) => Some(value.to_string()),
+            _ => None,
+        };
+
+        let get_skill = |field_name: &str| match &data.get(field_name) {
+            Some(FieldValue::Skill(value)) => Some(value.clone()),
+            _ => None,
         };
 
         CharacterData {
-            class: get_field("class"),
-            level: get_field("level"),
-            background: get_field("background"),
-            character_name: get_field("character_name"),
-            player_name: get_field("player_name"),
-            race: get_field("race"),
-            alignment: get_field("alignment"),
-            xp: get_field("xp"),
-            score_stength: get_field("score_stength"),
-            score_dexterity: get_field("score_dexterity"),
-            score_constitution: get_field("score_constitution"),
-            score_intelligence: get_field("score_intelligence"),
-            score_wisdom: get_field("score_wisdom"),
-            score_charisma: get_field("score_charisma"),
-            inspiration: get_field("inspiration"),
-            proficiency_bonus: get_field("proficiency_bonus"),
-            saving_throw_str: get_field("saving_throw_str"),
-            saving_throw_dexterity: get_field("saving_throw_dexterity"),
-            saving_throw_constitution: get_field("saving_throw_constitution"),
-            saving_throw_intelligence: get_field("saving_throw_intelligence"),
-            saving_throw_wisdom: get_field("saving_throw_wisdom"),
-            saving_throw_charisma: get_field("saving_throw_charisma"),
-            death_save_fail: get_field("death_save_fail"),
-            death_save_success: get_field("death_save_success"),
-            skill_acrobatics: get_field("skill_acrobatics"),
-            skill_animal_handling: get_field("skill_animal_handling"),
-            skill_athletics: get_field("skill_athletics"),
-            skill_deception: get_field("skill_deception"),
-            skill_history: get_field("skill_history"),
-            skill_insight: get_field("skill_insight"),
-            skill_inimidation: get_field("skill_inimidation"),
-            skill_investigation: get_field("skill_investigation"),
-            skill_medicine: get_field("skill_medicine"),
-            skill_nature: get_field("skill_nature"),
-            skill_perception: get_field("skill_perception"),
-            skill_performance: get_field("skill_performance"),
-            skill_persuasion: get_field("skill_persuasion"),
-            skill_religion: get_field("skill_religion"),
-            skill_sleight_of_hand: get_field("skill_sleight_of_hand"),
-            skill_stealth: get_field("skill_stealth"),
-            skill_survival: get_field("skill_survival"),
-            passive_wisdom: get_field("passive_wisdom"),
-            armor_class: get_field("armor_class"),
-            initiative: get_field("initiative"),
-            speed: get_field("speed"),
-            hit_point_max: get_field("hit_point_max"),
-            hit_point_current: get_field("hit_point_current"),
-            hit_point_temp: get_field("hit_point_temp"),
-            hit_dice: get_field("hit_dice"),
-            hit_dice_current: get_field("hit_dice_current"),
-            hit_dice_total: get_field("hit_dice_total"),
-            cp: get_field("cp"),
-            sp: get_field("sp"),
-            ep: get_field("ep"),
-            gp: get_field("gp"),
-            pp: get_field("pp"),
-            equipment: get_field("equipment"),
-            personality_traits: get_field("personality_traits"),
-            ideals: get_field("ideals"),
-            bonds: get_field("bonds"),
-            flaws: get_field("flaws"),
-            features_and_traits: get_field("features_and_traits"),
+            class: get_string("class"),
+            level: get_string("level"),
+            background: get_string("background"),
+            character_name: get_string("character_name"),
+            player_name: get_string("player_name"),
+            race: get_string("race"),
+            alignment: get_string("alignment"),
+            xp: get_string("xp"),
+            score_stength: get_string("score_stength"),
+            score_dexterity: get_string("score_dexterity"),
+            score_constitution: get_string("score_constitution"),
+            score_intelligence: get_string("score_intelligence"),
+            score_wisdom: get_string("score_wisdom"),
+            score_charisma: get_string("score_charisma"),
+            inspiration: get_string("inspiration"),
+            proficiency_bonus: get_string("proficiency_bonus"),
+            saving_throw_str: get_string("saving_throw_str"),
+            saving_throw_dexterity: get_string("saving_throw_dexterity"),
+            saving_throw_constitution: get_string("saving_throw_constitution"),
+            saving_throw_intelligence: get_string("saving_throw_intelligence"),
+            saving_throw_wisdom: get_string("saving_throw_wisdom"),
+            saving_throw_charisma: get_string("saving_throw_charisma"),
+            death_save_fail: get_string("death_save_fail"),
+            death_save_success: get_string("death_save_success"),
+            skill_acrobatics: get_skill("skill_acrobatics"),
+            skill_animal_handling: get_skill("skill_animal_handling"),
+            skill_athletics: get_skill("skill_athletics"),
+            skill_deception: get_skill("skill_deception"),
+            skill_history: get_skill("skill_history"),
+            skill_insight: get_skill("skill_insight"),
+            skill_inimidation: get_skill("skill_inimidation"),
+            skill_investigation: get_skill("skill_investigation"),
+            skill_medicine: get_skill("skill_medicine"),
+            skill_nature: get_skill("skill_nature"),
+            skill_perception: get_skill("skill_perception"),
+            skill_performance: get_skill("skill_performance"),
+            skill_persuasion: get_skill("skill_persuasion"),
+            skill_religion: get_skill("skill_religion"),
+            skill_sleight_of_hand: get_skill("skill_sleight_of_hand"),
+            skill_stealth: get_skill("skill_stealth"),
+            skill_survival: get_skill("skill_survival"),
+            passive_wisdom: get_string("passive_wisdom"),
+            armor_class: get_string("armor_class"),
+            initiative: get_string("initiative"),
+            speed: get_string("speed"),
+            hit_point_max: get_string("hit_point_max"),
+            hit_point_current: get_string("hit_point_current"),
+            hit_point_temp: get_string("hit_point_temp"),
+            hit_dice: get_string("hit_dice"),
+            hit_dice_current: get_string("hit_dice_current"),
+            hit_dice_total: get_string("hit_dice_total"),
+            cp: get_string("cp"),
+            sp: get_string("sp"),
+            ep: get_string("ep"),
+            gp: get_string("gp"),
+            pp: get_string("pp"),
+            equipment: get_string("equipment"),
+            personality_traits: get_string("personality_traits"),
+            ideals: get_string("ideals"),
+            bonds: get_string("bonds"),
+            flaws: get_string("flaws"),
+            features_and_traits: get_string("features_and_traits"),
         }
     }
 }
 
-impl From<CharacterData> for HashMap<String, String> {
+impl From<CharacterData> for HashMap<String, FieldValue> {
     fn from(value: CharacterData) -> Self {
-        let mut data = HashMap::new();
-        data.insert("class".to_string(), value.class.unwrap_or_default());
-        data.insert("level".to_string(), value.level.unwrap_or_default());
-        data.insert(
-            "background".to_string(),
-            value.background.unwrap_or_default(),
-        );
+        let mut data = HashMap::<String, FieldValue>::new();
+
+        let fv_string = |v: Option<String>| FieldValue::String(v.unwrap_or_default());
+        let fv_skill = |v: Option<Skill>| FieldValue::Skill(v.unwrap_or_default());
+
+        data.insert("class".to_string(), fv_string(value.class));
+        data.insert("level".to_string(), fv_string(value.level));
+        data.insert("background".to_string(), fv_string(value.background));
         data.insert(
             "character_name".to_string(),
-            value.character_name.unwrap_or_default(),
+            fv_string(value.character_name),
         );
-        data.insert(
-            "player_name".to_string(),
-            value.player_name.unwrap_or_default(),
-        );
-        data.insert("race".to_string(), value.race.unwrap_or_default());
-        data.insert("alignment".to_string(), value.alignment.unwrap_or_default());
-        data.insert("xp".to_string(), value.xp.unwrap_or_default());
-        data.insert(
-            "score_stength".to_string(),
-            value.score_stength.unwrap_or_default(),
-        );
+        data.insert("player_name".to_string(), fv_string(value.player_name));
+        data.insert("race".to_string(), fv_string(value.race));
+        data.insert("alignment".to_string(), fv_string(value.alignment));
+        data.insert("xp".to_string(), fv_string(value.xp));
+        data.insert("score_stength".to_string(), fv_string(value.score_stength));
         data.insert(
             "score_dexterity".to_string(),
-            value.score_dexterity.unwrap_or_default(),
+            fv_string(value.score_dexterity),
         );
         data.insert(
             "score_constitution".to_string(),
-            value.score_constitution.unwrap_or_default(),
+            fv_string(value.score_constitution),
         );
         data.insert(
             "score_intelligence".to_string(),
-            value.score_intelligence.unwrap_or_default(),
+            fv_string(value.score_intelligence),
         );
-        data.insert(
-            "score_wisdom".to_string(),
-            value.score_wisdom.unwrap_or_default(),
-        );
+        data.insert("score_wisdom".to_string(), fv_string(value.score_wisdom));
         data.insert(
             "score_charisma".to_string(),
-            value.score_charisma.unwrap_or_default(),
+            fv_string(value.score_charisma),
         );
-        data.insert(
-            "inspiration".to_string(),
-            value.inspiration.unwrap_or_default(),
-        );
+        data.insert("inspiration".to_string(), fv_string(value.inspiration));
         data.insert(
             "proficiency_bonus".to_string(),
-            value.proficiency_bonus.unwrap_or_default(),
+            fv_string(value.proficiency_bonus),
         );
         data.insert(
             "saving_throw_str".to_string(),
-            value.saving_throw_str.unwrap_or_default(),
+            fv_string(value.saving_throw_str),
         );
         data.insert(
             "saving_throw_dexterity".to_string(),
-            value.saving_throw_dexterity.unwrap_or_default(),
+            fv_string(value.saving_throw_dexterity),
         );
         data.insert(
             "saving_throw_constitution".to_string(),
-            value.saving_throw_constitution.unwrap_or_default(),
+            fv_string(value.saving_throw_constitution),
         );
         data.insert(
             "saving_throw_intelligence".to_string(),
-            value.saving_throw_intelligence.unwrap_or_default(),
+            fv_string(value.saving_throw_intelligence),
         );
         data.insert(
             "saving_throw_wisdom".to_string(),
-            value.saving_throw_wisdom.unwrap_or_default(),
+            fv_string(value.saving_throw_wisdom),
         );
         data.insert(
             "saving_throw_charisma".to_string(),
-            value.saving_throw_charisma.unwrap_or_default(),
+            fv_string(value.saving_throw_charisma),
         );
         data.insert(
             "death_save_fail".to_string(),
-            value.death_save_fail.unwrap_or_default(),
+            fv_string(value.death_save_fail),
         );
         data.insert(
             "death_save_success".to_string(),
-            value.death_save_success.unwrap_or_default(),
+            fv_string(value.death_save_success),
         );
         data.insert(
             "skill_acrobatics".to_string(),
-            value.skill_acrobatics.unwrap_or_default(),
+            fv_skill(value.skill_acrobatics),
         );
         data.insert(
             "skill_animal_handling".to_string(),
-            value.skill_animal_handling.unwrap_or_default(),
+            fv_skill(value.skill_animal_handling),
         );
         data.insert(
             "skill_athletics".to_string(),
-            value.skill_athletics.unwrap_or_default(),
+            fv_skill(value.skill_athletics),
         );
         data.insert(
             "skill_deception".to_string(),
-            value.skill_deception.unwrap_or_default(),
+            fv_skill(value.skill_deception),
         );
-        data.insert(
-            "skill_history".to_string(),
-            value.skill_history.unwrap_or_default(),
-        );
-        data.insert(
-            "skill_insight".to_string(),
-            value.skill_insight.unwrap_or_default(),
-        );
+        data.insert("skill_history".to_string(), fv_skill(value.skill_history));
+        data.insert("skill_insight".to_string(), fv_skill(value.skill_insight));
         data.insert(
             "skill_inimidation".to_string(),
-            value.skill_inimidation.unwrap_or_default(),
+            fv_skill(value.skill_inimidation),
         );
         data.insert(
             "skill_investigation".to_string(),
-            value.skill_investigation.unwrap_or_default(),
+            fv_skill(value.skill_investigation),
         );
-        data.insert(
-            "skill_medicine".to_string(),
-            value.skill_medicine.unwrap_or_default(),
-        );
-        data.insert(
-            "skill_nature".to_string(),
-            value.skill_nature.unwrap_or_default(),
-        );
+        data.insert("skill_medicine".to_string(), fv_skill(value.skill_medicine));
+        data.insert("skill_nature".to_string(), fv_skill(value.skill_nature));
         data.insert(
             "skill_perception".to_string(),
-            value.skill_perception.unwrap_or_default(),
+            fv_skill(value.skill_perception),
         );
         data.insert(
             "skill_performance".to_string(),
-            value.skill_performance.unwrap_or_default(),
+            fv_skill(value.skill_performance),
         );
         data.insert(
             "skill_persuasion".to_string(),
-            value.skill_persuasion.unwrap_or_default(),
+            fv_skill(value.skill_persuasion),
         );
-        data.insert(
-            "skill_religion".to_string(),
-            value.skill_religion.unwrap_or_default(),
-        );
+        data.insert("skill_religion".to_string(), fv_skill(value.skill_religion));
         data.insert(
             "skill_sleight_of_hand".to_string(),
-            value.skill_sleight_of_hand.unwrap_or_default(),
+            fv_skill(value.skill_sleight_of_hand),
         );
-        data.insert(
-            "skill_stealth".to_string(),
-            value.skill_stealth.unwrap_or_default(),
-        );
-        data.insert(
-            "skill_survival".to_string(),
-            value.skill_survival.unwrap_or_default(),
-        );
+        data.insert("skill_stealth".to_string(), fv_skill(value.skill_stealth));
+        data.insert("skill_survival".to_string(), fv_skill(value.skill_survival));
         data.insert(
             "passive_wisdom".to_string(),
-            value.passive_wisdom.unwrap_or_default(),
+            fv_string(value.passive_wisdom),
         );
         data.insert(
             "armor_class".to_string(),
-            value.armor_class.unwrap_or_default(),
+            fv_string(value.armor_class),
         );
         data.insert(
             "initiative".to_string(),
-            value.initiative.unwrap_or_default(),
+            fv_string(value.initiative),
         );
-        data.insert("speed".to_string(), value.speed.unwrap_or_default());
+        data.insert("speed".to_string(), fv_string(value.speed));
         data.insert(
             "hit_point_max".to_string(),
-            value.hit_point_max.unwrap_or_default(),
+            fv_string(value.hit_point_max),
         );
         data.insert(
             "hit_point_current".to_string(),
-            value.hit_point_current.unwrap_or_default(),
+            fv_string(value.hit_point_current),
         );
         data.insert(
             "hit_point_temp".to_string(),
-            value.hit_point_temp.unwrap_or_default(),
+            fv_string(value.hit_point_temp),
         );
-        data.insert("hit_dice".to_string(), value.hit_dice.unwrap_or_default());
+        data.insert("hit_dice".to_string(), fv_string(value.hit_dice));
         data.insert(
             "hit_dice_current".to_string(),
-            value.hit_dice_current.unwrap_or_default(),
+            fv_string(value.hit_dice_current),
         );
         data.insert(
             "hit_dice_total".to_string(),
-            value.hit_dice_total.unwrap_or_default(),
+            fv_string(value.hit_dice_total),
         );
-        data.insert("cp".to_string(), value.cp.unwrap_or_default());
-        data.insert("sp".to_string(), value.sp.unwrap_or_default());
-        data.insert("ep".to_string(), value.ep.unwrap_or_default());
-        data.insert("gp".to_string(), value.gp.unwrap_or_default());
-        data.insert("pp".to_string(), value.pp.unwrap_or_default());
-        data.insert("equipment".to_string(), value.equipment.unwrap_or_default());
+        data.insert("cp".to_string(), fv_string(value.cp));
+        data.insert("sp".to_string(), fv_string(value.sp));
+        data.insert("ep".to_string(), fv_string(value.ep));
+        data.insert("gp".to_string(), fv_string(value.gp));
+        data.insert("pp".to_string(), fv_string(value.pp));
+        data.insert("equipment".to_string(), fv_string(value.equipment));
         data.insert(
             "personality_traits".to_string(),
-            value.personality_traits.unwrap_or_default(),
+            fv_string(value.personality_traits),
         );
-        data.insert("ideals".to_string(), value.ideals.unwrap_or_default());
-        data.insert("bonds".to_string(), value.bonds.unwrap_or_default());
-        data.insert("flaws".to_string(), value.flaws.unwrap_or_default());
+        data.insert("ideals".to_string(), fv_string(value.ideals));
+        data.insert("bonds".to_string(), fv_string(value.bonds));
+        data.insert("flaws".to_string(), fv_string(value.flaws));
         data.insert(
             "features_and_traits".to_string(),
-            value.features_and_traits.unwrap_or_default(),
+            fv_string(value.features_and_traits),
         );
         data
     }
