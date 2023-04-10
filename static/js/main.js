@@ -31,7 +31,22 @@
                     "xp",
                 ]
             )
-        )
+        );
+
+        fields.appendChild(
+            createFieldGroup(
+                "abilities",
+                createAbilityField,
+                [
+                    ["ability_strength", "Strength"],
+                    ["ability_dexterity", "Dexterity"],
+                    ["ability_constitution", "Constitution"],
+                    ["ability_intelligence", "Intelligence"],
+                    ["ability_wisdom", "Wisdom"],
+                    ["ability_charisma", "Charisma"],
+                ]
+            )
+        );
 
         fields.appendChild(
             createFieldGroup(
@@ -125,6 +140,55 @@
             });
 
         return group;
+    }
+
+    function createInput(attributes, label) {
+        const input = document.createElement("input");
+
+        Object.entries(attributes).forEach(([attribute, value]) => {
+            input.setAttribute(attribute, value);
+        });
+
+        return input;
+    }
+
+    function createLabel(textContent, htmlFor) {
+        const label = document.createElement("label");
+
+        label.setAttribute("for", htmlFor);
+        label.textContent = textContent;
+
+        return label;
+    }
+
+    function createAbilityField(fieldName, label) {
+        const wrapper = document.createElement("div");
+
+        const score = createInput({
+            value: formModel[fieldName].score,
+            id: `${fieldName}-score`,
+        });
+
+        const scoreLabel = createLabel(label, score.id);
+
+        const modifier = createInput({
+            value: formModel[fieldName].modifier,
+            id: `${fieldName}-modifier`,
+        });
+
+        score.addEventListener("input", (ev) => {
+            formModel[fieldName].score = ev.target.value;
+        });
+
+        modifier.addEventListener("input", (ev) => {
+            formModel[fieldName].modifier = ev.target.value;
+        });
+
+        wrapper.appendChild(scoreLabel);
+        wrapper.appendChild(score);
+        wrapper.appendChild(modifier);
+
+        return wrapper;
     }
 
     function createProficiencyField(fieldName, label) {

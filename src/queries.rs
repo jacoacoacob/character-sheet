@@ -145,7 +145,7 @@ fn create_character(conn: &Connection) -> DbResult<QueryResponse> {
     )?;
 
     let character_id = rows.first().expect("Character ID");
-    let message = String::from("first commit");
+    let message = String::from("created new blank character");
     let field_diffs = FieldDiffs::from((None, Some(CharacterData::default())));
 
     let rows: Vec<CharacterDelta> = stmt_insert_character_delta

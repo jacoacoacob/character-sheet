@@ -4,16 +4,23 @@ use serde::{Deserialize, Serialize};
 
 use super::character_delta::CharacterDelta;
 
-#[derive(Default, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Proficiency {
     pub proficient: bool,
     pub modifier: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Default, Serialize, Deserialize, Clone, PartialEq)]
+pub struct Ability {
+    pub score: String,
+    pub modifier: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, PartialEq)]
 pub enum FieldValue {
     String(String),
     Proficiency(Proficiency),
+    Ability(Ability),
 }
 
 #[derive(Default, Serialize, Deserialize)]
@@ -26,12 +33,12 @@ pub struct CharacterData {
     pub parentage: Option<String>,
     pub alignment: Option<String>,
     pub xp: Option<String>,
-    pub score_stength: Option<String>,
-    pub score_dexterity: Option<String>,
-    pub score_constitution: Option<String>,
-    pub score_intelligence: Option<String>,
-    pub score_wisdom: Option<String>,
-    pub score_charisma: Option<String>,
+    pub ability_strength: Option<Ability>,
+    pub ability_dexterity: Option<Ability>,
+    pub ability_constitution: Option<Ability>,
+    pub ability_intelligence: Option<Ability>,
+    pub ability_wisdom: Option<Ability>,
+    pub ability_charisma: Option<Ability>,
     pub inspiration: Option<String>,
     pub proficiency_bonus: Option<String>,
     pub saving_throw_strength: Option<Proficiency>,
@@ -98,6 +105,11 @@ impl From<Vec<CharacterDelta>> for CharacterData {
             _ => None,
         };
 
+        let get_ability = |field_name: &str| match &data.get(field_name) {
+            Some(FieldValue::Ability(value)) => Some(value.clone()),
+            _ => None,
+        };
+
         let get_proficiency = |field_name: &str| match &data.get(field_name) {
             Some(FieldValue::Proficiency(value)) => Some(value.clone()),
             _ => None,
@@ -112,12 +124,12 @@ impl From<Vec<CharacterDelta>> for CharacterData {
             parentage: get_string("parentage"),
             alignment: get_string("alignment"),
             xp: get_string("xp"),
-            score_stength: get_string("score_stength"),
-            score_dexterity: get_string("score_dexterity"),
-            score_constitution: get_string("score_constitution"),
-            score_intelligence: get_string("score_intelligence"),
-            score_wisdom: get_string("score_wisdom"),
-            score_charisma: get_string("score_charisma"),
+            ability_strength: get_ability("ability_strength"),
+            ability_dexterity: get_ability("ability_dexterity"),
+            ability_constitution: get_ability("ability_constitution"),
+            ability_intelligence: get_ability("ability_intelligence"),
+            ability_wisdom: get_ability("ability_wisdom"),
+            ability_charisma: get_ability("ability_charisma"),
             inspiration: get_string("inspiration"),
             proficiency_bonus: get_string("proficiency_bonus"),
             saving_throw_strength: get_proficiency("saving_throw_strength"),
@@ -176,6 +188,9 @@ impl From<CharacterData> for HashMap<String, FieldValue> {
         let mut data = HashMap::<String, FieldValue>::new();
 
         let fv_string = |v: Option<String>| FieldValue::String(v.unwrap_or_default());
+
+        let fv_ability = |v: Option<Ability>| FieldValue::Ability(v.unwrap_or_default());
+
         let fv_proficiency =
             |v: Option<Proficiency>| FieldValue::Proficiency(v.unwrap_or_default());
 
@@ -190,25 +205,34 @@ impl From<CharacterData> for HashMap<String, FieldValue> {
         data.insert("parentage".to_string(), fv_string(value.parentage));
         data.insert("alignment".to_string(), fv_string(value.alignment));
         data.insert("xp".to_string(), fv_string(value.xp));
-        data.insert("score_stength".to_string(), fv_string(value.score_stength));
         data.insert(
-            "score_dexterity".to_string(),
-            fv_string(value.score_dexterity),
+            "ability_strength".to_string(),
+            fv_ability(value.ability_strength),
         );
         data.insert(
-            "score_constitution".to_string(),
-            fv_string(value.score_constitution),
+            "ability_dexterity".to_string(),
+            fv_ability(value.ability_dexterity),
         );
         data.insert(
-            "score_intelligence".to_string(),
-            fv_string(value.score_intelligence),
+            "ability_constitution".to_string(),
+            fv_ability(value.ability_constitution),
         );
-        data.insert("score_wisdom".to_string(), fv_string(value.score_wisdom));
         data.insert(
-            "score_charisma".to_string(),
-            fv_string(value.score_charisma),
+            "ability_intelligence".to_string(),
+            fv_ability(value.ability_intelligence),
         );
-        data.insert("inspiration".to_string(), fv_string(value.inspiration));
+        data.insert(
+            "ability_wisdom".to_string(),
+            fv_ability(value.ability_wisdom),
+        );
+        data.insert(
+            "ability_charisma".to_string(),
+            fv_ability(value.ability_charisma),
+        );
+        data.insert(
+            "ability_inspiration".to_string(),
+            fv_string(value.inspiration),
+        );
         data.insert(
             "proficiency_bonus".to_string(),
             fv_string(value.proficiency_bonus),

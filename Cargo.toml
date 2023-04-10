@@ -1,5 +1,5 @@
 [package]
-name = "character-sheet-rs"
+name = "character-sheet"
 version = "0.1.0"
 edition = "2021"
 
