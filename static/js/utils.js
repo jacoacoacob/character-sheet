@@ -30,12 +30,28 @@ function stylize(style, element) {
     });
 }
 
+function attribute(attrs, element) {
+    Object.entries(attrs).forEach(([attrName, attrValue]) => {
+        element.setAttribute(attrName, attrValue);
+    });
+}
+
+function createField(field, name, label) {
+    if (typeof label === "string") {
+        return field(name, label);
+    }
+    return field(
+        name,
+        name.split("_").map((part) => part[0].toUpperCase() + part.slice(1)).join(" ")
+    );
+}
+
 function checkIsDirty(input, formValue, apiValue) {
     if (formValue !== apiValue) {
-        input.classList.add("dirty");
+        input.classList.add("input--dirty");
     } else {
-        input.classList.remove("dirty");
+        input.classList.remove("input--dirty");
     }
 }
 
-export { deepCopy, classify, stylize, checkIsDirty };
+export { createField, attribute, deepCopy, classify, stylize, checkIsDirty };

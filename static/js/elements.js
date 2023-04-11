@@ -1,4 +1,4 @@
-import { classify, stylize, checkIsDirty } from "./utils.js";
+import { classify, stylize, checkIsDirty, attribute } from "./utils.js";
 
 function containerFactory(wrapperClassName = "") {
     /**
@@ -10,18 +10,39 @@ function containerFactory(wrapperClassName = "") {
      */
     return ({ className = "", style = {}, children = [] } = {}) => {
         const field = document.createElement("div");
-    
+
         classify(wrapperClassName, field);
         classify(className, field);
 
         stylize(style, field);
-    
+
         children.forEach((child) => {
             field.appendChild(child)
         });
-    
+
         return field;
     }
+}
+
+/**
+ * @param {{
+ *  className?: string;
+ *  style?: ElementCSSInlineStyle["style"];
+ *  children?: HTMLElement[];
+ * }} param0
+ */
+function createDiv({ className = "", style = {}, children = [] } = {}) {
+    const div = document.createElement("div");
+
+    classify(className, div);
+
+    stylize(style, div);
+
+    children.forEach((child) => {
+        div.appendChild(child)
+    });
+
+    return div;
 }
 
 const createField = containerFactory("field");
@@ -43,9 +64,7 @@ function createInput({ className = "", style = {}, attrs = {}, onInput = () => v
 
     stylize(style, input);
 
-    Object.entries(attrs).forEach(([attrName, attrValue]) => {
-        input.setAttribute(attrName, attrValue);
-    });
+    attribute(attrs, input);
 
     input.addEventListener("input", onInput);
 
@@ -62,7 +81,7 @@ function createInput({ className = "", style = {}, attrs = {}, onInput = () => v
 */
 function createLabel({ className = "", style = {}, text = "", forId = "" } = {}) {
     const label = document.createElement("label");
-    
+
     classify(className, label);
 
     stylize(style, label);
@@ -82,141 +101,12 @@ function createHeader(level, text) {
 }
 
 
-function abilityFieldFactory(formModel, apiModel) {
-    return (fieldName, fieldLabelText) => {
-        const fieldLabel = createLabel({ text: fieldLabelText });
-
-        const scoreInput = createInput({
-            style: {
-                fontSize: "14px",
-                width: "80px"
-            },
-            attrs: {
-                value: formModel[fieldName].score,
-                id: `${fieldName}-score`,
-            },
-            onInput(ev) {
-                formModel[fieldName].score = ev.target.value.trim();
-                checkIsDirty(
-                    ev.target,
-                    formModel[fieldName].score,
-                    apiModel[fieldName].score,
-                );
-            }
-        });
-
-        const scoreInputLabel = createLabel({
-            text: "score",
-            forId: scoreInput.id,
-            style: {
-                fontSize: "12px"
-            },
-        });
-
-        const modifierInput = createInput({
-            style: {
-                fontSize: "14px",
-                width: "50px",
-            },
-            attrs: {
-                value: formModel[fieldName].modifier,
-                id: `${fieldName}-modifier`,
-            },
-            onInput(ev) {
-                formModel[fieldName].modifier = ev.target.value.trim();
-                checkIsDirty(
-                    ev.target,
-                    formModel[fieldName].modifier,
-                    apiModel[fieldName].modifier
-                );
-            }
-        });
-
-        const modifierInputLabel = createLabel({
-            text: "modifier",
-            forId: modifierInput.id,
-            style: {
-                fontSize: "12px"
-            },
-        });
-
-        return createField({
-            children: [
-                createRow({ children: [fieldLabel] }),
-                createRow({
-                    children: [
-                        createCol({ children: [scoreInputLabel, scoreInput] }),
-                        createCol({ children: [modifierInputLabel, modifierInput] }),
-                    ],
-                }),
-            ],
-        });
-    };
-}
-
-function proficiencyFieldFactory(formModel, apiModel) {
-    return (fieldName, fieldLabelText) => {
-        const fieldLabel = createLabel({ text: fieldLabelText });
-
-        const proficientInput = createInput({
-            attrs: {
-                type: "checkbox",
-                value: formModel[fieldName].proficient,
-                id: `${fieldName}-proficient`,
-            },
-            onInput(ev) {
-                formModel[fieldName].proficient = ev.target.checked;
-                checkIsDirty(
-                    ev.target,
-                    formModel[fieldName].proficient,
-                    apiModel[fieldName].proficient,
-                );
-            }
-        });
-
-        const proficientInputLabel = createLabel({
-            text: "proficient",
-            forId: proficientInput.id
-        });
-
-        const modifierInput = createInput({
-            attrs: {
-                value: formModel[fieldName].modifier,
-                id: `${fieldName}-modifier`,
-            },
-            onInput(ev) {
-                formModel[fieldName].modifier = ev.target.value.trim();
-                checkIsDirty(
-                    ev.target,
-                    formModel[fieldName].modifier,
-                    apiModel[fieldName].modifier
-                );
-            }
-        });
-
-        const modifierInputLabel = createLabel({ text: "modifier", forId: modifierInput.id });
-
-        return createField({
-            children: [
-                createRow({ children: [fieldLabel] }),
-                createRow({
-                    children: [
-                        createCol({ children: [proficientInputLabel, proficientInput] }),
-                        createCol({ children: [modifierInputLabel, modifierInput] }),
-                    ]
-                }),
-            ],
-        });
-    };
-}
-
 export {
+    createDiv,
     createCol,
     createField,
     createHeader,
     createInput,
     createLabel,
     createRow,
-    abilityFieldFactory,
-    proficiencyFieldFactory,
 };
