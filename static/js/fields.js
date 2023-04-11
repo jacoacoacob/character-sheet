@@ -1,16 +1,10 @@
-import {
-    createDiv,
-    createCol,
-    createField,
-    createHeader,
-    createInput,
-    createLabel,
-    createRow,
-} from "./elements.js";
+import { createDiv, createInput, createLabel } from "./elements.js";
 import { checkIsDirty } from "./utils.js";
 
 
-function textFieldFactory(formModel, apiModel) {
+function textFieldFactory(context = {}) {
+    const { formModel, apiModel, dirtyFields } = context;
+
     return (fieldName, fieldLabelText) => {
         const input = createInput({
             className: "input",
@@ -20,11 +14,11 @@ function textFieldFactory(formModel, apiModel) {
             },
             onInput(ev) {
                 formModel[fieldName] = ev.target.value.trim();
-                checkIsDirty(
-                    ev.target,
-                    formModel[fieldName],
-                    apiModel[fieldName]
-                );
+                if (checkIsDirty(ev.target, formModel[fieldName], apiModel[fieldName])) {
+                    dirtyFields.push(ev.target.id);
+                } else {
+                    dirtyFields.splice(dirtyFields.indexOf(ev.target.id), 1);
+                }
             }
         });
 
@@ -44,7 +38,7 @@ function textFieldFactory(formModel, apiModel) {
     }
 }
 
-function abilityFieldFactory(formModel, apiModel) {
+function abilityFieldFactory({ formModel, apiModel, dirtyFields } = {}) {
     return (fieldName, fieldLabelText) => {
         const fieldLabel = createLabel({
             text: fieldLabelText,
@@ -59,21 +53,16 @@ function abilityFieldFactory(formModel, apiModel) {
             attrs: {
                 value: formModel[fieldName].score,
                 id: `${fieldName}-score`,
+                placeholder: "score",
             },
             onInput(ev) {
                 formModel[fieldName].score = ev.target.value.trim();
-                checkIsDirty(
-                    ev.target,
-                    formModel[fieldName].score,
-                    apiModel[fieldName].score,
-                );
+                if (checkIsDirty(ev.target, formModel[fieldName].score, apiModel[fieldName].score)) {
+                    dirtyFields.push(ev.target.id);
+                } else {
+                    dirtyFields.splice(dirtyFields.indexOf(ev.target.id), 1);
+                }
             }
-        });
-
-        const scoreInputLabel = createLabel({
-            text: "score",
-            forId: scoreInput.id,
-            className: "label"
         });
 
         const modifierInput = createInput({
@@ -84,37 +73,27 @@ function abilityFieldFactory(formModel, apiModel) {
             attrs: {
                 value: formModel[fieldName].modifier,
                 id: `${fieldName}-modifier`,
+                placeholder: "mod"
             },
             onInput(ev) {
                 formModel[fieldName].modifier = ev.target.value.trim();
-                checkIsDirty(
-                    ev.target,
-                    formModel[fieldName].modifier,
-                    apiModel[fieldName].modifier
-                );
+                if (checkIsDirty(ev.target, formModel[fieldName].modifier, apiModel[fieldName].modifier)) {
+                    dirtyFields.push(ev.target.id);
+                } else {
+                    dirtyFields.splice(dirtyFields.indexOf(ev.target.id), 1);
+                }
             }
         });
 
-        const modifierInputLabel = createLabel({
-            text: "modifier",
-            forId: modifierInput.id,
-            className: "label"
-        });
-
         return createDiv({
+            className: "space-y-2",
             children: [
                 fieldLabel,
                 createDiv({
                     className: "flex align-center space-x-2",
                     children: [
-                        createDiv({
-                            className: "flex flex-col",
-                            children: [scoreInputLabel, scoreInput],
-                        }),
-                        createField({
-                            className: "flex flex-col",
-                            children: [modifierInputLabel, modifierInput],
-                        }),
+                        scoreInput,
+                        modifierInput,
                     ],
                 }),
             ],
@@ -122,7 +101,7 @@ function abilityFieldFactory(formModel, apiModel) {
     };
 }
 
-function proficiencyFieldFactory(formModel, apiModel) {
+function proficiencyFieldFactory({ formModel, apiModel, dirtyFields } = {}) {
     return (fieldName, fieldLabelText) => {
         const fieldLabel = createLabel({
             className: "label label--bold",
@@ -138,11 +117,11 @@ function proficiencyFieldFactory(formModel, apiModel) {
             },
             onInput(ev) {
                 formModel[fieldName].proficient = ev.target.checked;
-                checkIsDirty(
-                    ev.target,
-                    formModel[fieldName].proficient,
-                    apiModel[fieldName].proficient,
-                );
+                if (checkIsDirty(ev.target, formModel[fieldName].proficient, apiModel[fieldName].proficient)) {
+                    dirtyFields.push(ev.target.id);
+                } else {
+                    dirtyFields.splice(dirtyFields.indexOf(ev.target.id), 1);
+                }
             }
         });
 
@@ -154,11 +133,11 @@ function proficiencyFieldFactory(formModel, apiModel) {
             },
             onInput(ev) {
                 formModel[fieldName].modifier = ev.target.value.trim();
-                checkIsDirty(
-                    ev.target,
-                    formModel[fieldName].modifier,
-                    apiModel[fieldName].modifier
-                );
+                if (checkIsDirty(ev.target, formModel[fieldName].modifier, apiModel[fieldName].modifier)) {
+                    dirtyFields.push(ev.target.id);
+                } else {
+                    dirtyFields.splice(dirtyFields.indexOf(ev.target.id), 1);
+                }
             }
         });
 

@@ -1,5 +1,5 @@
 
-/* Element styles */
+/* Elements */
 
 *,
 *::after,
@@ -12,7 +12,8 @@ html {
 }
 
 h1,h2,h3,h4,h5,h6,p {
-    margin: 0;
+    margin-top: 0;
+    margin-bottom: 12px;
 }
 
 input, textarea, button {
@@ -21,41 +22,11 @@ input, textarea, button {
 }
 
 main {
-    padding: 0 32px;
+    padding: 0 16px;
 }
 
 
-/* Component styles */
-
-.field {
-    padding: 4px 0;
-}
-
-.field-group {
-    display: flex;
-    flex-direction: column;
-}
-
-/* .field-group .text-field:not(:last-child) {
-    margin-right: 4px;
-}
-
-
-.field-group__fields {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.field-group__fields > .field:not(:last-child) {
-    margin-right: 16px;
-} 
-.text-field {
-    display: flex;
-    flex-direction: column;
-}
-.text-field > *:not(:last-child) {
-    margin-bottom: 2px;
-} */
+/* Utilities */
 
 .flex {
     display: flex;
@@ -66,6 +37,9 @@ main {
 .flex-wrap {
     flex-wrap: wrap;
 }
+.flex-1 {
+    flex: 1;
+}
 
 .justify-start {
     justify-content: flex-start;
@@ -75,6 +49,12 @@ main {
 }
 .justify-end {
     justify-content: flex-end;
+}
+.justify-evenly {
+    justify-content: space-evenly;
+}
+.justify-between {
+    justify-content: space-between;
 }
 
 .align-start {
@@ -149,16 +129,10 @@ main {
     margin-bottom: 64px;
 }
 
-.row {
-    display: flex;
-}
-.col {
-    display: flex;
-    flex-direction: column;
-}
+/* Components */
 
 .field-group {
-    background-color: #dde;
+    background-color: #e8eaec;
     padding: 12px;
     border-radius: 4px;
 }
@@ -169,6 +143,9 @@ main {
 }
 .input--bold {
     font-weight: 600;
+}
+.input--bold::placeholder {
+    font-weight: 400;
 }
 .input--dirty {
     box-shadow: 0 0 0 4px #be56fa

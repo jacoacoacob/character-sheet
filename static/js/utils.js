@@ -49,9 +49,10 @@ function createField(field, name, label) {
 function checkIsDirty(input, formValue, apiValue) {
     if (formValue !== apiValue) {
         input.classList.add("input--dirty");
-    } else {
-        input.classList.remove("input--dirty");
+        return true;
     }
+    input.classList.remove("input--dirty");
+    return false;
 }
 
 export { createField, attribute, deepCopy, classify, stylize, checkIsDirty };

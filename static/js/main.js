@@ -2,19 +2,25 @@ import { abilityFieldFactory, proficiencyFieldFactory, textFieldFactory } from "
 import { createDiv, createHeader } from "./elements.js";
 import { deepCopy, createField } from "./utils.js";
 
-window.deepCopy = deepCopy;
-
 const characterId = INITIAL_DATA.id;
 
 const apiModel = deepCopy(INITIAL_DATA.data);
 const formModel = deepCopy(INITIAL_DATA.data);
 
+const dirtyFields = [];
+
+const context = {
+    apiModel,
+    formModel,
+    dirtyFields,
+};
+
 window.apiModel = apiModel;
 window.formModel = formModel;
 
-const abilityField = abilityFieldFactory(formModel, apiModel);
-const textField = textFieldFactory(formModel, apiModel);
-const proficiencyField = proficiencyFieldFactory(formModel, apiModel);
+const abilityField = abilityFieldFactory(context);
+const textField = textFieldFactory(context);
+const proficiencyField = proficiencyFieldFactory(context);
 
 setupFields();
 setupCommitForm();
@@ -26,82 +32,111 @@ function setupFields() {
 
     fields.appendChild(
         createDiv({
-            className: "space-y-3 field-group",
-            children: [
-                createHeader(3, "General"),
-                createDiv({
-                    className: "flex space-x-4",
-                    children: [
-                        createField(textField, "character_name"),
-                        createField(textField, "class"),
-                        createField(textField, "parentage"),
-                        createField(textField, "level"),
-                    ],
-                }),
-                createDiv({
-                    className: "flex space-x-4",
-                    children: [
-                        createField(textField, "player_name"),
-                        createField(textField, "background"),
-                        createField(textField, "alignment"),
-                        createField(textField, "xp"),
-                    ],
-                }),
-            ],
-        })
-    );
-
-    fields.appendChild(
-        createDiv({
-            className: "flex space-x-4",
+            className: "flex space-x-6",
             children: [
                 createDiv({
-                    className: "field-group",
+                    className: "space-y-4",
                     children: [
-                        createHeader(3, "Abilities"),
-                        createField(abilityField, "ability_strength", "Strength"),
-                        createField(abilityField, "ability_dexterity", "Dexterity"),
-                        createField(abilityField, "ability_constitution", "Constitution"),
-                        createField(abilityField, "ability_intelligence", "Intelligence"),
-                        createField(abilityField, "ability_wisdom", "Wisdom"),
-                        createField(abilityField, "ability_charisma", "Charisma"),
-                    ],
-                }),
-                createDiv({
-                    className: "space-x-10 space-y-4 field-group",
-                    children: [
-                        createHeader(3, "Saving Throws"),
                         createDiv({
-                            className: "flex space-x-6",
+                            className: "space-y-3 field-group",
                             children: [
                                 createDiv({
-                                    className: "space-y-4",
+                                    className: "flex space-x-4",
+                                    children: [
+                                        createField(textField, "character_name"),
+                                        createField(textField, "class"),
+                                        createField(textField, "parentage"),
+                                        createField(textField, "level"),
+                                    ],
+                                }),
+                                createDiv({
+                                    className: "flex space-x-4",
+                                    children: [
+                                        createField(textField, "player_name"),
+                                        createField(textField, "background"),
+                                        createField(textField, "alignment"),
+                                        createField(textField, "xp"),
+                                    ],
+                                }),
+                            ]
+                        }),
+                        createDiv({
+                            className: "space-x-4 flex",
+                            children: [
+                                createDiv({
+                                    className: "space-y-4 flex flex-col justify-between",
                                     children: [
                                         createDiv({
+                                            className: "field-group flex-1",
+                                            children: [
+                                                createDiv({
+                                                    className: "space-y-3",
+                                                    children: [
+                                                        createHeader(4, "Ability Scores"),
+                                                        createField(abilityField, "ability_strength", "Strength"),
+                                                        createField(abilityField, "ability_dexterity", "Dexterity"),
+                                                        createField(abilityField, "ability_constitution", "Constitution"),
+                                                        createField(abilityField, "ability_intelligence", "Intelligence"),
+                                                        createField(abilityField, "ability_wisdom", "Wisdom"),
+                                                        createField(abilityField, "ability_charisma", "Charisma"),
+                                                    ],
+                                                }),
+                                            ],
+                                        }),
+                                    ],
+                                }),
+                                createDiv({
+                                    className: "space-y-4 flex flex-col justify-between",
+                                    children: [
+                                        createDiv({
+                                            className: "field-group flex-1 space-y-3",
+                                            children: [
+                                                createDiv({
+                                                    className: "space-y-3",
+                                                    children: [
+                                                        createHeader(5, "SAVING THROW (ability)"),
+                                                        createField(proficiencyField, "saving_throw_strength", "Strength"),
+                                                        createField(proficiencyField, "saving_throw_dexterity", "Dexterity"),
+                                                        createField(proficiencyField, "saving_throw_constitution", "Constitution"),
+                                                        createField(proficiencyField, "saving_throw_intelligence", "Intelligence"),
+                                                        createField(proficiencyField, "saving_throw_wisdom", "Wisdom"),
+                                                        createField(proficiencyField, "saving_throw_charisma", "Charisma"),
+                                                    ]
+                                                })
+                                            ]
+                                        }),
+                                        createDiv({
+                                            className: "space-y-2 field-group",
                                             children: [
                                                 createField(textField, "inspiration"),
                                                 createField(textField, "proficiency_bonus"),
                                             ],
                                         }),
-                                        createDiv({
-                                            className: "space-y-2",
-                                            children: [
-                                                createHeader(5, "ABILITY"),
-                                                createField(proficiencyField, "saving_throw_strength", "Strength"),
-                                                createField(proficiencyField, "saving_throw_dexterity", "Dexterity"),
-                                                createField(proficiencyField, "saving_throw_constitution", "Constitution"),
-                                                createField(proficiencyField, "saving_throw_intelligence", "Intelligence"),
-                                                createField(proficiencyField, "saving_throw_wisdom", "Wisdom"),
-                                                createField(proficiencyField, "saving_throw_charisma", "Charisma"),
-                                            ],
-                                        }),
                                     ]
                                 }),
+                                // createDiv({
+                                //     className: "field-group",
+                                //     children: [
+                                //         createDiv({
+                                //             className: "space-y-3",
+                                //             children: [
+                                //                 createHeader(5, "SAVING THROW (ability)"),
+                                //                 createField(proficiencyField, "saving_throw_strength", "Strength"),
+                                //                 createField(proficiencyField, "saving_throw_dexterity", "Dexterity"),
+                                //                 createField(proficiencyField, "saving_throw_constitution", "Constitution"),
+                                //                 createField(proficiencyField, "saving_throw_intelligence", "Intelligence"),
+                                //                 createField(proficiencyField, "saving_throw_wisdom", "Wisdom"),
+                                //                 createField(proficiencyField, "saving_throw_charisma", "Charisma"),
+                                //             ]
+                                //         })
+                                //     ],
+                                // }),
                                 createDiv({
+                                    className: "field-group",
                                     children: [
-                                        createHeader(5, "SKILL"),
+                                        createHeader(5, "SAVING THROW (skill)"),
                                         createDiv({
-                                            className: "flex space-x-6",
+                                            className: "flex space-x-4",
                                             children: [
                                                 createDiv({
                                                     className: "space-y-2",
@@ -135,87 +170,14 @@ function setupFields() {
                                         }),
                                     ],
                                 }),
-                            ]
-                        })
-                    ],
+                            ],
+                        }),
+                    ]
                 }),
             ],
         })
     );
 
-    // fields.appendChild(
-    //     createFieldGroup(
-    //         "general",
-    //         textField,
-    //         [
-    //             "class",
-    //             "level",
-    //             "background",
-    //             "character_name",
-    //             "player_name",
-    //             "parentage",
-    //             "alignment",
-    //             "xp",
-    //         ]
-    //     )
-    // );
-
-    // fields.appendChild(
-    //     createFieldGroup(
-    //         "abilities",
-    //         abilityField,
-    //         [
-    //             ["ability_strength", "Strength"],
-    //             ["ability_dexterity", "Dexterity"],
-    //             ["ability_constitution", "Constitution"],
-    //             ["ability_intelligence", "Intelligence"],
-    //             ["ability_wisdom", "Wisdom"],
-    //             ["ability_charisma", "Charisma"],
-    //         ]
-    //     )
-    // );
-
-    // fields.appendChild(
-    //     createFieldGroup(
-    //         "saving throws",
-    //         proficiencyField,
-    //         [
-    //             ["saving_throw_strength", "Strength"],
-    //             ["saving_throw_dexterity", "Dexterity"],
-    //             ["saving_throw_constitution", "Constitution"],
-    //             ["saving_throw_intelligence", "Intelligence"],
-    //             ["saving_throw_wisdom", "Wisdom"],
-    //             ["saving_throw_charisma", "Charisma"],
-    //         ]
-    //     )
-    // )
-
-    // fields.appendChild(
-    //     createFieldGroup(
-    //         "skills",
-    //         proficiencyField,
-    //         [
-    //             ["skill_acrobatics", "Acrobatics (dex)"],
-    //             ["skill_animal_handling", "Animal Handling (wis)"],
-    //             ["skill_arcana", "Arcana (int)"],
-    //             ["skill_athletics", "Athletics (str)"],
-    //             ["skill_deception", "Deception (dex)"],
-    //             ["skill_history", "History (int)"],
-    //             ["skill_insight", "Insight (wis)"],
-    //             ["skill_inimidation", "Intimidation (cha)"],
-    //             ["skill_investigation", "Investigation (int)"],
-    //             ["skill_medicine", "Medicine (wis)"],
-    //             ["skill_nature", "Nature (int)"],
-    //             ["skill_perception", "Perception (wis)"],
-    //             ["skill_performance", "Performance (cha)"],
-    //             ["skill_persuasion", "Persuasion (cha)"],
-    //             ["skill_religion", "Religion (int)"],
-    //             ["skill_sleight_of_hand", "Sleight of Hand (dex)"],
-    //             ["skill_stealth", "Stealth (dex)"],
-    //             ["skill_survival", "Survival (wis)"],
-    //         ]
-    //     )
-    // );
 
     // fields.appendChild(
     //     createFieldGroup(
@@ -284,6 +246,11 @@ function setupCommitForm() {
         Object.entries(responseJson.data).forEach(([fieldName, value]) => {
             apiModel[fieldName] = value;
         });
+
+        while (dirtyFields.length) {
+            const fieldId = dirtyFields.pop();
+            document.getElementById(fieldId).classList.remove("input--dirty");
+        }
     });
 }
 

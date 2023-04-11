@@ -230,7 +230,7 @@ impl From<CharacterData> for HashMap<String, FieldValue> {
             fv_ability(value.ability_charisma),
         );
         data.insert(
-            "ability_inspiration".to_string(),
+            "inspiration".to_string(),
             fv_string(value.inspiration),
         );
         data.insert(

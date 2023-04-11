@@ -1,28 +1,4 @@
-import { classify, stylize, checkIsDirty, attribute } from "./utils.js";
-
-function containerFactory(wrapperClassName = "") {
-    /**
-     * @param {{
-     *  className?: string;
-     *  style?: ElementCSSInlineStyle["style"];
-     *  children?: HTMLElement[];
-     * }} param0
-     */
-    return ({ className = "", style = {}, children = [] } = {}) => {
-        const field = document.createElement("div");
-
-        classify(wrapperClassName, field);
-        classify(className, field);
-
-        stylize(style, field);
-
-        children.forEach((child) => {
-            field.appendChild(child)
-        });
-
-        return field;
-    }
-}
+import { classify, stylize, attribute } from "./utils.js";
 
 /**
  * @param {{
@@ -44,10 +20,6 @@ function createDiv({ className = "", style = {}, children = [] } = {}) {
 
     return div;
 }
-
-const createField = containerFactory("field");
-const createRow = containerFactory("row");
-const createCol = containerFactory("col");
 
 /**
  * @param {{
@@ -100,13 +72,4 @@ function createHeader(level, text) {
     return header;
 }
 
-
-export {
-    createDiv,
-    createCol,
-    createField,
-    createHeader,
-    createInput,
-    createLabel,
-    createRow,
-};
+export { createDiv, createHeader, createInput, createLabel };
