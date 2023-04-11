@@ -67,7 +67,7 @@ pub struct CharacterData {
     pub skill_sleight_of_hand: Option<Proficiency>,
     pub skill_stealth: Option<Proficiency>,
     pub skill_survival: Option<Proficiency>,
-    pub passive_wisdom: Option<String>,
+    pub passive_perception: Option<String>,
     pub armor_class: Option<String>,
     pub initiative: Option<String>,
     pub speed: Option<String>,
@@ -158,7 +158,7 @@ impl From<Vec<CharacterDelta>> for CharacterData {
             skill_sleight_of_hand: get_proficiency("skill_sleight_of_hand"),
             skill_stealth: get_proficiency("skill_stealth"),
             skill_survival: get_proficiency("skill_survival"),
-            passive_wisdom: get_string("passive_wisdom"),
+            passive_perception: get_string("passive_perception"),
             armor_class: get_string("armor_class"),
             initiative: get_string("initiative"),
             speed: get_string("speed"),
@@ -342,8 +342,8 @@ impl From<CharacterData> for HashMap<String, FieldValue> {
             fv_proficiency(value.skill_survival),
         );
         data.insert(
-            "passive_wisdom".to_string(),
-            fv_string(value.passive_wisdom),
+            "passive_perception".to_string(),
+            fv_string(value.passive_perception),
         );
         data.insert("armor_class".to_string(), fv_string(value.armor_class));
         data.insert("initiative".to_string(), fv_string(value.initiative));

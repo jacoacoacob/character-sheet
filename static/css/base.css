@@ -1,0 +1,69 @@
+
+/* Element styles */
+
+*,
+*::after,
+*::before {
+    box-sizing: border-box;
+}
+
+html {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+input, textarea, button {
+    padding: 4px 8px;
+    font: inherit;
+}
+
+main {
+    padding: 0 32px;
+}
+
+
+/* Component styles */
+
+.field {
+    padding: 4px 0;
+}
+
+
+.field-group {
+
+}
+
+.field-group__fields {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.field-group__fields > .field:not(:last-child) {
+    margin-right: 16px;
+} 
+
+
+.text-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.text-field__label {
+
+}
+
+.text-field__input {
+
+}
+
+.dirty {
+    box-shadow: 0 0 0 4px #be56fa
+}
+
+
+.row {
+    display: flex;
+}
+.col {
+    display: flex;
+    flex-direction: column;
+}
