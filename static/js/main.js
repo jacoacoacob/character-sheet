@@ -72,7 +72,7 @@ function setupFields() {
                                                 createDiv({
                                                     className: "space-y-3",
                                                     children: [
-                                                        createHeader(4, "Ability Scores"),
+                                                        createHeader(6, "ABILITY SCORES"),
                                                         createField(abilityField, "ability_strength", "Strength"),
                                                         createField(abilityField, "ability_dexterity", "Dexterity"),
                                                         createField(abilityField, "ability_constitution", "Constitution"),
@@ -83,18 +83,24 @@ function setupFields() {
                                                 }),
                                             ],
                                         }),
+                                        createDiv({
+                                            className: "field-group",
+                                            children: [
+                                                createField(textField, "passive_perception"),
+                                            ],
+                                        }),
                                     ],
                                 }),
                                 createDiv({
                                     className: "space-y-4 flex flex-col justify-between",
                                     children: [
                                         createDiv({
-                                            className: "field-group flex-1 space-y-3",
+                                            className: "field-group flex-1",
                                             children: [
                                                 createDiv({
                                                     className: "space-y-3",
                                                     children: [
-                                                        createHeader(5, "SAVING THROW (ability)"),
+                                                        createHeader(6, "SAVING THROW (ABILITY)"),
                                                         createField(proficiencyField, "saving_throw_strength", "Strength"),
                                                         createField(proficiencyField, "saving_throw_dexterity", "Dexterity"),
                                                         createField(proficiencyField, "saving_throw_constitution", "Constitution"),
@@ -106,7 +112,7 @@ function setupFields() {
                                             ]
                                         }),
                                         createDiv({
-                                            className: "space-y-2 field-group",
+                                            className: "field-group space-y-3",
                                             children: [
                                                 createField(textField, "inspiration"),
                                                 createField(textField, "proficiency_bonus"),
@@ -114,27 +120,10 @@ function setupFields() {
                                         }),
                                     ]
                                 }),
-                                // createDiv({
-                                //     className: "field-group",
-                                //     children: [
-                                //         createDiv({
-                                //             className: "space-y-3",
-                                //             children: [
-                                //                 createHeader(5, "SAVING THROW (ability)"),
-                                //                 createField(proficiencyField, "saving_throw_strength", "Strength"),
-                                //                 createField(proficiencyField, "saving_throw_dexterity", "Dexterity"),
-                                //                 createField(proficiencyField, "saving_throw_constitution", "Constitution"),
-                                //                 createField(proficiencyField, "saving_throw_intelligence", "Intelligence"),
-                                //                 createField(proficiencyField, "saving_throw_wisdom", "Wisdom"),
-                                //                 createField(proficiencyField, "saving_throw_charisma", "Charisma"),
-                                //             ]
-                                //         })
-                                //     ],
-                                // }),
                                 createDiv({
                                     className: "field-group",
                                     children: [
-                                        createHeader(5, "SAVING THROW (skill)"),
+                                        createHeader(6, "SAVING THROW (SKILL)"),
                                         createDiv({
                                             className: "flex space-x-4",
                                             children: [

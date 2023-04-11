@@ -111,9 +111,8 @@ function proficiencyFieldFactory({ formModel, apiModel, dirtyFields } = {}) {
         const proficientInput = createInput({
             attrs: {
                 type: "checkbox",
-                value: formModel[fieldName].proficient,
                 id: `${fieldName}-proficient`,
-                title: `Check if proficient in ${fieldLabelText}`,
+                title: `Check if proficient in ${fieldLabelText.replace(/\(\w*\)/, "")}`,
             },
             onInput(ev) {
                 formModel[fieldName].proficient = ev.target.checked;
@@ -124,6 +123,8 @@ function proficiencyFieldFactory({ formModel, apiModel, dirtyFields } = {}) {
                 }
             }
         });
+
+        proficientInput.checked = formModel[fieldName].proficient;
 
         const modifierInput = createInput({
             className: "input",

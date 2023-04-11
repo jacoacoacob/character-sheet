@@ -16,4 +16,4 @@ _The below steps assume that you have [rustup](https://www.rust-lang.org/tools/i
     ```
     cargo run
     ```
-    _if you plan on making code changes, [`cargo watch`](https://crates.io/crates/cargo-watch) makes things real nice with hot reloading_
+    _if you plan on making code changes, [`cargo-watch`](https://crates.io/crates/cargo-watch) makes things real nice with hot reloading_
