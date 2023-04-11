@@ -5,16 +5,16 @@
     window.INITIAL_DATA = {{ character | json_encode | safe }}
 </script>
 
-<main>
+<main class="space-y-4">
     <section class="fields-wrapper"></section>
     
     <section class="commit">
-        <form id="commit-form">
-            <div class="field text-field">
-                <label for="commit-message">Commit message</label>
-                <textarea id="commit-message" name="commit-message"></textarea>
+        <form id="commit-form" class="space-y-2">
+            <div class="flex flex-col space-y-1">
+                <label class="label" for="commit-message">Commit message</label>
+                <textarea class="input" id="commit-message" name="commit-message"></textarea>
             </div>
-            <button type="submit">save changes</button>
+            <button class="input" type="submit">save changes</button>
         </form>
     </section>
 </main>

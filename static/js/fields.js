@@ -29,13 +29,13 @@ function textFieldFactory(formModel, apiModel) {
         });
 
         const label = createLabel({
-            className: "label",
+            className: "label label--bold",
             text: fieldLabelText,
             forId: input.id,
         });
 
         return createDiv({
-            className: "flex flex-col",
+            className: "flex flex-col space-y-1",
             children: [
                 label,
                 input,
@@ -48,7 +48,7 @@ function abilityFieldFactory(formModel, apiModel) {
     return (fieldName, fieldLabelText) => {
         const fieldLabel = createLabel({
             text: fieldLabelText,
-            className: "label label--lg label--bold",
+            className: "label label--bold",
         });
 
         const scoreInput = createInput({
@@ -115,7 +115,7 @@ function abilityFieldFactory(formModel, apiModel) {
                             className: "flex flex-col",
                             children: [modifierInputLabel, modifierInput],
                         }),
-                    ]
+                    ],
                 }),
             ],
         });
@@ -125,7 +125,7 @@ function abilityFieldFactory(formModel, apiModel) {
 function proficiencyFieldFactory(formModel, apiModel) {
     return (fieldName, fieldLabelText) => {
         const fieldLabel = createLabel({
-            className: "label label--lg",
+            className: "label label--bold",
             text: fieldLabelText
         });
 
@@ -167,6 +167,7 @@ function proficiencyFieldFactory(formModel, apiModel) {
             children: [
                 fieldLabel,
                 createDiv({
+                    className: "space-x-3",
                     children: [
                         proficientInput,
                         modifierInput,
