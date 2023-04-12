@@ -9,6 +9,7 @@
 
 html {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: .875rem;
 }
 
 h1,h2,h3,h4,h5,h6,p {
@@ -188,4 +189,14 @@ main {
 }
 .label--bold {
     font-weight: 600;
+}
+
+.textarea {
+    width: 360px;
+    resize: none;
+}
+
+
+.commit {
+    max-width: 300px;
 }

@@ -1,4 +1,4 @@
-import { createDiv, createInput, createLabel } from "./elements.js";
+import { createDiv, createInput, createLabel, createTextarea } from "./elements.js";
 import { checkIsDirty, classify, stylize } from "./utils.js";
 
 
@@ -42,9 +42,7 @@ function textFieldFactory(context = {}) {
     }
 }
 
-function numberFieldFactory(context = {}) {
-    const { formModel, apiModel, dirtyFields } = context;
-
+function numberFieldFactory({ formModel, apiModel, dirtyFields } ) {
     return ({ className = "", style = {} } = {}) => (fieldName, fieldLabel) => {
         const input = createInput({
             className: "input input--w-3",
@@ -76,6 +74,51 @@ function numberFieldFactory(context = {}) {
         return createDiv({
             className: "flex flex-col space-y-1",
             children: [label, input],
+        });
+    }
+}
+
+function textareaFieldFactory({ formModel, apiModel, dirtyFields }) {
+    return (fieldName, fieldLabel) => {
+        const textarea = createTextarea({
+            className: "textarea",
+            style: {
+                height: "288px",
+                width: "100%"
+            },
+            attrs: {
+                id: fieldName,
+            },
+            onInput(ev) {
+                formModel[fieldName] = ev.target.value.trim();
+                ev.target.style.height = 0;
+                ev.target.style.height = ev.target.scrollHeight > 288
+                    ? ev.target.scrollHeight + 10 + "px"
+                    : "288px";
+                checkIsDirty(
+                    ev.target,
+                    formModel[fieldName],
+                    apiModel[fieldName],
+                    dirtyFields
+                );
+            },
+        });
+
+        textarea.value = formModel[fieldName];
+
+        const label = createLabel({
+            className: "label label--bold",
+            text: fieldLabel,
+            forId: textarea.id,
+        });
+
+        return createDiv({
+            className: "flex flex-col space-y-2",
+            style: {
+                width: "100%",
+                position: "relative",
+            },
+            children: [label, textarea],
         });
     }
 }
@@ -113,6 +156,7 @@ function abilityFieldFactory({ formModel, apiModel, dirtyFields } = {}) {
             attrs: {
                 value: formModel[fieldName].modifier,
                 id: `${fieldName}-modifier`,
+                placeholder: "mod",
             },
             onInput(ev) {
                 formModel[fieldName].modifier = ev.target.value.trim();
@@ -172,6 +216,7 @@ function proficiencyFieldFactory({ formModel, apiModel, dirtyFields } = {}) {
             attrs: {
                 value: formModel[fieldName].modifier,
                 id: `${fieldName}-modifier`,
+                placeholder: "mod",
             },
             onInput(ev) {
                 formModel[fieldName].modifier = ev.target.value.trim();
@@ -200,4 +245,10 @@ function proficiencyFieldFactory({ formModel, apiModel, dirtyFields } = {}) {
     };
 }
 
-export { numberFieldFactory, textFieldFactory, abilityFieldFactory, proficiencyFieldFactory };
+export {
+    abilityFieldFactory,
+    numberFieldFactory,
+    proficiencyFieldFactory,
+    textareaFieldFactory,
+    textFieldFactory,
+};

@@ -1,16 +1,16 @@
 
-function deepCopy(obj) {
+function naiveDeepCopy(obj) {
     if (obj === null) {
         return null;
     }
     
     if (Array.isArray(obj)) {
-        return obj.map(x => deepCopy(x));
+        return obj.map(x => naiveDeepCopy(x));
     }
 
     if (typeof obj === "object" && obj !== null) {
         return Object.entries(obj).reduce((accum, [key, value]) => {
-            accum[key] = deepCopy(value)
+            accum[key] = naiveDeepCopy(value)
             return accum;
         }, {});
     }
@@ -49,11 +49,13 @@ function createField(field, name, label) {
 function checkIsDirty(input, formValue, apiValue, dirtyFields) {
     if (formValue !== apiValue) {
         input.classList.add("input--dirty");
-        dirtyFields.push(input.id);
+        dirtyFields.add(input.id);
+        // dirtyFields.push(input.id);
     } else {
         input.classList.remove("input--dirty");
-        dirtyFields.splice(dirtyFields.indexOf(input.id), 1);
+        dirtyFields.remove(input.id);
+        // dirtyFields.splice(dirtyFields.indexOf(input.id), 1);
     }
 }
 
-export { createField, attribute, deepCopy, classify, stylize, checkIsDirty };
+export { createField, attribute, naiveDeepCopy, classify, stylize, checkIsDirty };

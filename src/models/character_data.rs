@@ -82,6 +82,7 @@ pub struct CharacterData {
     pub bonds: Option<String>,
     pub flaws: Option<String>,
     pub features_and_traits: Option<String>,
+    pub proficiencies_and_languages: Option<String>,
 }
 
 impl From<Vec<CharacterDelta>> for CharacterData {
@@ -178,6 +179,7 @@ impl From<Vec<CharacterDelta>> for CharacterData {
             bonds: get_string("bonds"),
             flaws: get_string("flaws"),
             features_and_traits: get_string("features_and_traits"),
+            proficiencies_and_languages: get_string("proficiencies_and_languages"),
         }
     }
 }
@@ -383,6 +385,10 @@ impl From<CharacterData> for HashMap<String, FieldValue> {
         data.insert(
             "features_and_traits".to_string(),
             FieldValue::from(value.features_and_traits),
+        );
+        data.insert(
+            "proficiencies_and_languages".to_string(),
+            FieldValue::from(value.proficiencies_and_languages),
         );
         data
     }

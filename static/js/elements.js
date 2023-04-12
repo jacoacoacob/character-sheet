@@ -45,6 +45,29 @@ function createInput({ className = "", style = {}, attrs = {}, onInput = () => v
 
 /**
  * @param {{
+ *  className: string;
+ *  style: ElementCSSInlineStyle["style"];
+ *  attrs: Record<string, *>;
+ *  onInput: (ev: InputEvent) => void;
+ * }} param0
+ */
+function createTextarea({ className = "", style = {}, attrs = {}, onInput = () => void 0 } = {}) {
+   const textarea = document.createElement("textarea");
+
+   classify(className, textarea);
+
+   stylize(style, textarea);
+
+   attribute(attrs, textarea);
+
+   textarea.addEventListener("input", onInput);
+
+   return textarea;
+}
+
+
+/**
+ * @param {{
 *  className: string;
 *  style: ElementCSSInlineStyle["style"];
 *  text: string;
@@ -72,4 +95,4 @@ function createHeader(level, text) {
     return header;
 }
 
-export { createDiv, createHeader, createInput, createLabel };
+export { createDiv, createHeader, createInput, createLabel, createTextarea };
