@@ -7,7 +7,7 @@ use super::character_data::{CharacterData, Ability, Proficiency};
 #[derive(Serialize, Deserialize, Clone, PartialEq)]
 pub enum FieldValue {
     String(String),
-    Num(usize),
+    Num(isize),
     Proficiency(Proficiency),
     Ability(Ability),
 }
@@ -24,8 +24,8 @@ impl From<Option<Proficiency>> for FieldValue {
     }
 }
 
-impl From<Option<usize>> for FieldValue {
-    fn from(value: Option<usize>) -> Self {
+impl From<Option<isize>> for FieldValue {
+    fn from(value: Option<isize>) -> Self {
         FieldValue::Num(value.unwrap_or_default())
     }
 }

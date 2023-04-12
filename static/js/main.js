@@ -411,21 +411,21 @@ function setupFields() {
 
 
 function createDirtyFields() {
-    const data = [];
+    const _dirtyFields = [];
 
     return {
         add(fieldId) {
-            data.push(fieldId);
+            _dirtyFields.push(fieldId);
         },
         remove(fieldId) {
-            const indexOfFieldId = data.indexOf(fieldId);
+            const indexOfFieldId = _dirtyFields.indexOf(fieldId);
             if (indexOfFieldId > -1) {
-                data.splice(indexOfFieldId, 1);
+                _dirtyFields.splice(indexOfFieldId, 1);
             }
         },
         removeAll() {
-            while (data.length) {
-                document.getElementById(data.pop()).classList.remove("input--dirty");
+            while (_dirtyFields.length) {
+                document.getElementById(_dirtyFields.pop()).classList.remove("input--dirty");
             }
         }
     }
