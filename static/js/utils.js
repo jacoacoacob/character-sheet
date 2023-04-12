@@ -46,13 +46,14 @@ function createField(field, name, label) {
     );
 }
 
-function checkIsDirty(input, formValue, apiValue) {
+function checkIsDirty(input, formValue, apiValue, dirtyFields) {
     if (formValue !== apiValue) {
         input.classList.add("input--dirty");
-        return true;
+        dirtyFields.push(input.id);
+    } else {
+        input.classList.remove("input--dirty");
+        dirtyFields.splice(dirtyFields.indexOf(input.id), 1);
     }
-    input.classList.remove("input--dirty");
-    return false;
 }
 
 export { createField, attribute, deepCopy, classify, stylize, checkIsDirty };

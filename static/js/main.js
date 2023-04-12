@@ -1,4 +1,4 @@
-import { abilityFieldFactory, proficiencyFieldFactory, textFieldFactory } from "./fields.js";
+import { abilityFieldFactory, numberFieldFactory, proficiencyFieldFactory, textFieldFactory } from "./fields.js";
 import { createDiv, createHeader } from "./elements.js";
 import { deepCopy, createField } from "./utils.js";
 
@@ -20,6 +20,7 @@ window.formModel = formModel;
 
 const abilityField = abilityFieldFactory(context);
 const textField = textFieldFactory(context);
+const numberField = numberFieldFactory(context);
 const proficiencyField = proficiencyFieldFactory(context);
 
 setupFields();
@@ -32,31 +33,41 @@ function setupFields() {
 
     fields.appendChild(
         createDiv({
-            className: "flex space-x-6",
+            className: "flex space-x-4",
             children: [
                 createDiv({
                     className: "space-y-4",
                     children: [
                         createDiv({
-                            className: "space-y-3 field-group",
+                            className: "flex",
                             children: [
                                 createDiv({
-                                    className: "flex space-x-4",
+                                    className: "field-group flex-1",
                                     children: [
-                                        createField(textField, "character_name"),
-                                        createField(textField, "class"),
-                                        createField(textField, "parentage"),
-                                        createField(textField, "level"),
-                                    ],
-                                }),
-                                createDiv({
-                                    className: "flex space-x-4",
-                                    children: [
-                                        createField(textField, "player_name"),
-                                        createField(textField, "background"),
-                                        createField(textField, "alignment"),
-                                        createField(textField, "xp"),
-                                    ],
+                                        createDiv({
+                                            className: "space-y-3",
+                                            children: [
+                                                createDiv({
+                                                    className: "flex space-x-4",
+                                                    children: [
+                                                        createField(textField(), "character_name"),
+                                                        createField(textField(), "class"),
+                                                        createField(textField(), "parentage"),
+                                                        createField(textField(), "level"),
+                                                    ],
+                                                }),
+                                                createDiv({
+                                                    className: "flex space-x-4",
+                                                    children: [
+                                                        createField(textField(), "player_name"),
+                                                        createField(textField(), "background"),
+                                                        createField(textField(), "alignment"),
+                                                        createField(textField(), "xp"),
+                                                    ],
+                                                }),
+                                            ]
+                                        })
+                                    ]
                                 }),
                             ]
                         }),
@@ -86,7 +97,7 @@ function setupFields() {
                                         createDiv({
                                             className: "field-group",
                                             children: [
-                                                createField(textField, "passive_perception"),
+                                                createField(textField(), "passive_perception"),
                                             ],
                                         }),
                                     ],
@@ -100,7 +111,7 @@ function setupFields() {
                                                 createDiv({
                                                     className: "space-y-3",
                                                     children: [
-                                                        createHeader(6, "SAVING THROW (ABILITY)"),
+                                                        createHeader(6, "SV THRW (ABILITY)"),
                                                         createField(proficiencyField, "saving_throw_strength", "Strength"),
                                                         createField(proficiencyField, "saving_throw_dexterity", "Dexterity"),
                                                         createField(proficiencyField, "saving_throw_constitution", "Constitution"),
@@ -114,8 +125,8 @@ function setupFields() {
                                         createDiv({
                                             className: "field-group space-y-3",
                                             children: [
-                                                createField(textField, "inspiration"),
-                                                createField(textField, "proficiency_bonus"),
+                                                createField(textField(), "inspiration"),
+                                                createField(textField(), "proficiency_bonus"),
                                             ],
                                         }),
                                     ]
@@ -123,7 +134,7 @@ function setupFields() {
                                 createDiv({
                                     className: "field-group",
                                     children: [
-                                        createHeader(6, "SAVING THROW (SKILL)"),
+                                        createHeader(6, "SV THRW (SKILL)"),
                                         createDiv({
                                             className: "flex space-x-4",
                                             children: [
@@ -163,51 +174,75 @@ function setupFields() {
                         }),
                     ]
                 }),
+                createDiv({
+                    className: "flex flex-col space-y-4",
+                    children: [
+                        createDiv({
+                            className: "flex space-x-4",
+                            children: [
+                                createDiv({
+                                    className: "field-group flex-1",
+                                    children: [
+                                        createHeader(6, "BATTLE STUFF"),
+                                        createDiv({
+                                            className: "flex flex-wrap space-x-4 space-y-3",
+                                            children: [
+                                                createField(numberField(), "armor_class", "AC"),
+                                                createField(numberField(), "initiative"),
+                                                createField(numberField(), "speed"),
+                                            ]
+                                        }),
+                                    ]
+                                }),
+                                createDiv({
+                                    className: "field-group flex-1",
+                                    children: [
+                                        createDiv({
+                                            className: "space-y-3",
+                                            children: [
+                                                createHeader(6, "HIT POINTS"),
+                                                createField(numberField(), "hit_point_current", "current"),
+                                                createField(numberField(), "hit_point_max", "max"),
+                                            ],
+                                        }),
+                                    ],
+                                }),
+                            ],
+                        }),
+                        createDiv({
+                            className: "flex space-x-4",
+                            children: [
+                                createDiv({
+                                    className: "field-group space-y-3",
+                                    children: [
+                                        createHeader(6, "HIT DICE"),
+                                        createField(textField(), "hit_dice", "kind"),
+                                        createDiv({
+                                            className: "flex flex-wrap space-x-4",
+                                            children: [
+                                                createField(numberField(), "hit_dice_current", "current"),
+                                                createField(numberField(), "hit_dice_total", "max"),
+                                            ],
+                                        }),
+                                    ]
+                                }),
+                                createDiv({
+                                    className: "field-group flex-1 space-y-3",
+                                    children: [
+                                        createHeader(6, "DEATH SAVES"),
+                                        createField(numberField(), "death_save_fail", "fail"),
+                                        createField(numberField(), "death_save_success", "success"),
+                                    ]
+                                }),
+                            ]
+                        }),
+           
+                    ]
+                }),
+
             ],
         })
     );
-
-
-    // fields.appendChild(
-    //     createFieldGroup(
-    //         "well-being",
-    //         textField,
-    //         [
-    //             "death_save_fail",
-    //             "dealth_save_success",
-    //             "hit_dice",
-    //             "hit_dice_current",
-    //             "hit_dice_total",
-    //             "hit_point_max",
-    //             "hit_point_current",
-    //             "hit_point_temp",
-    //         ]
-    //     )
-    // );
-
-    // fields.appendChild(
-    //     createFieldGroup(
-    //         "battle readiness",
-    //         textField,
-    //         [
-    //             "armor_class",
-    //             "initiative",
-    //             "speed"
-    //         ]
-    //     )
-    // )
-
-    // fields.appendChild(
-    //     createFieldGroup(
-    //         "misc",
-    //         textField,
-    //         [
-    //             "passive_perception",
-    //             "inspiration",
-    //             "proficiency_bonus"
-    //         ]
-    //     )
-    // )
 }
 
 function setupCommitForm() {

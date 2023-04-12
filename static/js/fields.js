@@ -1,26 +1,30 @@
 import { createDiv, createInput, createLabel } from "./elements.js";
-import { checkIsDirty } from "./utils.js";
+import { checkIsDirty, classify, stylize } from "./utils.js";
 
 
 function textFieldFactory(context = {}) {
     const { formModel, apiModel, dirtyFields } = context;
 
-    return (fieldName, fieldLabelText) => {
+    return ({ className = "", style = {} } = {}) => (fieldName, fieldLabelText) => {
         const input = createInput({
-            className: "input",
+            className: "input input--w-6",
             attrs: {
                 value: formModel[fieldName],
                 id: fieldName,
             },
             onInput(ev) {
                 formModel[fieldName] = ev.target.value.trim();
-                if (checkIsDirty(ev.target, formModel[fieldName], apiModel[fieldName])) {
-                    dirtyFields.push(ev.target.id);
-                } else {
-                    dirtyFields.splice(dirtyFields.indexOf(ev.target.id), 1);
-                }
+                checkIsDirty(
+                    ev.target,
+                    formModel[fieldName],
+                    apiModel[fieldName],
+                    dirtyFields
+                );
             }
         });
+
+        classify(className, input);
+        stylize(style, input);
 
         const label = createLabel({
             className: "label label--bold",
@@ -38,6 +42,44 @@ function textFieldFactory(context = {}) {
     }
 }
 
+function numberFieldFactory(context = {}) {
+    const { formModel, apiModel, dirtyFields } = context;
+
+    return ({ className = "", style = {} } = {}) => (fieldName, fieldLabel) => {
+        const input = createInput({
+            className: "input input--w-3",
+            attrs: {
+                value: formModel[fieldName],
+                id: fieldName,
+                type: "number",
+            },
+            onInput(ev) {
+                formModel[fieldName] = Number.parseInt(ev.target.value);
+                checkIsDirty(
+                    ev.target,
+                    formModel[fieldName],
+                    apiModel[fieldName],
+                    dirtyFields
+                );
+            }
+        });
+
+        classify(className, input);
+        stylize(style, input);
+
+        const label = createLabel({
+            className: "label label--bold",
+            text: fieldLabel,
+            forId: input.id,
+        });
+
+        return createDiv({
+            className: "flex flex-col space-y-1",
+            children: [label, input],
+        });
+    }
+}
+
 function abilityFieldFactory({ formModel, apiModel, dirtyFields } = {}) {
     return (fieldName, fieldLabelText) => {
         const fieldLabel = createLabel({
@@ -46,7 +88,7 @@ function abilityFieldFactory({ formModel, apiModel, dirtyFields } = {}) {
         });
 
         const scoreInput = createInput({
-            className: "input",
+            className: "input input--w-6",
             style: {
                 width: "80px"
             },
@@ -57,31 +99,29 @@ function abilityFieldFactory({ formModel, apiModel, dirtyFields } = {}) {
             },
             onInput(ev) {
                 formModel[fieldName].score = ev.target.value.trim();
-                if (checkIsDirty(ev.target, formModel[fieldName].score, apiModel[fieldName].score)) {
-                    dirtyFields.push(ev.target.id);
-                } else {
-                    dirtyFields.splice(dirtyFields.indexOf(ev.target.id), 1);
-                }
+                checkIsDirty(
+                    ev.target,
+                    formModel[fieldName].score,
+                    apiModel[fieldName].score,
+                    dirtyFields
+                );
             }
         });
 
         const modifierInput = createInput({
-            className: "input input--bold",
-            style: {
-                width: "50px",
-            },
+            className: "input input--w-1 input--bold",
             attrs: {
                 value: formModel[fieldName].modifier,
                 id: `${fieldName}-modifier`,
-                placeholder: "mod"
             },
             onInput(ev) {
                 formModel[fieldName].modifier = ev.target.value.trim();
-                if (checkIsDirty(ev.target, formModel[fieldName].modifier, apiModel[fieldName].modifier)) {
-                    dirtyFields.push(ev.target.id);
-                } else {
-                    dirtyFields.splice(dirtyFields.indexOf(ev.target.id), 1);
-                }
+                checkIsDirty(
+                    ev.target,
+                    formModel[fieldName].modifier,
+                    apiModel[fieldName].modifier,
+                    dirtyFields
+                );
             }
         });
 
@@ -104,7 +144,7 @@ function abilityFieldFactory({ formModel, apiModel, dirtyFields } = {}) {
 function proficiencyFieldFactory({ formModel, apiModel, dirtyFields } = {}) {
     return (fieldName, fieldLabelText) => {
         const fieldLabel = createLabel({
-            className: "label label--bold",
+            className: "label label label--bold",
             text: fieldLabelText
         });
 
@@ -116,29 +156,31 @@ function proficiencyFieldFactory({ formModel, apiModel, dirtyFields } = {}) {
             },
             onInput(ev) {
                 formModel[fieldName].proficient = ev.target.checked;
-                if (checkIsDirty(ev.target, formModel[fieldName].proficient, apiModel[fieldName].proficient)) {
-                    dirtyFields.push(ev.target.id);
-                } else {
-                    dirtyFields.splice(dirtyFields.indexOf(ev.target.id), 1);
-                }
+                checkIsDirty(
+                    ev.target,
+                    formModel[fieldName].proficient,
+                    apiModel[fieldName].proficient,
+                    dirtyFields
+                );
             }
         });
 
         proficientInput.checked = formModel[fieldName].proficient;
 
         const modifierInput = createInput({
-            className: "input",
+            className: "input input--w-1",
             attrs: {
                 value: formModel[fieldName].modifier,
                 id: `${fieldName}-modifier`,
             },
             onInput(ev) {
                 formModel[fieldName].modifier = ev.target.value.trim();
-                if (checkIsDirty(ev.target, formModel[fieldName].modifier, apiModel[fieldName].modifier)) {
-                    dirtyFields.push(ev.target.id);
-                } else {
-                    dirtyFields.splice(dirtyFields.indexOf(ev.target.id), 1);
-                }
+                checkIsDirty(
+                    ev.target,
+                    formModel[fieldName].modifier,
+                    apiModel[fieldName].modifier,
+                    dirtyFields
+                );
             }
         });
 
@@ -158,4 +200,4 @@ function proficiencyFieldFactory({ formModel, apiModel, dirtyFields } = {}) {
     };
 }
 
-export { textFieldFactory, abilityFieldFactory, proficiencyFieldFactory };
+export { numberFieldFactory, textFieldFactory, abilityFieldFactory, proficiencyFieldFactory };

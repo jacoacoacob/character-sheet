@@ -40,6 +40,11 @@ main {
 .flex-1 {
     flex: 1;
 }
+.flex-shrink {
+    flex-basis: 0;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
 
 .justify-start {
     justify-content: flex-start;
@@ -139,8 +144,27 @@ main {
 
 .input {
     font-size: .875rem;
+    /* width: 128px; */
+}
+.input--w-1 {
+    width: 56px;
+}
+.input--w-2 {
+    width: 62px;
+}
+.input--w-3 {
+    width: 72px;
+}
+.input--w-4 {
+    width: 90px;
+}
+.input--w-5 {
+    width: 108px;
+}
+.input--w-6 {
     width: 128px;
 }
+
 .input--bold {
     font-weight: 600;
 }
@@ -155,6 +179,9 @@ main {
 .label {
     display: inline-block;
     font-size: .75rem;
+}
+.label--sm {
+    font-size: .625rem;
 }
 .label--lg {
     font-size: .875rem;

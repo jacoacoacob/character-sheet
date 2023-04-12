@@ -2,7 +2,40 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use super::character_data::{CharacterData, FieldValue};
+use super::character_data::{CharacterData, Ability, Proficiency};
+
+#[derive(Serialize, Deserialize, Clone, PartialEq)]
+pub enum FieldValue {
+    String(String),
+    Num(usize),
+    Proficiency(Proficiency),
+    Ability(Ability),
+}
+
+impl From<Option<Ability>> for FieldValue {
+    fn from(value: Option<Ability>) -> Self {
+        FieldValue::Ability(value.unwrap_or_default())
+    }
+}
+
+impl From<Option<Proficiency>> for FieldValue {
+    fn from(value: Option<Proficiency>) -> Self {
+        FieldValue::Proficiency(value.unwrap_or_default())
+    }
+}
+
+impl From<Option<usize>> for FieldValue {
+    fn from(value: Option<usize>) -> Self {
+        FieldValue::Num(value.unwrap_or_default())
+    }
+}
+
+impl From<Option<String>> for FieldValue {
+    fn from(value: Option<String>) -> Self {
+        FieldValue::String(value.unwrap_or_default())
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct FieldDiff {
