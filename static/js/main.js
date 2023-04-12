@@ -104,7 +104,7 @@ function setupFields() {
                         ],
                     }),
                     createDiv({
-                        className: "space-y-2",
+                        className: "space-y-3",
                         children: [
                             createField(proficiencyField, "skill_medicine", "Medicine (wis)"),
                             createField(proficiencyField, "skill_nature", "Nature (int)"),
@@ -139,7 +139,6 @@ function setupFields() {
     const battleStuff = createDiv({
         className: "flex flex-col space-y-3",
         children: [
-            createHeader(6, "BATTLE STUFF"),
             createField(numberField(), "armor_class", "AC"),
             createField(numberField(), "initiative"),
             createField(numberField(), "speed"),
@@ -181,7 +180,6 @@ function setupFields() {
                     className: "flex space-x-4",
                     children: [
                         createDiv({
-                            // style: { flex: 1 },
                             className: "space-y-4",
                             children: [
                                 fieldGroup({ flex: 1, root: characterInfo }),
