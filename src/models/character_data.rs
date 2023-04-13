@@ -83,13 +83,6 @@ pub struct CharacterData {
     pub gp: Option<String>,
     pub pp: Option<String>,
     pub notes: Option<Markdown>,
-    // pub equipment: Option<String>,
-    // pub personality_traits: Option<String>,
-    // pub ideals: Option<String>,
-    // pub bonds: Option<String>,
-    // pub flaws: Option<String>,
-    // pub features_and_traits: Option<String>,
-    // pub proficiencies_and_languages: Option<String>,
 }
 
 impl From<Vec<CharacterDelta>> for CharacterData {
@@ -186,13 +179,6 @@ impl From<Vec<CharacterDelta>> for CharacterData {
             gp: get_string("gp"),
             pp: get_string("pp"),
             notes: get_markdown("notes"),
-            // equipment: get_string("equipment"),
-            // personality_traits: get_string("personality_traits"),
-            // ideals: get_string("ideals"),
-            // bonds: get_string("bonds"),
-            // flaws: get_string("flaws"),
-            // features_and_traits: get_string("features_and_traits"),
-            // proficiencies_and_languages: get_string("proficiencies_and_languages"),
         }
     }
 }
@@ -387,22 +373,7 @@ impl From<CharacterData> for HashMap<String, FieldValue> {
         data.insert("ep".to_string(), FieldValue::from(value.ep));
         data.insert("gp".to_string(), FieldValue::from(value.gp));
         data.insert("pp".to_string(), FieldValue::from(value.pp));
-        // data.insert("equipment".to_string(), FieldValue::from(value.equipment));
-        // data.insert(
-        //     "personality_traits".to_string(),
-        //     FieldValue::from(value.personality_traits),
-        // );
-        // data.insert("ideals".to_string(), FieldValue::from(value.ideals));
-        // data.insert("bonds".to_string(), FieldValue::from(value.bonds));
-        // data.insert("flaws".to_string(), FieldValue::from(value.flaws));
-        // data.insert(
-        //     "features_and_traits".to_string(),
-        //     FieldValue::from(value.features_and_traits),
-        // );
-        // data.insert(
-        //     "proficiencies_and_languages".to_string(),
-        //     FieldValue::from(value.proficiencies_and_languages),
-        // );
+        data.insert("notes".to_string(), FieldValue::from(value.notes));
         data
     }
 }

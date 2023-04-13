@@ -1,5 +1,11 @@
-import { abilityFieldFactory, numberFieldFactory, proficiencyFieldFactory, textFieldFactory, textareaFieldFactory } from "./fields.js";
 import { createDiv, createHeader } from "./elements.js";
+import {
+    abilityFieldFactory,
+    markdownFieldFactory,
+    numberFieldFactory,
+    proficiencyFieldFactory,
+    textFieldFactory,
+} from "./fields.js";
 import { fieldGroup } from "./layouts.js";
 import { naiveDeepCopy, createField } from "./utils.js";
 
@@ -21,7 +27,7 @@ window.formModel = formModel;
 
 const abilityField = abilityFieldFactory(context);
 const textField = textFieldFactory(context);
-const textareaField = textareaFieldFactory(context);
+const markdownField = markdownFieldFactory(context);
 const numberField = numberFieldFactory(context);
 const proficiencyField = proficiencyFieldFactory(context);
 
@@ -136,7 +142,7 @@ function setupFields() {
         ],
     });
 
-    const battleStuff = createDiv({
+    const acInitiativeSpeed = createDiv({
         className: "space-y-3",
         children: [
             createField(numberField(), "armor_class", "AC"),
@@ -222,7 +228,7 @@ function setupFields() {
 
     const notes = createDiv({
         children: [
-            createField(textareaField, "notes"),
+            createField(markdownField, "notes"),
         ],
     });
 
@@ -236,7 +242,7 @@ function setupFields() {
                         createDiv({
                             className: "space-y-4",
                             children: [
-                                fieldGroup({ flex: 1, root: characterInfo }),
+                                fieldGroup({ root: characterInfo, flex: 1 }),
                                 createDiv({
                                     className: "flex flex-1 space-x-4",
                                     children: [
@@ -250,14 +256,14 @@ function setupFields() {
                                         createDiv({
                                             className: "flex flex-col  space-y-4",
                                             children: [
-                                                fieldGroup({ flex: 1, root: abilitySavingThrows }),
+                                                fieldGroup({ root: abilitySavingThrows, flex: 1 }),
                                                 fieldGroup({ root: proficiencyBonus }),
                                             ],
                                         }),
                                         createDiv({
                                             className: "flex flex-col flex-1 space-y-4",
                                             children: [
-                                                fieldGroup({ flex: 1, root: skillSavingThrows }),
+                                                fieldGroup({ root: skillSavingThrows, flex: 1 }),
                                             ],
                                         }),
                                     ],
@@ -267,11 +273,11 @@ function setupFields() {
                         createDiv({
                             className: "space-y-4",
                             children: [
-                                fieldGroup({ root: battleStuff }),
+                                fieldGroup({ root: acInitiativeSpeed }),
                                 fieldGroup({ root: hitDice }),
                                 fieldGroup({ root: hitPoints }),
                                 fieldGroup({ root: deathSaves }),
-                                fieldGroup({ root: money,  }),
+                                fieldGroup({ root: money }),
                             ],
                         }),
                     ],

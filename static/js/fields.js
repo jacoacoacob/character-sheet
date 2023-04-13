@@ -2,9 +2,7 @@ import { createDiv, createInput, createLabel, createTextarea } from "./elements.
 import { checkIsDirty, classify, stylize } from "./utils.js";
 
 
-function textFieldFactory(context = {}) {
-    const { formModel, apiModel, dirtyFields } = context;
-
+function textFieldFactory({ formModel, apiModel, dirtyFields }) {
     return ({ className = "", style = {} } = {}) => (fieldName, fieldLabelText) => {
         const input = createInput({
             className: "input input--w-6",
@@ -42,7 +40,7 @@ function textFieldFactory(context = {}) {
     }
 }
 
-function numberFieldFactory({ formModel, apiModel, dirtyFields } ) {
+function numberFieldFactory({ formModel, apiModel, dirtyFields }) {
     return ({ className = "", style = {} } = {}) => (fieldName, fieldLabel) => {
         const input = createInput({
             className: "input input--w-3",
@@ -78,13 +76,9 @@ function numberFieldFactory({ formModel, apiModel, dirtyFields } ) {
     }
 }
 
-window.addEventListener("scroll", (ev) => {
-    console.log("[onWindowScroll]")
-})
-
-function textareaFieldFactory({ formModel, apiModel, dirtyFields }) {
+function markdownFieldFactory({ formModel, apiModel, dirtyFields }) {
     return (fieldName, fieldLabel) => {
-        const textarea = createTextarea({
+        const source = createTextarea({
             className: "textarea",
             style: {
                 height: "288px",
@@ -96,7 +90,7 @@ function textareaFieldFactory({ formModel, apiModel, dirtyFields }) {
             onInput(ev) {
                 /** @type {HTMLTextAreaElement} */
                 const target = ev.target
-                formModel[fieldName] = target.value.trim();
+                formModel[fieldName].source = target.value.trim();
                 if (target.scrollHeight > 288) {
                     const scrollLeft = window.scrollX;
                     const scrollTop = window.scrollY;
@@ -108,19 +102,23 @@ function textareaFieldFactory({ formModel, apiModel, dirtyFields }) {
                 }
                 checkIsDirty(
                     target,
-                    formModel[fieldName],
-                    apiModel[fieldName],
+                    formModel[fieldName].source,
+                    apiModel[fieldName].source,
                     dirtyFields
                 );
             },
         });
 
-        textarea.value = formModel[fieldName];
+        const html = createDiv();
+
+        html.innerHTML = formModel[fieldName].html;
+
+        source.value = formModel[fieldName].source;
 
         const label = createLabel({
             className: "label label--bold",
             text: fieldLabel,
-            forId: textarea.id,
+            forId: source.id,
         });
 
         return createDiv({
@@ -129,12 +127,12 @@ function textareaFieldFactory({ formModel, apiModel, dirtyFields }) {
                 width: "100%",
                 position: "relative",
             },
-            children: [label, textarea],
+            children: [label, source],
         });
     }
 }
 
-function abilityFieldFactory({ formModel, apiModel, dirtyFields } = {}) {
+function abilityFieldFactory({ formModel, apiModel, dirtyFields }) {
     return (fieldName, fieldLabelText) => {
         const fieldLabel = createLabel({
             text: fieldLabelText,
@@ -196,7 +194,7 @@ function abilityFieldFactory({ formModel, apiModel, dirtyFields } = {}) {
     };
 }
 
-function proficiencyFieldFactory({ formModel, apiModel, dirtyFields } = {}) {
+function proficiencyFieldFactory({ formModel, apiModel, dirtyFields }) {
     return (fieldName, fieldLabelText) => {
         const fieldLabel = createLabel({
             className: "label label label--bold",
@@ -260,6 +258,6 @@ export {
     abilityFieldFactory,
     numberFieldFactory,
     proficiencyFieldFactory,
-    textareaFieldFactory,
+    markdownFieldFactory,
     textFieldFactory,
 };
