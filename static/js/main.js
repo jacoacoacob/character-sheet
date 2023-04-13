@@ -184,7 +184,6 @@ function setupFields() {
         ],
     });
 
-
     const deathSaves = createDiv({
         className: "space-y-3",
         children: [
@@ -272,36 +271,20 @@ function setupFields() {
                                 fieldGroup({ root: hitDice }),
                                 fieldGroup({ root: hitPoints }),
                                 fieldGroup({ root: deathSaves }),
-                                // createDiv({
-                                //     className: "flex flex-1 space-x-4",
-                                //     children: [
-                                //         fieldGroup({ root: hitPoints, flex: 1 }),
-                                //         fieldGroup({ root: deathSaves, flex: 1 }),
-                                //     ]
-                                // }),
                                 fieldGroup({ root: money,  }),
                             ],
                         }),
                     ],
                 }),
-                // createDiv({
-                //     children: [
-                //         fieldGroup({ root: money, flex: 1 }),
-                //     ],
-                // }),
                 createDiv({
                     children: [
                         fieldGroup({ root: notes, flex: 1 }),
-                    ]
-                })
-            ]
+                    ],
+                }),
+            ],
         }),
-      
-    );
-    
+    );   
 }
-
-
 
 function createDirtyFields() {
     const _dirtyFields = [];

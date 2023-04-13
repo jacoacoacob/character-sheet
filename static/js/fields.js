@@ -97,10 +97,12 @@ function textareaFieldFactory({ formModel, apiModel, dirtyFields }) {
                 /** @type {HTMLTextAreaElement} */
                 const target = ev.target
                 formModel[fieldName] = target.value.trim();
-                console.log(target.scrollHeight, target.style.height)
                 if (target.scrollHeight > 288) {
-                    target.style.height = "auto";
+                    const scrollLeft = window.scrollX;
+                    const scrollTop = window.scrollY;
+                    target.style.height = 0;
                     target.style.height = target.scrollHeight + 10 + "px";
+                    window.scrollTo(scrollLeft, scrollTop);
                 } else {
                     target.style.height = "288px";
                 }
