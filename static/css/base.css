@@ -41,6 +41,9 @@ main {
 .flex-1 {
     flex: 1;
 }
+.flex-0 {
+    flex: 0;
+}
 .flex-shrink {
     flex-basis: 0;
     flex-grow: 0;
@@ -138,7 +141,10 @@ main {
 /* Components */
 
 .field-group {
-    background-color: #e8eaec;
+    /* background-color: #e8eaec; */
+    /* background-color: #a7ff78; */
+    background-color: #fad400a1;
+    /* background-color: #ff89c0ca; */
     padding: 12px;
     border-radius: 4px;
 }
@@ -194,6 +200,7 @@ main {
 .textarea {
     width: 360px;
     resize: none;
+    overflow-y: hidden;
 }
 
 

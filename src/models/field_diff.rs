@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use super::character_data::{CharacterData, Ability, Proficiency};
+use super::character_data::{CharacterData, Ability, Proficiency, Markdown};
 
 #[derive(Serialize, Deserialize, Clone, PartialEq)]
 pub enum FieldValue {
@@ -10,11 +10,18 @@ pub enum FieldValue {
     Num(isize),
     Proficiency(Proficiency),
     Ability(Ability),
+    Markdown(Markdown),
 }
 
 impl From<Option<Ability>> for FieldValue {
     fn from(value: Option<Ability>) -> Self {
         FieldValue::Ability(value.unwrap_or_default())
+    }
+}
+
+impl From<Option<Markdown>> for FieldValue {
+    fn from(value: Option<Markdown>) -> Self {
+        FieldValue::Markdown(value.unwrap_or_default())
     }
 }
 

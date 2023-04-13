@@ -78,6 +78,10 @@ function numberFieldFactory({ formModel, apiModel, dirtyFields } ) {
     }
 }
 
+window.addEventListener("scroll", (ev) => {
+    console.log("[onWindowScroll]")
+})
+
 function textareaFieldFactory({ formModel, apiModel, dirtyFields }) {
     return (fieldName, fieldLabel) => {
         const textarea = createTextarea({
@@ -90,13 +94,18 @@ function textareaFieldFactory({ formModel, apiModel, dirtyFields }) {
                 id: fieldName,
             },
             onInput(ev) {
-                formModel[fieldName] = ev.target.value.trim();
-                ev.target.style.height = 0;
-                ev.target.style.height = ev.target.scrollHeight > 288
-                    ? ev.target.scrollHeight + 10 + "px"
-                    : "288px";
+                /** @type {HTMLTextAreaElement} */
+                const target = ev.target
+                formModel[fieldName] = target.value.trim();
+                console.log(target.scrollHeight, target.style.height)
+                if (target.scrollHeight > 288) {
+                    target.style.height = "auto";
+                    target.style.height = target.scrollHeight + 10 + "px";
+                } else {
+                    target.style.height = "288px";
+                }
                 checkIsDirty(
-                    ev.target,
+                    target,
                     formModel[fieldName],
                     apiModel[fieldName],
                     dirtyFields
