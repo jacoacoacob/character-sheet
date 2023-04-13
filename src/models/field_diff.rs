@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
+use crate::markdown::html_from_markdown;
+
 use super::character_data::{CharacterData, Ability, Proficiency, Markdown};
 
 #[derive(Serialize, Deserialize, Clone, PartialEq)]
@@ -73,7 +75,13 @@ impl From<(Option<CharacterData>, Option<CharacterData>)> for FieldDiffs {
         match value {
             (Some(old), Some(new)) => {
                 let old = HashMap::from(old);
-                let new = HashMap::from(new);
+                let mut new = HashMap::from(new);
+                new.entry("notes".to_string()).and_modify(|value| match value {
+                    FieldValue::Markdown(markdown) => {
+                        markdown.html = html_from_markdown(&markdown.source);
+                    },
+                    _ => {}
+                });
                 for field_name in old.keys() {
                     let old = old.get(field_name).unwrap().clone();
                     let new = new.get(field_name).unwrap().clone();
@@ -83,7 +91,13 @@ impl From<(Option<CharacterData>, Option<CharacterData>)> for FieldDiffs {
                 }
             }
             (None, Some(new)) => {
-                let new = HashMap::from(new);
+                let mut new = HashMap::from(new);
+                new.entry("notes".to_string()).and_modify(|value| match value {
+                    FieldValue::Markdown(markdown) => {
+                        markdown.html = html_from_markdown(&markdown.source);
+                    },
+                    _ => {}
+                });
                 for field_name in new.keys() {
                     let new = new.get(field_name).unwrap().clone();
                     data.push(FieldDiff::new(field_name, None, new));

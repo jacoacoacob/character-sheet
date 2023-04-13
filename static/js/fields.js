@@ -79,7 +79,7 @@ function numberFieldFactory({ formModel, apiModel, dirtyFields }) {
 function markdownFieldFactory({ formModel, apiModel, dirtyFields }) {
     return (fieldName, fieldLabel) => {
         const source = createTextarea({
-            className: "textarea",
+            className: "textarea flex-1",
             style: {
                 height: "288px",
                 width: "100%"
@@ -88,20 +88,19 @@ function markdownFieldFactory({ formModel, apiModel, dirtyFields }) {
                 id: fieldName,
             },
             onInput(ev) {
-                /** @type {HTMLTextAreaElement} */
-                const target = ev.target
-                formModel[fieldName].source = target.value.trim();
-                if (target.scrollHeight > 288) {
+                formModel[fieldName].source = ev.target.value.trim();
+                fetchMarkdownPreivew(500);
+                if (ev.target.scrollHeight > 288) {
                     const scrollLeft = window.scrollX;
                     const scrollTop = window.scrollY;
-                    target.style.height = 0;
-                    target.style.height = target.scrollHeight + 10 + "px";
+                    ev.target.style.height = 0;
+                    ev.target.style.height = ev.target.scrollHeight + 10 + "px";
                     window.scrollTo(scrollLeft, scrollTop);
                 } else {
-                    target.style.height = "288px";
+                    ev.target.style.height = "288px";
                 }
                 checkIsDirty(
-                    target,
+                    ev.target,
                     formModel[fieldName].source,
                     apiModel[fieldName].source,
                     dirtyFields
@@ -109,11 +108,29 @@ function markdownFieldFactory({ formModel, apiModel, dirtyFields }) {
             },
         });
 
-        const html = createDiv();
+        const html = createDiv({ className: "md flex-1" });
 
         html.innerHTML = formModel[fieldName].html;
 
         source.value = formModel[fieldName].source;
+
+        let handle;
+        function fetchMarkdownPreivew(delayMillis) {
+            clearTimeout(handle);
+            handle = setTimeout(async () => {
+                const response = await fetch("/md-preview", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        source: formModel[fieldName].source,
+                    }),
+                });
+                const data = await response.json();
+                html.innerHTML = data.html;
+            }, delayMillis);
+        }
 
         const label = createLabel({
             className: "label label--bold",
@@ -122,12 +139,18 @@ function markdownFieldFactory({ formModel, apiModel, dirtyFields }) {
         });
 
         return createDiv({
-            className: "flex flex-col space-y-2",
-            style: {
-                width: "100%",
-                position: "relative",
-            },
-            children: [label, source],
+            className: "space-y-2",
+            children: [
+                label,
+                createDiv({
+                    className: "flex space-x-4",
+                    children: [
+                        source,
+                        html
+                    ]
+                })
+            ],
+            // children: [label, source, html],
         });
     }
 }

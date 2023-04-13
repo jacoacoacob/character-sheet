@@ -320,7 +320,7 @@ function setupCommitForm() {
     form.addEventListener("submit", async (ev) => {
         ev.preventDefault();
 
-        const response = await fetch(`/${characterId}`, {
+        const response = await fetch(`/character/${characterId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

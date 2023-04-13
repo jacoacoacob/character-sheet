@@ -13,7 +13,7 @@
 <ul>
     {% for x in character_list %}
         <li>
-            <a href="/{{ x.id }}">
+            <a href="/character/{{ x.id }}">
                 {% if x.data.character_name %}
                     {{ x.data.character_name }}
                 {% else %}

@@ -4,6 +4,7 @@ use actix_web::{middleware, web, App, HttpServer};
 
 mod character_detail_page;
 mod character_listing_page;
+mod markdown;
 mod models;
 mod page;
 mod queries;
@@ -12,6 +13,7 @@ use character_detail_page::{
     create_character_detail_page, get_character_detail_page, update_character_detail_page,
 };
 use character_listing_page::get_character_listing_page;
+use markdown::create_md_preview;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -33,10 +35,11 @@ async fn main() -> std::io::Result<()> {
                     .route(web::post().to(create_character_detail_page)),
             )
             .service(
-                web::resource("/{character_id}")
+                web::resource("/character/{character_id}")
                     .route(web::get().to(get_character_detail_page))
                     .route(web::put().to(update_character_detail_page)),
             )
+            .route("/md-preview", web::post().to(create_md_preview))
     })
     .bind(("127.0.0.1", 8080))?
     .run()
