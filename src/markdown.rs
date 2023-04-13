@@ -2,7 +2,9 @@ use actix_web::{web, HttpResponse, Result};
 use serde::Deserialize;
 
 pub fn html_from_markdown(source: &str) -> String {
-    let options = comrak::ComrakOptions::default();
+    let mut options = comrak::ComrakOptions::default();
+
+    options.extension.table = true;
 
     println!("HTML_FROM_MARKDOWN");
 

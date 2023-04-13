@@ -52,17 +52,17 @@ function createInput({ className = "", style = {}, attrs = {}, onInput = () => v
  * }} param0
  */
 function createTextarea({ className = "", style = {}, attrs = {}, onInput = () => void 0 } = {}) {
-   const textarea = document.createElement("textarea");
+    const textarea = document.createElement("textarea");
 
-   classify(className, textarea);
+    classify(className, textarea);
 
-   stylize(style, textarea);
+    stylize(style, textarea);
 
-   attribute(attrs, textarea);
+    attribute(attrs, textarea);
 
-   textarea.addEventListener("input", onInput);
+    textarea.addEventListener("input", onInput);
 
-   return textarea;
+    return textarea;
 }
 
 
@@ -95,4 +95,27 @@ function createHeader(level, text) {
     return header;
 }
 
-export { createDiv, createHeader, createInput, createLabel, createTextarea };
+/**
+ * @param {{
+ *  innerHTML?: string;
+ *  className?: string;
+ *  style?: ElementCSSInlineStyle["style"];
+ *  attrs?: Record<string, *>;
+ *  onClick: (ev: MouseEvent, self: HTMLButtonElement) => void;
+ * }} param0
+ */
+function createButton({ innerHTML = "", attrs = {}, className = "", style = {}, onClick = () => void 0 } = {}) {
+    const button = document.createElement("button");
+
+    attribute(attrs, button);
+    classify(className, button);
+    stylize(style, button);
+
+    button.innerHTML = innerHTML;
+
+    button.addEventListener("click", (ev) => onClick(ev, button));
+
+    return button;
+}
+
+export { createButton, createDiv, createHeader, createInput, createLabel, createTextarea };

@@ -179,7 +179,7 @@ main {
     font-weight: 400;
 }
 .input--dirty {
-    box-shadow: 0 0 0 4px #be56fa
+    box-shadow: 0 0 0 4px #be56fa;
 }
 
 
@@ -206,4 +206,37 @@ main {
 
 .commit {
     max-width: 300px;
+}
+
+.md h1 {
+    font-size: 1.5rem;
+    margin: 16px 0;
+}
+.md h2 {
+    font-size: 1.25rem;
+    margin: 16px 0;
+}
+.md h3 {
+    font-size: 1rem;
+}
+.md h4 {
+    font-size: .875rem;
+}
+.md h5 {
+    font-size: .75rem;
+}
+
+.md hr {
+    border: none;
+    border-bottom: 1px solid #6a6a6a;
+    margin: 24px 0;
+}
+
+.md td {
+    padding-right: 16px;
+}
+
+.md th {
+    text-align: start;
+    padding-right: 16px;
 }

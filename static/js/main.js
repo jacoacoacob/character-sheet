@@ -316,6 +316,45 @@ function createDirtyFields() {
 function setupCommitForm() {
     const form = document.getElementById("commit-form");
     const message = document.getElementById("commit-message");
+    const commitChanges = document.getElementById("commit-changes");
+
+
+    /**
+     * 
+     * @param {KeyboardEvent} ev 
+     */
+    function isCommandS(ev) {
+        return (ev.metaKey || ev.ctrlKey) && ["s", "S"].includes(ev.key);
+    }
+
+    /**
+     * 
+     * @param {KeyboardEvent} ev 
+     */
+    function isCommandEnter(ev) {
+        return (ev.metaKey || ev.ctrlKey) && ev.key === "Enter";
+    }
+
+    let prevActiveElement = null;
+
+    window.addEventListener("keydown", (ev) => {
+        if (isCommandS(ev)) {
+            ev.preventDefault();
+            prevActiveElement = document.activeElement
+            message.focus();
+        }
+    });
+
+    message.addEventListener("keydown", (ev) => {
+        if (isCommandEnter(ev)) {
+            commitChanges.click();
+            if (prevActiveElement) {
+                prevActiveElement.focus();
+                prevActiveElement = null;
+            }
+        }
+    })
+
 
     form.addEventListener("submit", async (ev) => {
         ev.preventDefault();
