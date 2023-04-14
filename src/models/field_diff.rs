@@ -82,6 +82,18 @@ impl From<(Option<CharacterData>, Option<CharacterData>)> for FieldDiffs {
                     },
                     _ => {}
                 });
+                new.entry("attacks_and_spells".to_string()).and_modify(|value| match value {
+                    FieldValue::Markdown(markdown) => {
+                        markdown.html = html_from_markdown(&markdown.source);
+                    },
+                    _ => {}
+                });
+                new.entry("equipment".to_string()).and_modify(|value| match value {
+                    FieldValue::Markdown(markdown) => {
+                        markdown.html = html_from_markdown(&markdown.source);
+                    },
+                    _ => {}
+                });
                 for field_name in old.keys() {
                     let old = old.get(field_name).unwrap().clone();
                     let new = new.get(field_name).unwrap().clone();
@@ -93,6 +105,18 @@ impl From<(Option<CharacterData>, Option<CharacterData>)> for FieldDiffs {
             (None, Some(new)) => {
                 let mut new = HashMap::from(new);
                 new.entry("notes".to_string()).and_modify(|value| match value {
+                    FieldValue::Markdown(markdown) => {
+                        markdown.html = html_from_markdown(&markdown.source);
+                    },
+                    _ => {}
+                });
+                new.entry("attacks_and_spells".to_string()).and_modify(|value| match value {
+                    FieldValue::Markdown(markdown) => {
+                        markdown.html = html_from_markdown(&markdown.source);
+                    },
+                    _ => {}
+                });
+                new.entry("equipment".to_string()).and_modify(|value| match value {
                     FieldValue::Markdown(markdown) => {
                         markdown.html = html_from_markdown(&markdown.source);
                     },

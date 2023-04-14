@@ -226,6 +226,18 @@ function setupFields() {
         ],
     });
 
+    const attacksAndSpells = createDiv({
+        children: [
+            createField(markdownField, "attacks_and_spells"),
+        ],
+    });
+    
+    const equipment = createDiv({
+        children: [
+            createField(markdownField, "equipment"),
+        ],
+    });
+
     const notes = createDiv({
         children: [
             createField(markdownField, "notes"),
@@ -283,7 +295,10 @@ function setupFields() {
                     ],
                 }),
                 createDiv({
+                    className: "space-y-4",
                     children: [
+                        fieldGroup({ root: equipment, flex: 1 }),
+                        fieldGroup({ root: attacksAndSpells, flex: 1 }),
                         fieldGroup({ root: notes, flex: 1 }),
                     ],
                 }),

@@ -48,7 +48,7 @@ pub async fn create_character_detail_page() -> PageResponse {
     let response = execute(Query::CreateCharacter)?;
 
     match response {
-        QueryResponse::Character(character) => redirect(&format!("/{}", character.id)),
+        QueryResponse::Character(character) => redirect(&format!("/character/{}", character.id)),
         _ => redirect("/"),
     }
 }

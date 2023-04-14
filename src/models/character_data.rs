@@ -83,6 +83,8 @@ pub struct CharacterData {
     pub gp: Option<String>,
     pub pp: Option<String>,
     pub notes: Option<Markdown>,
+    pub equipment: Option<Markdown>,
+    pub attacks_and_spells: Option<Markdown>,
 }
 
 impl From<Vec<CharacterDelta>> for CharacterData {
@@ -179,6 +181,8 @@ impl From<Vec<CharacterDelta>> for CharacterData {
             gp: get_string("gp"),
             pp: get_string("pp"),
             notes: get_markdown("notes"),
+            attacks_and_spells: get_markdown("attacks_and_spells"),
+            equipment: get_markdown("equipment"),
         }
     }
 }
@@ -374,6 +378,8 @@ impl From<CharacterData> for HashMap<String, FieldValue> {
         data.insert("gp".to_string(), FieldValue::from(value.gp));
         data.insert("pp".to_string(), FieldValue::from(value.pp));
         data.insert("notes".to_string(), FieldValue::from(value.notes));
+        data.insert("attacks_and_spells".to_string(), FieldValue::from(value.attacks_and_spells));
+        data.insert("equipment".to_string(), FieldValue::from(value.equipment));
         data
     }
 }
