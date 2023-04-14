@@ -110,7 +110,7 @@ function markdownFieldFactory({ formModel, apiModel, dirtyFields }) {
         const label = createLabel({
             className: "label label--lg label--bold",
             style: {
-                fontSize: "16px",
+                fontSize: "20px",
             },
             text: fieldLabel,
             forId: source.id,
