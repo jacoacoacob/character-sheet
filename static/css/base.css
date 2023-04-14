@@ -142,9 +142,13 @@ main {
 
 .field-group {
     /* background-color: #e8eaec; */
+    box-shadow: 2px 2px 8px #bababa;
+
     /* background-color: #a7ff78; */
-    background-color: #fad400a1;
+    /* background-color: #fad400a1; */
     /* background-color: #ff89c0ca; */
+    /* background-color: #d3baf873; */
+    background-color: #cab49a73;
     padding: 12px;
     border-radius: 4px;
 }
