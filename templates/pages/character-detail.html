@@ -5,7 +5,30 @@
     window.INITIAL_DATA = {{ character | json_encode | safe }}
 </script>
 
-<main class="flex space-x-6">
+<main id="main-content" class="flex space-x-6" tabindex="-1">
+    <section id="commit-history">
+    </section>
+    <div class="flex-1 flex justify-center">
+        <section id="fields-wrapper"></section>
+    </div>
+</main>
+
+<div class="modal modal--visible">
+    <div class="modal-content">
+        <form id="commit-form" class="space-y-3">
+            <div class="flex flex-col space-y-2">
+                <label for="commit-message">Message</label>
+                <textarea class="textarea" id="commit-message"></textarea>
+            </div>
+            <button id="commit-changes" class="input" type="submit">Save</button>
+        </form>
+    </div>
+</div>
+
+<script src="/static/js/main.js?ts={{ now(timestamp=true) }}" type="module"></script>
+{% endblock body %}
+
+<!-- <main class="flex space-x-6">
     <section class="commit flex-1">
         <form id="commit-form" class="space-y-3">
             <div class="flex flex-col space-y-2">
@@ -16,7 +39,4 @@
         </form>
     </section>
     <section class="fields-wrapper"></section>
-</main>
-
-<script src="/static/js/main.js?ts={{ now(timestamp=true) }}" type="module"></script>
-{% endblock body %}
+</main> -->

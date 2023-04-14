@@ -50,12 +50,16 @@ function checkIsDirty(input, formValue, apiValue, dirtyFields) {
     if (formValue !== apiValue) {
         input.classList.add("input--dirty");
         dirtyFields.add(input.id);
-        // dirtyFields.push(input.id);
     } else {
         input.classList.remove("input--dirty");
         dirtyFields.remove(input.id);
-        // dirtyFields.splice(dirtyFields.indexOf(input.id), 1);
     }
 }
 
-export { createField, attribute, naiveDeepCopy, classify, stylize, checkIsDirty };
+function clearElement(elem) {
+    while (elem.lastChild) {
+        elem.removeChild(elem.lastChild);
+    }
+}
+
+export { clearElement, createField, attribute, naiveDeepCopy, classify, stylize, checkIsDirty };

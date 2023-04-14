@@ -23,6 +23,17 @@ function createDiv({ className = "", style = {}, children = [] } = {}) {
 
 /**
  * @param {{
+ *  className?: string;
+ *  style?: ElementCSSInlineStyle["style"];
+ *  children?: HTMLElement[];
+ * }} param0
+ */
+function createReactiveDiv({ className = "", style = {}, children = [] } = {}) {
+
+}
+
+/**
+ * @param {{
  *  className: string;
  *  style: ElementCSSInlineStyle["style"];
  *  attrs: Record<string, *>;
@@ -118,4 +129,64 @@ function createButton({ innerHTML = "", attrs = {}, className = "", style = {}, 
     return button;
 }
 
-export { createButton, createDiv, createHeader, createInput, createLabel, createTextarea };
+/**
+ * @param {{
+ *  className?: string;
+ *  style?: ElementCSSInlineStyle["style"];
+ *  children?: HTMLElement[];
+ *  onSubmit: (ev: SubmitEvent) => void;
+ * }} param0
+ */
+function createForm({
+    className = "",
+    style = {},
+    children = [],
+    onSubmit = () => void 0
+} = {}) {
+    
+}
+
+
+/**
+ * @param {{
+ *  tagName: string; 
+ *  className?: string;
+ *  attrs: Record<string, *>;
+ *  style?: ElementCSSInlineStyle["style"];
+ *  children?: HTMLElement[];
+ *  listeners?: [string, (ev: Event) => void][]
+ * }} param0
+ */
+function createReactiveElement({
+    tagName,
+    attrs,
+    className = "",
+    style = {},
+    children = [],
+    listeners,
+} = {}) {
+    const elem = document.createElement(tagName);
+
+    function updateChildren(children = []) {
+        while (elem.lastChild) {
+            elem.removeChild(element.lastChild);
+        }
+        elem.append(children);
+    }
+
+    updateChildren(children);
+
+    attribute(attrs, elem);
+
+    stylize(style, elem);
+
+    className(className, elem);
+
+    listeners.forEach(([type, listener]) => {
+        elem.addEventListener(type, listener);
+    });
+
+    return { elem, updateChildren }
+}
+
+export { createButton, createDiv, createReactiveElement, createForm, createHeader, createInput, createLabel, createTextarea };

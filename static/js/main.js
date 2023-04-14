@@ -35,7 +35,7 @@ setupFields();
 setupCommitForm();
 
 function setupFields() {
-    const fields = document.querySelector(".fields-wrapper");
+    const fields = document.getElementById("fields-wrapper");
 
     fields.classList.add("space-y-4");
 
@@ -295,11 +295,16 @@ function setupFields() {
                     ],
                 }),
                 createDiv({
-                    className: "space-y-4",
+                    className: "flex",
                     children: [
-                        fieldGroup({ root: equipment, flex: 1 }),
-                        fieldGroup({ root: attacksAndSpells, flex: 1 }),
-                        fieldGroup({ root: notes, flex: 1 }),
+                        createDiv({
+                            className: "flex-1 space-y-4",
+                            children: [
+                                fieldGroup({ root: equipment, flex: 1 }),
+                                fieldGroup({ root: attacksAndSpells, flex: 1 }),
+                                fieldGroup({ root: notes, flex: 1 }),
+                            ]
+                        })
                     ],
                 }),
             ],
