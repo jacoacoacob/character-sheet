@@ -5,7 +5,7 @@ import {
     numberFieldFactory,
     proficiencyFieldFactory,
     textFieldFactory,
-} from "./fields.js";
+} from "./fields/index.js";
 import { fieldGroup } from "./layouts.js";
 import { naiveDeepCopy, createField } from "./utils.js";
 
