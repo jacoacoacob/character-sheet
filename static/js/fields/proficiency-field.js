@@ -28,7 +28,7 @@ function proficiencyFieldFactory({ formModel, apiModel, dirtyFields }) {
         proficientInput.checked = formModel[fieldName].proficient;
 
         const modifierInput = createInput({
-            className: "input input--w-1",
+            className: "input input--w-4",
             attrs: {
                 value: formModel[fieldName].modifier,
                 id: `${fieldName}-modifier`,

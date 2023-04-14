@@ -1,8 +1,10 @@
 use std::collections::HashMap;
+use std::fs;
 
+use actix_web::guard::Connect;
 use actix_web::{error, Error};
 use chrono::{DateTime, Utc};
-use rusqlite::{named_params, params, Connection, Result};
+use rusqlite::{named_params, params, Connection, Result, Batch};
 
 use crate::models::character::Character;
 use crate::models::character_data::CharacterData;
@@ -24,10 +26,43 @@ pub enum QueryResponse {
     CharacterList(Vec<Character>),
 }
 
-pub fn execute(query: Query) -> Result<QueryResponse, Error> {
-    let db_path = std::env::var("DB_PATH").unwrap_or("./db/data.db".to_string());
+fn check_table_exists(conn: &Connection, table_name: &str) -> Result<bool, Error> {
+    let mut stmt = conn
+        .prepare("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name = ?1")
+        .map_err(error::ErrorInternalServerError)?;
 
-    let conn = Connection::open(db_path).map_err(error::ErrorInternalServerError)?;
+    let row_count = stmt
+        .query_row([table_name], |row| row.get::<_, usize>(0))
+        .map_err(error::ErrorInternalServerError)?;
+
+    Ok(row_count > 0)
+}
+
+fn get_conn() -> Result<Connection, Error> {
+    let DB_DATA_PATH = concat!(env!("CARGO_MANIFEST_DIR"), "/db/data.db");
+
+    let conn = Connection::open(&DB_DATA_PATH).map_err(error::ErrorInternalServerError)?;
+
+    match check_table_exists(&conn, "character")? && check_table_exists(&conn, "character_delta")? {
+        true => Ok(conn),
+        false => {
+            let DB_SCHEMA_PATH = concat!(env!("CARGO_MANIFEST_DIR"), "/db/schema.sql");
+
+            let db_schema_sql = fs::read_to_string(&DB_SCHEMA_PATH)?;
+
+            let mut batch = Batch::new(&conn, &db_schema_sql);
+
+            while let Some(mut stmt) = batch.next().map_err(error::ErrorInternalServerError)? {
+                stmt.execute([]).map_err(error::ErrorInternalServerError)?;
+            }
+
+            Ok(conn)
+        }
+    }
+}
+
+pub fn execute(query: Query) -> Result<QueryResponse, Error> {
+    let conn = get_conn()?;
 
     let result = match query {
         Query::CreateCharacter => create_character(&conn),
@@ -58,12 +93,15 @@ fn map_character_delta(row: &rusqlite::Row) -> rusqlite::Result<CharacterDelta> 
 }
 
 fn get_most_recent_timestamp_from(deltas: &Vec<CharacterDelta>) -> DateTime<Utc> {
-    let mut timestamps = deltas.iter().map(|x| x.created).collect::<Vec<DateTime<Utc>>>();
+    let mut timestamps = deltas
+        .iter()
+        .map(|x| x.created)
+        .collect::<Vec<DateTime<Utc>>>();
 
     timestamps.sort_by(|a, b| b.cmp(&a));
 
     timestamps.first().unwrap().clone()
-} 
+}
 
 fn list_characters(conn: &Connection) -> DbResult<QueryResponse> {
     let mut stmt = conn.prepare(
@@ -96,7 +134,7 @@ fn list_characters(conn: &Connection) -> DbResult<QueryResponse> {
                 accum
             },
         );
-    
+
     character_list.sort_by(|a, b| b.updated.cmp(&a.updated));
 
     Ok(QueryResponse::CharacterList(character_list))

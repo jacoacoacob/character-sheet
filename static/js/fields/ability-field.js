@@ -11,10 +11,10 @@ function abilityFieldFactory({ formModel, apiModel, dirtyFields }) {
         });
 
         const scoreInput = createInput({
-            className: "input input--w-6",
-            style: {
-                width: "80px"
-            },
+            className: "input input--w-2",
+            // style: {
+            //     width: "80px"
+            // },
             attrs: {
                 value: formModel[fieldName].score,
                 id: `${fieldName}-score`,
