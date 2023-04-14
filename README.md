@@ -5,14 +5,8 @@
 
 _The below steps assume that you have [rustup](https://www.rust-lang.org/tools/install) and [sqlite](https://sqlite.org/index.html) available on your system._
 
-1. Clone or download the repo and cd into the project root
-
-2. Create the database 
-    ```
-    sqlite3 db/data.db < db/schema.sql
-    ```
-
-3. Start the dev server
+1. Clone or download the repo and `cd` into the project root
+2. Start the dev server
     ```
     cargo run
     ```

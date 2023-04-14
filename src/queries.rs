@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::fs;
 
-use actix_web::guard::Connect;
 use actix_web::{error, Error};
 use chrono::{DateTime, Utc};
 use rusqlite::{named_params, params, Connection, Result, Batch};
