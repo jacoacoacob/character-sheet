@@ -38,7 +38,10 @@ fn check_table_exists(conn: &Connection, table_name: &str) -> Result<bool, Error
 }
 
 fn get_conn() -> Result<Connection, Error> {
-    let DB_DATA_PATH = concat!(env!("CARGO_MANIFEST_DIR"), "/db/data.db");
+    let DB_NAME = std::env::var("DB_NAME").unwrap_or("data.db".to_string());
+    let mut DB_DATA_PATH = env!("CARGO_MANIFEST_DIR").to_string();
+    DB_DATA_PATH.push_str("/db/");
+    DB_DATA_PATH.push_str(&DB_NAME);
 
     let conn = Connection::open(&DB_DATA_PATH).map_err(error::ErrorInternalServerError)?;
 

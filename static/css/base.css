@@ -202,7 +202,6 @@ main {
 }
 
 .textarea {
-    width: 360px;
     resize: none;
     overflow-y: hidden;
 }
@@ -244,7 +243,6 @@ main {
     text-align: start;
     padding-right: 16px;
 }
-
 
 .modal {
     position: absolute;

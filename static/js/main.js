@@ -32,7 +32,9 @@ const numberField = numberFieldFactory(context);
 const proficiencyField = proficiencyFieldFactory(context);
 
 setupFields();
-setupCommitForm();
+setupSaveModal();
+setupSaveAsImage()
+// setupCommitForm();
 
 function setupFields() {
     const fields = document.getElementById("fields-wrapper");
@@ -102,7 +104,7 @@ function setupFields() {
                             createField(proficiencyField, "skill_animal_handling", "Animal Handling (wis)"),
                             createField(proficiencyField, "skill_arcana", "Arcana (int)"),
                             createField(proficiencyField, "skill_athletics", "Athletics (str)"),
-                            createField(proficiencyField, "skill_deception", "Deception (dex)"),
+                            createField(proficiencyField, "skill_deception", "Deception (cha)"),
                             createField(proficiencyField, "skill_history", "History (int)"),
                             createField(proficiencyField, "skill_insight", "Insight (wis)"),
                             createField(proficiencyField, "skill_inimidation", "Intimidation (cha)"),
@@ -338,7 +340,6 @@ function setupCommitForm() {
     const message = document.getElementById("commit-message");
     const commitChanges = document.getElementById("commit-changes");
 
-
     /**
      * 
      * @param {KeyboardEvent} ev 
@@ -403,3 +404,129 @@ function setupCommitForm() {
 }
 
 
+function setupSaveModal() {
+    const modal = document.getElementById("save-modal");
+    const btnCloseModal = document.getElementById("btn-close-modal");
+    const formCommit = document.getElementById("form-commit");
+    const btnSubmitCommitForm = document.getElementById("btn-submit-commit-form");
+    const taCommitMessage = document.getElementById("ta-commit-message");
+
+    let prevActiveElement = null;
+
+    btnCloseModal.addEventListener("click", closeModal);
+
+    window.addEventListener("keydown", (ev) => {
+        if (isCommandS(ev)) {
+            ev.preventDefault();
+            openModal();
+        }
+    });
+
+    formCommit.addEventListener("submit", async (ev) => {
+        ev.preventDefault();
+
+        const response = await fetch(`/character/${characterId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                message: taCommitMessage.value,
+                new_data: formModel,
+            }),
+        });
+
+        taCommitMessage.value = "";
+        
+        const responseJson = await response.json();
+
+        Object.entries(responseJson.data).forEach(([fieldName, value]) => {
+            apiModel[fieldName] = value;
+        });
+
+        dirtyFields.removeAll();
+
+        closeModal();
+    });
+
+    taCommitMessage.addEventListener("keydown", (ev) => {
+        if (isCommandEnter(ev)) {
+            btnSubmitCommitForm.click();
+        }
+    });
+
+ 
+
+    function openModal() {
+        modal.classList.add("modal--visible");
+        prevActiveElement = document.activeElement;
+        taCommitMessage.focus();
+        window.addEventListener("keydown", listenEscapeKey);
+    }
+
+    function closeModal() {
+        modal.classList.remove("modal--visible");
+        if (prevActiveElement) {
+            prevActiveElement.focus();
+            prevActiveElement = null;
+        }
+        window.removeEventListener("keydown", listenEscapeKey);
+    }
+
+    /**
+     * 
+     * @param {KeyboardEvent} ev 
+     */
+    function isCommandS(ev) {
+        return (ev.metaKey || ev.ctrlKey) && ["s", "S"].includes(ev.key);
+    }
+
+    /**
+     * 
+     * @param {KeyboardEvent} ev 
+     */
+    function isCommandEnter(ev) {
+        return (ev.metaKey || ev.ctrlKey) && ev.key === "Enter";
+    }
+
+    /**
+     * 
+     * @param {KeyboardEvent} ev 
+     */
+    function isEsc(ev) {
+        return ev.key === "Escape";
+    }
+
+    /**
+     * 
+     * @param {KeyboardEvent} ev 
+     */
+    function listenEscapeKey(ev) {
+        if (isEsc(ev)) {
+            closeModal();
+        }
+    }
+}
+
+function setupSaveAsImage() {
+    const btnSaveImage = document.getElementById("btn-save-image")
+    
+    btnSaveImage.addEventListener("click", async () => {
+        const element = document.getElementById("fields-wrapper");
+
+        element.style.padding = "8px";
+        
+        const a = document.createElement("a");
+
+        try {
+            const canvas = await html2canvas(element);
+            a.href = canvas.toDataURL();
+            a.download = formModel.character_name + "_" + new Date().toDateString().toLowerCase().replace(/\s+/g, "_");
+            a.click();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            element.style.padding = 0;
+        }
+    });
+}
