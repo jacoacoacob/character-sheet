@@ -62,4 +62,78 @@ function clearElement(elem) {
     }
 }
 
-export { clearElement, createField, attribute, naiveDeepCopy, classify, stylize, checkIsDirty };
+
+
+
+/**
+ * 
+ * @param {KeyboardEvent} ev 
+ */
+function isEnterKey(ev) {
+    return ev.key === "Enter";
+}
+
+/**
+ * 
+ * @param {KeyboardEvent} ev 
+ */
+function isShiftKey(ev) {
+    return ev.shiftKey;
+}
+
+/**
+ * 
+ * @param {KeyboardEvent} ev 
+ */
+function isCommandKey(ev) {
+    return ev.metaKey || ev.ctrlKey;
+}
+
+/**
+ * 
+ * @param {KeyboardEvent} ev 
+ */
+function isTabKey(ev) {
+    return ev.key === "Tab";
+}
+
+/**
+ * 
+ * @param {KeyboardEvent} ev 
+ */
+function isSKey(ev) {
+    return ev.key === "s" || ev.key === "S";
+}
+
+/**
+ * 
+ * @param {KeyboardEvent} ev 
+ */
+function isCommandEnter(ev) {
+    return isCommandKey(ev) && isEnterKey(ev);
+}
+
+/**
+ * 
+ * @param {KeyboardEvent} ev 
+ */
+function isCommandS(ev) {
+    return isCommandKey(ev) && isSKey(ev);
+}
+
+export {
+    clearElement,
+    createField,
+    attribute,
+    isCommandKey,
+    isEnterKey,
+    isSKey,
+    isShiftKey,
+    isTabKey,
+    isCommandEnter,
+    isCommandS,
+    naiveDeepCopy,
+    classify,
+    stylize,
+    checkIsDirty
+};

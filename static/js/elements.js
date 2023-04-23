@@ -96,6 +96,7 @@ function createHeader(level, text) {
 
 /**
  * @param {{
+ *  text?: string;
  *  innerHTML?: string;
  *  className?: string;
  *  style?: ElementCSSInlineStyle["style"];
@@ -103,14 +104,18 @@ function createHeader(level, text) {
  *  onClick: (ev: MouseEvent, self: HTMLButtonElement) => void;
  * }} param0
  */
-function createButton({ innerHTML = "", attrs = {}, className = "", style = {}, onClick = () => void 0 } = {}) {
+function createButton({ text = "", innerHTML = "", attrs = {}, className = "", style = {}, onClick = () => void 0 } = {}) {
     const button = document.createElement("button");
 
     attribute(attrs, button);
     classify(className, button);
     stylize(style, button);
 
-    button.innerHTML = innerHTML;
+    if (innerHTML) {
+        button.innerHTML = innerHTML;
+    } else {
+        button.textContent = text;
+    }
 
     button.addEventListener("click", (ev) => onClick(ev, button));
 
@@ -119,6 +124,7 @@ function createButton({ innerHTML = "", attrs = {}, className = "", style = {}, 
 
 /**
  * @param {{
+ *  attrs?: Record<string, *>;
  *  className?: string;
  *  style?: ElementCSSInlineStyle["style"];
  *  children?: HTMLElement[];
@@ -127,49 +133,22 @@ function createButton({ innerHTML = "", attrs = {}, className = "", style = {}, 
  */
 function createForm({
     className = "",
+    attrs = {},
     style = {},
     children = [],
     onSubmit = () => void 0
 } = {}) {
-    
+    const form = document.createElement("form");
+
+    classify(className, form);
+    stylize(style, form);
+    attribute(attrs, form);
+
+    form.addEventListener("submit", onSubmit);
+
+    form.append(...children);
+
+    return form;
 }
 
-
-/**
- * @param {{
- *  className?: string;
- *  style?: ElementCSSInlineStyle["style"];
- *  children?: HTMLElement[];
- * }} param0
- */
-function createDynamicDiv({
-    attrs,
-    className = "",
-    style = {},
-    children = [],
-} = {}) {
-    const elem = document.createElement("div");
-
-    function updateChildren(...children) {
-        while (elem.lastChild) {
-            elem.removeChild(element.lastChild);
-        }
-        elem.append(children.filter(Boolean));
-    }
-
-    updateChildren(...children);
-
-    attribute(attrs, elem);
-
-    stylize(style, elem);
-
-    className(className, elem);
-
-    listeners.forEach(([type, listener]) => {
-        elem.addEventListener(type, listener);
-    });
-
-    return { elem, updateChildren }
-}
-
-export { createButton, createDiv, createDynamicDiv, createForm, createHeader, createInput, createLabel, createTextarea };
+export { createButton, createDiv, createForm, createHeader, createInput, createLabel, createTextarea };

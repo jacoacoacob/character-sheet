@@ -1,4 +1,4 @@
-import { createButton, createDiv, createHeader } from "./elements.js";
+import { createButton, createDiv, createForm, createHeader, createTextarea } from "./elements.js";
 import { createModal } from "./modal.js";
 import {
     abilityFieldFactory,
@@ -8,7 +8,7 @@ import {
     textFieldFactory,
 } from "./fields/index.js";
 import { fieldGroup } from "./layouts.js";
-import { naiveDeepCopy, createField } from "./utils.js";
+import { naiveDeepCopy, createField, isCommandEnter, isCommandS } from "./utils.js";
 
 const characterId = INITIAL_DATA.id;
 
@@ -336,187 +336,11 @@ function createDirtyFields() {
     }
 }
 
-function setupCommitForm() {
-    const form = document.getElementById("commit-form");
-    const message = document.getElementById("commit-message");
-    const commitChanges = document.getElementById("commit-changes");
-
-    /**
-     * 
-     * @param {KeyboardEvent} ev 
-     */
-    function isCommandS(ev) {
-        return (ev.metaKey || ev.ctrlKey) && ["s", "S"].includes(ev.key);
-    }
-
-    /**
-     * 
-     * @param {KeyboardEvent} ev 
-     */
-    function isCommandEnter(ev) {
-        return (ev.metaKey || ev.ctrlKey) && ev.key === "Enter";
-    }
-
-    let prevActiveElement = null;
-
-    window.addEventListener("keydown", (ev) => {
-        if (isCommandS(ev)) {
-            ev.preventDefault();
-            prevActiveElement = document.activeElement
-            message.focus();
-        }
-    });
-
-    message.addEventListener("keydown", (ev) => {
-        if (isCommandEnter(ev)) {
-            commitChanges.click();
-            if (prevActiveElement) {
-                prevActiveElement.focus();
-                prevActiveElement = null;
-            }
-        }
-    })
-
-
-    form.addEventListener("submit", async (ev) => {
-        ev.preventDefault();
-
-        const response = await fetch(`/character/${characterId}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                message: message.value,
-                new_data: formModel,
-            }),
-        });
-
-        message.value = "";
-
-        const responseJson = await response.json();
-
-        Object.entries(responseJson.data).forEach(([fieldName, value]) => {
-            apiModel[fieldName] = value;
-        });
-
-        dirtyFields.removeAll();
-    });
-}
-
-
-// function setupSaveModal() {
-function setupSaveModalOld() {
-    const modal = document.getElementById("save-modal");
-    const btnCloseModal = document.getElementById("btn-close-modal");
-    const formCommit = document.getElementById("form-commit");
-    const btnSubmitCommitForm = document.getElementById("btn-submit-commit-form");
-    const taCommitMessage = document.getElementById("ta-commit-message");
-
-    let prevActiveElement = null;
-
-    btnCloseModal.addEventListener("click", closeModal);
-
-    window.addEventListener("keydown", (ev) => {
-        if (isCommandS(ev)) {
-            ev.preventDefault();
-            openModal();
-        }
-    });
-
-    formCommit.addEventListener("submit", async (ev) => {
-        ev.preventDefault();
-
-        const response = await fetch(`/character/${characterId}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                message: taCommitMessage.value,
-                new_data: formModel,
-            }),
-        });
-
-        taCommitMessage.value = "";
-        
-        const responseJson = await response.json();
-
-        Object.entries(responseJson.data).forEach(([fieldName, value]) => {
-            apiModel[fieldName] = value;
-        });
-
-        dirtyFields.removeAll();
-
-        closeModal();
-    });
-
-    taCommitMessage.addEventListener("keydown", (ev) => {
-        if (isCommandEnter(ev)) {
-            btnSubmitCommitForm.click();
-        }
-    });
-
- 
-
-    function openModal() {
-        modal.classList.add("modal--visible");
-        prevActiveElement = document.activeElement;
-        taCommitMessage.focus();
-        window.addEventListener("keydown", listenEscapeKey);
-    }
-
-    function closeModal() {
-        modal.classList.remove("modal--visible");
-        if (prevActiveElement) {
-            prevActiveElement.focus();
-            prevActiveElement = null;
-        }
-        window.removeEventListener("keydown", listenEscapeKey);
-    }
-
-    /**
-     * 
-     * @param {KeyboardEvent} ev 
-     */
-    function isCommandS(ev) {
-        return (ev.metaKey || ev.ctrlKey) && ["s", "S"].includes(ev.key);
-    }
-
-    /**
-     * 
-     * @param {KeyboardEvent} ev 
-     */
-    function isCommandEnter(ev) {
-        return (ev.metaKey || ev.ctrlKey) && ev.key === "Enter";
-    }
-
-    /**
-     * 
-     * @param {KeyboardEvent} ev 
-     */
-    function isEsc(ev) {
-        return ev.key === "Escape";
-    }
-
-    /**
-     * 
-     * @param {KeyboardEvent} ev 
-     */
-    function listenEscapeKey(ev) {
-        if (isEsc(ev)) {
-            closeModal();
-        }
-    }
-}
-
 function setupSaveAsImage() {
     const btnSaveImage = document.getElementById("btn-save-image")
     
     btnSaveImage.addEventListener("click", async () => {
         const element = document.getElementById("fields-wrapper");
-
-        element.style.padding = "8px";
         
         const a = document.createElement("a");
 
@@ -527,42 +351,106 @@ function setupSaveAsImage() {
             a.click();
         } catch (error) {
             console.error(error);
-        } finally {
-            element.style.padding = 0;
         }
     });
 }
 
 function setupSaveModal() {
-
-    /**
-     * 
-     * @param {KeyboardEvent} ev 
-     */
-    function isCommandS(ev) {
-        return (ev.metaKey || ev.ctrlKey) && ["s", "S"].includes(ev.key);
-    }
-
-    /**
-     * 
-     * @param {KeyboardEvent} ev 
-     */
-    function isCommandEnter(ev) {
-        return (ev.metaKey || ev.ctrlKey) && ev.key === "Enter";
-    }
-
-
-    createModal({
+    const modal = createModal({
+        onClose(contentRoot) {
+            contentRoot.querySelector("#message").value = "";
+        },
         setup({ closeModal, openModal }) {
+
             window.addEventListener("keydown", (ev) => {
                 if (isCommandS(ev)) {
                     ev.preventDefault();
                     openModal();
                 }
             });
+
+
+            const textareaCommitMessage = createTextarea({
+                className: "flex-1 focusable",
+                attrs: {
+                    id: "message",
+                    name: "message",
+                    placeholder: "Describe the changes you made (optional)"
+                },
+            });
+
+
+            const buttonCancel = createButton({
+                className: "focusable",
+                style: {
+                    order: 1,
+                    marginRight: "8px",
+                    backgroundColor: "transparent",
+                    border: "none",
+                },
+                text: "cancel",
+                onClick: closeModal
+            });
             
-            return [];
+            const buttonSubmit = createButton({
+                text: "Save",
+                className: "focusable",
+                style: {
+                    order: 2,
+                },
+                attrs: {
+                    type: "submit",
+                },
+            });
+
+            return [
+                createForm({
+                    async onSubmit(ev) {
+                        ev.preventDefault();
+
+                        const response = await fetch(`/character/${characterId}`, {
+                            method: "PUT",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                message: textareaCommitMessage.value,
+                                new_data: formModel,
+                            }),
+                        });
+                
+                        textareaCommitMessage.value = "";
+                        
+                        const responseJson = await response.json();
+                
+                        Object.entries(responseJson.data).forEach(([fieldName, value]) => {
+                            apiModel[fieldName] = value;
+                        });
+                
+                        dirtyFields.removeAll();
+                
+                        closeModal();
+                    },
+                    className: "flex flex-col space-y-3",
+                    attrs: {
+                        tabIndex: 1,
+                        id: "commit-form",
+                    },
+                    children: [
+                        textareaCommitMessage,
+                        createDiv({
+                            className: "flex justify-end",
+                            children: [
+                                buttonSubmit,
+                                buttonCancel,
+                            ],
+                        }),
+                    ],
+                })
+            ];
         },
     });
+
+    document.body.appendChild(modal);
 }
 

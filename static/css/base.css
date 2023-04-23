@@ -22,12 +22,26 @@ input, textarea, button {
     font: inherit;
 }
 
-main {
-    padding: 0 16px;
+button {
+    cursor: pointer;
 }
+
+/* main {
+    padding: 0 16px;
+} */
 
 
 /* Utilities */
+
+.text-start {
+    text-align: start;
+}
+.text-center {
+    text-align: center;
+}
+.text-end {
+    text-align: end;
+}
 
 .flex {
     display: flex;
@@ -141,21 +155,18 @@ main {
 /* Components */
 
 .field-group {
-    /* background-color: #e8eaec; */
-    box-shadow: 2px 2px 8px #bababa;
-
-    /* background-color: #a7ff78; */
-    /* background-color: #fad400a1; */
-    /* background-color: #ff89c0ca; */
-    /* background-color: #d3baf873; */
-    background-color: #cab49a73;
+    box-shadow: 2px 2px 8px #c4c4c4;
+    background: linear-gradient(
+        to right,
+        rgba(202, 181, 155, 0.451),
+        rgba(202, 181, 155, 0.402)
+    );
     padding: 12px;
     border-radius: 4px;
 }
 
 .input {
     font-size: .875rem;
-    /* width: 128px; */
 }
 .input--w-1 {
     width: 56px;
@@ -245,7 +256,7 @@ main {
 }
 
 .modal {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     display: none;
@@ -261,9 +272,11 @@ main {
 }
 
 .modal-content {
-    background-color: azure;
+    box-shadow: 2px 2px 12px #a5a5a5;
+    border-radius: 4px;
+    background-color: #ffffff;
     flex: 1;
     max-height: 80%;
     max-width: 400px;
-    padding: 24px;
+    padding: 32px;
 }
