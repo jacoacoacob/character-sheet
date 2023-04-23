@@ -14,23 +14,11 @@ function createDiv({ className = "", style = {}, children = [] } = {}) {
 
     stylize(style, div);
 
-    children.forEach((child) => {
-        div.appendChild(child)
-    });
+    div.append(...children.filter(Boolean))
 
     return div;
 }
 
-/**
- * @param {{
- *  className?: string;
- *  style?: ElementCSSInlineStyle["style"];
- *  children?: HTMLElement[];
- * }} param0
- */
-function createReactiveDiv({ className = "", style = {}, children = [] } = {}) {
-
-}
 
 /**
  * @param {{
@@ -149,32 +137,27 @@ function createForm({
 
 /**
  * @param {{
- *  tagName: string; 
  *  className?: string;
- *  attrs: Record<string, *>;
  *  style?: ElementCSSInlineStyle["style"];
  *  children?: HTMLElement[];
- *  listeners?: [string, (ev: Event) => void][]
  * }} param0
  */
-function createReactiveElement({
-    tagName,
+function createDynamicDiv({
     attrs,
     className = "",
     style = {},
     children = [],
-    listeners,
 } = {}) {
-    const elem = document.createElement(tagName);
+    const elem = document.createElement("div");
 
-    function updateChildren(children = []) {
+    function updateChildren(...children) {
         while (elem.lastChild) {
             elem.removeChild(element.lastChild);
         }
-        elem.append(children);
+        elem.append(children.filter(Boolean));
     }
 
-    updateChildren(children);
+    updateChildren(...children);
 
     attribute(attrs, elem);
 
@@ -189,4 +172,4 @@ function createReactiveElement({
     return { elem, updateChildren }
 }
 
-export { createButton, createDiv, createReactiveElement, createForm, createHeader, createInput, createLabel, createTextarea };
+export { createButton, createDiv, createDynamicDiv, createForm, createHeader, createInput, createLabel, createTextarea };

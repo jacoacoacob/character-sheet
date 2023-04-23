@@ -1,4 +1,5 @@
-import { createDiv, createHeader } from "./elements.js";
+import { createButton, createDiv, createHeader } from "./elements.js";
+import { createModal } from "./modal.js";
 import {
     abilityFieldFactory,
     markdownFieldFactory,
@@ -404,7 +405,8 @@ function setupCommitForm() {
 }
 
 
-function setupSaveModal() {
+// function setupSaveModal() {
+function setupSaveModalOld() {
     const modal = document.getElementById("save-modal");
     const btnCloseModal = document.getElementById("btn-close-modal");
     const formCommit = document.getElementById("form-commit");
@@ -530,3 +532,37 @@ function setupSaveAsImage() {
         }
     });
 }
+
+function setupSaveModal() {
+
+    /**
+     * 
+     * @param {KeyboardEvent} ev 
+     */
+    function isCommandS(ev) {
+        return (ev.metaKey || ev.ctrlKey) && ["s", "S"].includes(ev.key);
+    }
+
+    /**
+     * 
+     * @param {KeyboardEvent} ev 
+     */
+    function isCommandEnter(ev) {
+        return (ev.metaKey || ev.ctrlKey) && ev.key === "Enter";
+    }
+
+
+    createModal({
+        setup({ closeModal, openModal }) {
+            window.addEventListener("keydown", (ev) => {
+                if (isCommandS(ev)) {
+                    ev.preventDefault();
+                    openModal();
+                }
+            });
+            
+            return [];
+        },
+    });
+}
+
