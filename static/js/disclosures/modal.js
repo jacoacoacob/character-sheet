@@ -1,9 +1,10 @@
-import { createDiv } from "./elements.js"
-import { isShiftKey, isTabKey } from "./utils.js";
+import { createDiv } from "../elements.js"
+import { isShiftKey, isTabKey } from "../utils.js";
 
 /**
  * 
  * @param {{
+ *  closeOnClickOutside?: boolean;
  *  onClose?: (contentRoot: HTMLDivElement) => void;
  *  onOpen?: (contentRoot: HTMLDivElement) => void;
  *  setup?: (options: {
@@ -11,9 +12,9 @@ import { isShiftKey, isTabKey } from "./utils.js";
  *      closeModal: () => void;
  *  }) => HTMLElement[];
  * }} param0 
- * @returns 
  */
 function createModal({
+    closeOnClickOutside = false,
     onOpen = () => void 0,
     onClose = () => void 0,
     setup = () => [],
@@ -35,6 +36,16 @@ function createModal({
     });
 
     modal.hidden = true;
+
+    /**
+     * 
+     * @param {MouseEvent} ev 
+     */
+    function listenClickOutsideContent(ev) {
+        if (closeOnClickOutside && ev.target === modal) {
+            closeModal();
+        }
+    }
 
     function firstFocusablModalContentElement() {
         if (focusableModalContentElements) {
@@ -82,6 +93,7 @@ function createModal({
         modal.classList.remove("modal--visible");
         modal.hidden = true;
         window.removeEventListener("keydown", listenKeyDown);
+        modal.removeEventListener("click", listenClickOutsideContent);
         if (prevActiveNonModalElement) {
             prevActiveNonModalElement.focus();
             prevActiveNonModalElement = null;
@@ -100,10 +112,11 @@ function createModal({
             focusableModalContentElements[0].focus();
         }
         window.addEventListener("keydown", listenKeyDown);
+        modal.addEventListener("click", listenClickOutsideContent);
         onOpen(modalContent);
     }
 
-    return modal;
+    document.body.appendChild(modal)
 }
 
 export { createModal };

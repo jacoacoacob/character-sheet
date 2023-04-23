@@ -1,5 +1,5 @@
 import { createButton, createDiv, createForm, createHeader, createTextarea } from "./elements.js";
-import { createModal } from "./modal.js";
+import { createModal } from "./disclosures/modal.js";
 import {
     abilityFieldFactory,
     markdownFieldFactory,
@@ -35,7 +35,6 @@ const proficiencyField = proficiencyFieldFactory(context);
 setupFields();
 setupSaveModal();
 setupSaveAsImage()
-// setupCommitForm();
 
 function setupFields() {
     const fields = document.getElementById("fields-wrapper");
@@ -356,7 +355,8 @@ function setupSaveAsImage() {
 }
 
 function setupSaveModal() {
-    const modal = createModal({
+    createModal({
+        closeOnClickOutside: true,
         onClose(contentRoot) {
             contentRoot.querySelector("#message").value = "";
         },
@@ -369,7 +369,6 @@ function setupSaveModal() {
                 }
             });
 
-
             const textareaCommitMessage = createTextarea({
                 className: "flex-1 focusable",
                 attrs: {
@@ -378,7 +377,6 @@ function setupSaveModal() {
                     placeholder: "Describe the changes you made (optional)"
                 },
             });
-
 
             const buttonCancel = createButton({
                 className: "focusable",
@@ -431,7 +429,7 @@ function setupSaveModal() {
                 
                         closeModal();
                     },
-                    className: "flex flex-col space-y-3",
+                    className: "space-y-3",
                     attrs: {
                         tabIndex: 1,
                         id: "commit-form",
@@ -450,7 +448,5 @@ function setupSaveModal() {
             ];
         },
     });
-
-    document.body.appendChild(modal);
 }
 

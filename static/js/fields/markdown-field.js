@@ -50,7 +50,6 @@ function markdownFieldFactory({ formModel, apiModel, dirtyFields }) {
             onInput(ev) {
                 formModel[fieldName].source = ev.target.value.trim();
                 fetchMarkdownPreivew(500);
-                autoSizeHeight(ev.target);
                 checkIsDirty(
                     ev.target,
                     formModel[fieldName].source,
@@ -70,18 +69,6 @@ function markdownFieldFactory({ formModel, apiModel, dirtyFields }) {
                 source.selectionStart = source.selectionEnd = start + SPACES.length;
             }
         });
-
-        function autoSizeHeight(textarea) {
-            if (textarea.scrollHeight > 288) {
-                const scrollLeft = window.scrollX;
-                const scrollTop = window.scrollY;
-                textarea.style.height = 0;
-                textarea.style.height = textarea.scrollHeight + 10 + "px";
-                window.scrollTo(scrollLeft, scrollTop);
-            } else {
-                textarea.style.height = MIN_TEXTAREA_HEIGHT + "px";
-            }
-        }
 
         const html = createDiv({ className: "md flex-1" });
 
@@ -194,7 +181,9 @@ function markdownFieldFactory({ formModel, apiModel, dirtyFields }) {
             }
             previewStateButton.style.boxShadow = "0 0 0 2px black";
             setTimeout(() => {
-                autoSizeHeight(source);
+                if (source.scrollHeight > MIN_TEXTAREA_HEIGHT) {
+                    source.style.height = source.scrollHeight + 10 + "px";
+                }
             });
         }
 

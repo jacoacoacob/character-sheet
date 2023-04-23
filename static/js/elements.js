@@ -53,13 +53,33 @@ function createInput({ className = "", style = {}, attrs = {}, onInput = () => v
 function createTextarea({ className = "", style = {}, attrs = {}, onInput = () => void 0 } = {}) {
     const textarea = document.createElement("textarea");
 
-    classify(className, textarea);
+    const DEFAULT_HEIGHT = 64;
 
-    stylize(style, textarea);
+    classify(`textarea ${className}`.trim(), textarea);
+
+    stylize({ height: DEFAULT_HEIGHT + "px", ...style }, textarea);
 
     attribute(attrs, textarea);
 
-    textarea.addEventListener("input", onInput);
+    const INITIAL_HEIGHT = Number.parseInt(textarea.style.height.replace("px", "").trim());
+
+    function autoSizeHeight() {
+        if (textarea.scrollHeight > INITIAL_HEIGHT) {
+            const scrollLeft = window.scrollX;
+            const scrollTop = window.scrollY;
+            textarea.style.height = 0;
+            textarea.style.height = textarea.scrollHeight + 10 + "px";
+            window.scrollTo(0, 0);
+            window.scrollTo(scrollLeft, scrollTop);
+        } else {
+            textarea.style.height = INITIAL_HEIGHT + "px";
+        }
+    }
+
+    textarea.addEventListener("input", (ev) => {
+        autoSizeHeight(ev);
+        onInput(ev);
+    });
 
     return textarea;
 }
