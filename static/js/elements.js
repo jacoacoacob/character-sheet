@@ -44,18 +44,19 @@ function createInput({ className = "", style = {}, attrs = {}, onInput = () => v
 
 /**
  * @param {{
+ *  autoSize?: boolean; 
  *  className: string;
  *  style: ElementCSSInlineStyle["style"];
  *  attrs: Record<string, *>;
  *  onInput: (ev: InputEvent) => void;
  * }} param0
  */
-function createTextarea({ className = "", style = {}, attrs = {}, onInput = () => void 0 } = {}) {
+function createTextarea({ autoSize = false, className = "", style = {}, attrs = {}, onInput = () => void 0 } = {}) {
     const textarea = document.createElement("textarea");
 
     const DEFAULT_HEIGHT = 64;
 
-    classify(`textarea ${className}`.trim(), textarea);
+    classify(className, textarea);
 
     stylize({ height: DEFAULT_HEIGHT + "px", ...style }, textarea);
 
@@ -63,21 +64,20 @@ function createTextarea({ className = "", style = {}, attrs = {}, onInput = () =
 
     const INITIAL_HEIGHT = Number.parseInt(textarea.style.height.replace("px", "").trim());
 
-    function autoSizeHeight() {
-        if (textarea.scrollHeight > INITIAL_HEIGHT) {
-            const scrollLeft = window.scrollX;
-            const scrollTop = window.scrollY;
-            textarea.style.height = 0;
-            textarea.style.height = textarea.scrollHeight + 10 + "px";
-            window.scrollTo(0, 0);
-            window.scrollTo(scrollLeft, scrollTop);
-        } else {
-            textarea.style.height = INITIAL_HEIGHT + "px";
-        }
-    }
-
     textarea.addEventListener("input", (ev) => {
-        autoSizeHeight(ev);
+        if (autoSize) {
+            textarea.style.overflow = "hidden";
+            if (textarea.scrollHeight > INITIAL_HEIGHT) {
+                const scrollLeft = window.scrollX;
+                const scrollTop = window.scrollY;
+                textarea.style.height = 0;
+                textarea.style.height = textarea.scrollHeight + 10 + "px";
+                window.scrollTo(0, 0);
+                window.scrollTo(scrollLeft, scrollTop);
+            } else {
+                textarea.style.height = INITIAL_HEIGHT + "px";
+            }
+        }
         onInput(ev);
     });
 

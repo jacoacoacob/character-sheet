@@ -22,13 +22,14 @@ input, textarea, button {
     font: inherit;
 }
 
+textarea {
+    resize: none;
+    width: 100%;
+}
+
 button {
     cursor: pointer;
 }
-
-/* main {
-    padding: 0 16px;
-} */
 
 
 /* Utilities */
@@ -210,12 +211,6 @@ button {
 }
 .label--bold {
     font-weight: 600;
-}
-
-.textarea {
-    resize: none;
-    overflow-y: hidden;
-    width: 100%;
 }
 
 

@@ -39,6 +39,7 @@ function markdownFieldFactory({ formModel, apiModel, dirtyFields }) {
         const COLLAPSE_STATE_KEY = location.pathname + "-" + fieldName + "collapsed";
 
         const source = createTextarea({
+            autoSize: true,
             className: "textarea flex-1",
             style: {
                 height: MIN_TEXTAREA_HEIGHT + "px",
