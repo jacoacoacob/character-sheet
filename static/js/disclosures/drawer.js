@@ -1,41 +1,78 @@
-import { createButton, createDiv } from "../elements";
+import { createButton, createDiv, createHeader } from "../elements.js";
 
 /**
  * 
  * @param {{
- *  align: "left" | "right";
- *  triggerMount: HTMLElement | string;
- *  onClose?: (contentRoot: HTMLDivElement) => void;
- *  onOpen?: (contentRoot: HTMLDivElement) => void;
+ *  container: HTMLElement,
+ *  onExpand?: (contentRoot: HTMLDivElement) => void;
+ *  onCollapse?: (contentRoot: HTMLDivElement) => void;
  *  setup?: (options: {
- *      openModal: () => void;
- *      closeModal: () => void;
+ *      expand: () => void;
+ *      collapse: () => void;
+ *      isExpanded: () => boolean;
  *  }) => HTMLElement[];
  * }} param0 
  */
 function createDrawer({
-    align = "left",
-    triggerMount = "",
-    onClose = () => void 0,
-    onOpen = () => void 0,
+    container,
+    onExpand = () => void 0,
+    onCollapse = () => void 0,
     setup = () => [],
 } = {}) {
 
+    const trigger = createButton({
+        className: "drawer-trigger",
+        innerHTML: `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" height="24px" width="24px" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+        `,
+        onClick() {
+            isExpanded() ? collapse() : expand();
+        },
+    });
+
+    const drawerContent = createDiv({
+        className: "drawer-content",
+        children: [
+            createHeader(2, "History"),
+            ...setup({ expand, collapse, isExpanded }),
+   
+        ],
+    });
+
     const drawer = createDiv({
         className: "drawer",
+        children: [
+            createDiv({
+                style: {
+                    position: "sticky",
+                    top: 0,
+                    zIndex: 20,
+                },
+                children: [
+                    trigger,
+                ],
+            }),
+            drawerContent,
+        ],
     });
 
-    const drawerTrigger = createButton({
-        text: "hi"
-    });
-
-    if (typeof triggerMount === "string") {
-        document.querySelector(triggerMount).appendChild(drawerTrigger);
-    } else {
-        triggerMount.appendChild(drawerTrigger);
+    function isExpanded() {
+        return drawer.classList.contains("drawer--expanded");
     }
 
-    document.appendChild(drawer);
+    function expand() {
+        drawer.classList.add("drawer--expanded");
+        onExpand(drawer);
+    }
+    
+    function collapse() {
+        drawer.classList.remove("drawer--expanded");
+        onCollapse(drawer);
+    }
+
+    container.append(drawer);
 }
 
 export { createDrawer };

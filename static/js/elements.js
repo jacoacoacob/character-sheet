@@ -3,16 +3,19 @@ import { classify, stylize, attribute } from "./utils.js";
 /**
  * @param {{
  *  className?: string;
+ *  attrs: Record<string, *>;
  *  style?: ElementCSSInlineStyle["style"];
  *  children?: HTMLElement[];
  * }} param0
  */
-function createDiv({ className = "", style = {}, children = [] } = {}) {
+function createDiv({ className = "", attrs = {}, style = {}, children = [] } = {}) {
     const div = document.createElement("div");
 
     classify(className, div);
 
     stylize(style, div);
+
+    attribute(attrs, div);
 
     div.append(...children.filter(Boolean))
 

@@ -9,11 +9,7 @@
     window.INITIAL_DATA = {{ character | json_encode | safe }}
 </script>
 
-<button id="btn-save-image" style="position: absolute; top: 8px; right: 16px;">
-    export as image
-</button>
-
-<main id="main-content" class="flex space-x-6" tabindex="-1">
+<main id="main-content" class="flex space-x-6">
     <section id="commit-history"></section>
     <div class="flex-1 flex justify-center">
         <section id="fields-wrapper" style="background-color: white; padding: 8px;"></section>

@@ -9,6 +9,7 @@ import {
 } from "./fields/index.js";
 import { fieldGroup } from "./layouts.js";
 import { naiveDeepCopy, createField, isCommandEnter, isCommandS } from "./utils.js";
+import { createDrawer } from "./disclosures/drawer.js";
 
 const characterId = INITIAL_DATA.id;
 
@@ -34,7 +35,8 @@ const proficiencyField = proficiencyFieldFactory(context);
 
 setupFields();
 setupSaveModal();
-setupSaveAsImage()
+// setupSaveAsImage()
+setupCommitHistoryDrawer();
 
 function setupFields() {
     const fields = document.getElementById("fields-wrapper");
@@ -335,24 +337,24 @@ function createDirtyFields() {
     }
 }
 
-function setupSaveAsImage() {
-    const btnSaveImage = document.getElementById("btn-save-image")
+// function setupSaveAsImage() {
+//     const btnSaveImage = document.getElementById("btn-save-image")
     
-    btnSaveImage.addEventListener("click", async () => {
-        const element = document.getElementById("fields-wrapper");
+//     btnSaveImage.addEventListener("click", async () => {
+//         const element = document.getElementById("fields-wrapper");
         
-        const a = document.createElement("a");
+//         const a = document.createElement("a");
 
-        try {
-            const canvas = await html2canvas(element);
-            a.href = canvas.toDataURL();
-            a.download = formModel.character_name + "_" + new Date().toDateString().toLowerCase().replace(/\s+/g, "_");
-            a.click();
-        } catch (error) {
-            console.error(error);
-        }
-    });
-}
+//         try {
+//             const canvas = await html2canvas(element);
+//             a.href = canvas.toDataURL();
+//             a.download = formModel.character_name + "_" + new Date().toDateString().toLowerCase().replace(/\s+/g, "_");
+//             a.click();
+//         } catch (error) {
+//             console.error(error);
+//         }
+//     });
+// }
 
 function setupSaveModal() {
     createModal({
@@ -444,9 +446,47 @@ function setupSaveModal() {
                             ],
                         }),
                     ],
-                })
+                }),
             ];
         },
     });
 }
 
+function setupCommitHistoryDrawer() {
+    createDrawer({
+        container: document.getElementById("commit-history"),
+        setup() {
+            return [
+                createDiv({
+                    className: "flex flex-col justify-between flex-1",
+                    children: [
+                        createDiv({
+
+                        }),
+                        createDiv({
+                            children: [
+                                createButton({
+                                    text: "Export as image",
+                                    async onClick() {
+                                        const element = document.getElementById("fields-wrapper");
+        
+                                        const a = document.createElement("a");
+                                
+                                        try {
+                                            const canvas = await html2canvas(element);
+                                            a.href = canvas.toDataURL();
+                                            a.download = formModel.character_name + "_" + new Date().toDateString().toLowerCase().replace(/\s+/g, "_");
+                                            a.click();
+                                        } catch (error) {
+                                            console.error(error);
+                                        }
+                                    },
+                                }),
+                            ],
+                        })
+                    ],
+                }),
+            ];
+        },
+    });
+}
