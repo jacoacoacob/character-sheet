@@ -1,5 +1,5 @@
 
-import { createButton, createDiv, createList, createListItem } from "./elements.js";
+import { createButton, createDiv, createList, createListItem, createSpan } from "./elements.js";
 import { clearElement } from "./utils.js";
 import { createDrawer } from "./disclosures/drawer.js";
 import { getCommitHistory } from "./fetchers.js";
@@ -7,8 +7,7 @@ import { getCommitHistory } from "./fetchers.js";
 
 /**
  * 
- * @param {import("./fetchers.js").Api} api 
- * @param {*} commitHistory 
+ * @param {*} context
  */
 function setupCommitHistoryDrawer(context) {
 
@@ -18,7 +17,15 @@ function setupCommitHistoryDrawer(context) {
         );
     })();
 
-    const commitList = createList({ className: "space-y-3" });
+    const commitList = createList({
+        className: "space-y-3",
+        style: {
+            position: "relative",
+            overflowY: "scroll",
+            height: "500px",
+            paddingRight: "12px",
+        }
+    });
 
     context.commitHistory.watch(
         (commits) => {
@@ -31,7 +38,7 @@ function setupCommitHistoryDrawer(context) {
                     accum[date] = []
                 }
                 accum[date].push({
-                    time: dateCreated.toLocaleTimeString(),
+                    time: dateCreated.toLocaleTimeString().replace(/:\d{2}\s/, " "),
                     message: commit.message,
                 });
                 return accum;
@@ -43,15 +50,34 @@ function setupCommitHistoryDrawer(context) {
                     .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
                     .map((date) => createListItem({
                         children: [
-                            createDiv({
+                            createSpan({
+                                style: {
+                                    position: "sticky",
+                                    top: 0,
+                                    backgroundColor: "white",
+                                    padding: "4px",
+                                    border: "1px solid #aaa",
+                                    borderRadius: "4px",
+                                },
                                 children: [
                                     date,
                                 ]
                             }),
+
                             createList({
                                 children: commitsByDate[date].map((commit) => createListItem({
+                                    style: {
+                                        paddingTop: "12px",
+                                    },
                                     children: [
-                                        commit.time,
+                                        createDiv({
+                                            style: {
+                                                fontSize: "12px",
+                                            },
+                                            children: [
+                                                commit.time,
+                                            ]
+                                        }),
                                         commit.message,
                                     ],
                                 })),
@@ -68,11 +94,11 @@ function setupCommitHistoryDrawer(context) {
         setup() {
             return [
                 createDiv({
-                    className: "flex flex-col justify-between flex-1",
+                    className: "flex flex-col justify-between",
                     children: [
                         createDiv({
                             children: [
-                                commitList
+                                commitList,
                             ]
                         }),
                         createDiv({
@@ -83,6 +109,7 @@ function setupCommitHistoryDrawer(context) {
                                 bottom: 0,
                                 left: 0,
                                 width: "100%",
+                                // height: "100%",
                                 backgroundColor: "#ddd",
                             },
                             children: [

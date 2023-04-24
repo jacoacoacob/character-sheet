@@ -82,9 +82,8 @@ function markdownFieldFactory({ formModel, apiModel, dirtyFields }) {
         function fetchMarkdownPreivew(delayMillis) {
             clearTimeout(handle);
             handle = setTimeout(async () => {
-                html.innerHTML = await createMarkdownPreview(
-                    formModel[fieldName].source
-                );
+                const res = await createMarkdownPreview(formModel[fieldName].source);
+                html.innerHTML = res.html;
             }, delayMillis);
         }
 
