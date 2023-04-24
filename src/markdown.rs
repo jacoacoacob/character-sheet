@@ -6,8 +6,6 @@ pub fn html_from_markdown(source: &str) -> String {
 
     options.extension.table = true;
 
-    println!("HTML_FROM_MARKDOWN");
-
     comrak::markdown_to_html(&source, &options)
 }
 

@@ -287,7 +287,6 @@ button {
     top: 0;
     left: 0;
     width: 60px;
-    /* min-height: 100vh; */
     transition: all ease-in-out .1s;
 }
 

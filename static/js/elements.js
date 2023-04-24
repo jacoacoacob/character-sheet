@@ -22,6 +22,51 @@ function createDiv({ className = "", attrs = {}, style = {}, children = [] } = {
     return div;
 }
 
+/**
+ * @param {{
+*  className?: string;
+*  attrs: Record<string, *>;
+*  style?: ElementCSSInlineStyle["style"];
+*  children?: HTMLElement[];
+* }} param0
+*/
+function createList({ className = "", attrs = {}, style = {}, children = [] } = {}) {
+   const list = document.createElement("ul");
+
+   classify(className, list);
+
+   stylize(style, list);
+
+   attribute(attrs, list);
+
+   list.append(...children);
+
+   return list;
+}
+
+/**
+* @param {{
+*  className?: string;
+*  attrs: Record<string, *>;
+*  style?: ElementCSSInlineStyle["style"];
+*  children?: HTMLElement[];
+* }} param0
+*/
+function createListItem({ className = "", attrs = {}, style = {}, children = [] } = {}) {
+    const li = document.createElement("li");
+
+    classify(className, li);
+
+    stylize(style, li);
+
+    attribute(attrs, li);
+
+    li.append(...children);
+
+    return li;
+}
+
+
 
 /**
  * @param {{
@@ -174,4 +219,5 @@ function createForm({
     return form;
 }
 
-export { createButton, createDiv, createForm, createHeader, createInput, createLabel, createTextarea };
+
+export { createButton, createDiv, createList, createListItem, createForm, createHeader, createInput, createLabel, createTextarea };

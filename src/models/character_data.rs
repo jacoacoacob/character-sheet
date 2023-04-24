@@ -23,7 +23,7 @@ pub struct Markdown {
     pub html: String, 
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Default, Clone, Serialize, Deserialize)]
 pub struct CharacterData {
     pub class: Option<String>,
     pub level: Option<String>,

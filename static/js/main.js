@@ -1,5 +1,4 @@
-import { createButton, createDiv, createForm, createHeader, createTextarea } from "./elements.js";
-import { createModal } from "./disclosures/modal.js";
+import { createDiv, createHeader } from "./elements.js";
 import {
     abilityFieldFactory,
     markdownFieldFactory,
@@ -8,13 +7,19 @@ import {
     textFieldFactory,
 } from "./fields/index.js";
 import { fieldGroup } from "./layouts.js";
-import { naiveDeepCopy, createField, isCommandEnter, isCommandS } from "./utils.js";
-import { createDrawer } from "./disclosures/drawer.js";
+import { naiveDeepCopy, createField, useWatch } from "./utils.js";
+
+
+import { setupCommitHistoryDrawer } from "./setup-commit-history-drawer.js";
+import { setupSaveCommitModal } from "./setup-save-commit-modal.js";
+import { Api } from "./api.js";
 
 const characterId = INITIAL_DATA.id;
 
 const apiModel = naiveDeepCopy(INITIAL_DATA.data);
 const formModel = naiveDeepCopy(INITIAL_DATA.data);
+
+const commitHistory = window.commitHistory = useWatch(["xena"]);
 
 const dirtyFields = createDirtyFields();
 
@@ -33,9 +38,19 @@ const markdownField = markdownFieldFactory(context);
 const numberField = numberFieldFactory(context);
 const proficiencyField = proficiencyFieldFactory(context);
 
+const api = new Api(characterId);
+
 setupFields();
-setupSaveModal();
-setupCommitHistoryDrawer();
+setupSaveCommitModal(
+    api,
+    context,
+    dirtyFields,
+    commitHistory
+);
+setupCommitHistoryDrawer(
+    api,
+    commitHistory
+);
 
 function setupFields() {
     const fields = document.getElementById("fields-wrapper");
@@ -334,139 +349,4 @@ function createDirtyFields() {
             }
         }
     }
-}
-
-function setupSaveModal() {
-    createModal({
-        closeOnClickOutside: true,
-        onClose(contentRoot) {
-            contentRoot.querySelector("#message").value = "";
-        },
-        setup({ closeModal, openModal }) {
-
-            window.addEventListener("keydown", (ev) => {
-                if (isCommandS(ev)) {
-                    ev.preventDefault();
-                    openModal();
-                }
-            });
-
-            const textareaCommitMessage = createTextarea({
-                className: "flex-1 focusable",
-                attrs: {
-                    id: "message",
-                    name: "message",
-                    placeholder: "Describe the changes you made (optional)"
-                },
-            });
-
-            const buttonCancel = createButton({
-                className: "focusable",
-                style: {
-                    order: 1,
-                    marginRight: "8px",
-                    backgroundColor: "transparent",
-                    border: "none",
-                },
-                text: "cancel",
-                onClick: closeModal
-            });
-            
-            const buttonSubmit = createButton({
-                text: "Save",
-                className: "focusable",
-                style: {
-                    order: 2,
-                },
-                attrs: {
-                    type: "submit",
-                },
-            });
-
-            return [
-                createForm({
-                    async onSubmit(ev) {
-                        ev.preventDefault();
-
-                        const response = await fetch(`/character/${characterId}`, {
-                            method: "PUT",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({
-                                message: textareaCommitMessage.value,
-                                new_data: formModel,
-                            }),
-                        });
-                
-                        textareaCommitMessage.value = "";
-                        
-                        const responseJson = await response.json();
-                
-                        Object.entries(responseJson.data).forEach(([fieldName, value]) => {
-                            apiModel[fieldName] = value;
-                        });
-                
-                        dirtyFields.removeAll();
-                
-                        closeModal();
-                    },
-                    className: "space-y-3",
-                    attrs: {
-                        tabIndex: 1,
-                        id: "commit-form",
-                    },
-                    children: [
-                        textareaCommitMessage,
-                        createDiv({
-                            className: "flex justify-end",
-                            children: [
-                                buttonSubmit,
-                                buttonCancel,
-                            ],
-                        }),
-                    ],
-                }),
-            ];
-        },
-    });
-}
-
-function setupCommitHistoryDrawer() {
-    createDrawer({
-        container: document.getElementById("commit-history"),
-        setup() {
-            return [
-                createDiv({
-                    className: "flex flex-col justify-between flex-1",
-                    children: [
-                        createDiv({
-
-                        }),
-                        createDiv({
-                            children: [
-                                createButton({
-                                    text: "Export as image",
-                                    async onClick() {
-                                        const element = document.getElementById("fields-wrapper");
-        
-                                        const a = document.createElement("a");
-                                
-                                        try {
-                                            const canvas = await html2canvas(element);
-                                            a.href = canvas.toDataURL();
-                                            a.download = formModel.character_name + "_" + new Date().toDateString().toLowerCase().replace(/\s+/g, "_");
-                                            a.click();
-                                        } catch (error) {
-                                            console.error(error);
-                                        }
-                                    },
-                                }),
-                            ],
-                        })
-                    ],
-                }),
-            ];
-        },
-    });
 }

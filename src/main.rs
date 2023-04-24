@@ -4,6 +4,7 @@ use actix_web::{middleware, web, App, HttpServer};
 
 mod character_detail_page;
 mod character_listing_page;
+mod commit_history;
 mod markdown;
 mod models;
 mod page;
@@ -14,6 +15,7 @@ use character_detail_page::{
 };
 use character_listing_page::get_character_listing_page;
 use markdown::create_md_preview;
+use commit_history::get_commit_history;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -41,6 +43,7 @@ async fn main() -> std::io::Result<()> {
                     .route(web::get().to(get_character_detail_page))
                     .route(web::put().to(update_character_detail_page)),
             )
+            .route("/commits/{character_id}", web::get().to(get_commit_history))
             .route("/md-preview", web::post().to(create_md_preview))
     })
     .bind(("0.0.0.0", 8080))?

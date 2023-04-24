@@ -15,14 +15,15 @@ type DbResult<T> = Result<T>;
 pub enum Query {
     ListCharacters,
     CreateCharacter,
+    ListCommits(usize),
     GetCharacter(usize),
-    // ArchiveCharacter(usize),
     UpdateCharacter(usize, String, CharacterData),
 }
 
 pub enum QueryResponse {
     Character(Character),
     CharacterList(Vec<Character>),
+    CommitHistory(Vec<CharacterDelta>),
 }
 
 fn check_table_exists(conn: &Connection, table_name: &str) -> Result<bool, Error> {
@@ -70,6 +71,7 @@ pub fn execute(query: Query) -> Result<QueryResponse, Error> {
         Query::CreateCharacter => create_character(&conn),
         Query::ListCharacters => list_characters(&conn),
         Query::GetCharacter(character_id) => get_character(&conn, character_id),
+        Query::ListCommits(character_id) => list_commits(&conn, character_id),
         Query::UpdateCharacter(character_id, message, new_data) => {
             update_character(&conn, character_id, &message, new_data)
         }
@@ -217,7 +219,11 @@ fn update_character(
 ) -> DbResult<QueryResponse> {
     match get_character(conn, character_id)? {
         QueryResponse::Character(current) => {
-            let field_diffs = FieldDiffs::from((Some(current.data), Some(new_data)));
+            let field_diffs = FieldDiffs::from((Some(current.data.clone()), Some(new_data)));
+
+            if field_diffs.data.is_empty() {
+                return Ok(QueryResponse::Character(current));
+            }
 
             conn.execute(
                 "INSERT INTO character_delta (character_id, message, field_diffs)
@@ -233,4 +239,21 @@ fn update_character(
         }
         _ => Err(rusqlite::Error::QueryReturnedNoRows),
     }
+}
+
+fn list_commits(conn: &Connection, character_id: usize) -> DbResult<QueryResponse> {
+    let mut stmt = conn.prepare("
+          SELECT *
+            FROM character_delta
+           WHERE character_id = ?1
+        ORDER BY created
+            DESC
+    ")?;
+
+    let rows: Vec<CharacterDelta> = stmt
+        .query_map(params![character_id], map_character_delta)?
+        .map(|row| row.unwrap())
+        .collect();
+
+    Ok(QueryResponse::CommitHistory(rows))
 }

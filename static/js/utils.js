@@ -121,6 +121,30 @@ function isCommandS(ev) {
     return isCommandKey(ev) && isSKey(ev);
 }
 
+function useWatch(initialData) {
+    let _data = initialData;
+
+    const _watchers = [];
+
+    return {
+        get data() {
+            return _data;
+        },
+        update(data) {
+            _data = data;
+            _watchers.forEach((watcher) => {
+                watcher(_data);
+            });
+        },
+        watch(callback, opts) {
+            _watchers.push(callback);
+            if (opts.isEager) {
+                callback(_data);
+            }
+        }
+    }
+}
+
 export {
     clearElement,
     createField,
@@ -135,5 +159,6 @@ export {
     naiveDeepCopy,
     classify,
     stylize,
-    checkIsDirty
+    checkIsDirty,
+    useWatch,
 };
