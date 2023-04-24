@@ -1,15 +1,14 @@
 import { createButton, createDiv, createForm, createTextarea } from "./elements.js";
 import { createModal } from "./disclosures/modal.js";
 import { isCommandS } from "./utils.js";
+import { updateCharacter, getCommitHistory } from "./fetchers.js";
 
 /**
  * 
- * @param {import("./api.js").Api} api 
  * @param {*} context
  * @param {*} dirtyFields 
- * @param {*} commitHistory 
  */
-function setupSaveCommitModal(api, context, dirtyFields, commitHistory) {
+function setupSaveCommitModal(context, dirtyFields) {
     createModal({
         closeOnClickOutside: true,
         onClose(contentRoot) {
@@ -61,7 +60,8 @@ function setupSaveCommitModal(api, context, dirtyFields, commitHistory) {
                     async onSubmit(ev) {
                         ev.preventDefault();
 
-                        const res = await api.updateCharacter(
+                        const res = await updateCharacter(
+                            context.characterId,
                             textareaCommitMessage.value,
                             context.formModel,
                         );
@@ -74,8 +74,8 @@ function setupSaveCommitModal(api, context, dirtyFields, commitHistory) {
                 
                         dirtyFields.removeAll();
 
-                        commitHistory.update(
-                            await api.fetchCommitHistory()
+                        context.commitHistory.update(
+                            await getCommitHistory(context.characterId)
                         );
                 
                         closeModal();

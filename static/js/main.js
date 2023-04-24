@@ -12,7 +12,6 @@ import { naiveDeepCopy, createField, useWatch } from "./utils.js";
 
 import { setupCommitHistoryDrawer } from "./setup-commit-history-drawer.js";
 import { setupSaveCommitModal } from "./setup-save-commit-modal.js";
-import { Api } from "./api.js";
 
 const characterId = INITIAL_DATA.id;
 
@@ -24,6 +23,8 @@ const commitHistory = window.commitHistory = useWatch(["xena"]);
 const dirtyFields = createDirtyFields();
 
 const context = {
+    characterId,
+    commitHistory,
     apiModel,
     formModel,
     dirtyFields,
@@ -38,19 +39,9 @@ const markdownField = markdownFieldFactory(context);
 const numberField = numberFieldFactory(context);
 const proficiencyField = proficiencyFieldFactory(context);
 
-const api = new Api(characterId);
-
 setupFields();
-setupSaveCommitModal(
-    api,
-    context,
-    dirtyFields,
-    commitHistory
-);
-setupCommitHistoryDrawer(
-    api,
-    commitHistory
-);
+setupSaveCommitModal(context, dirtyFields);
+setupCommitHistoryDrawer(context);
 
 function setupFields() {
     const fields = document.getElementById("fields-wrapper");

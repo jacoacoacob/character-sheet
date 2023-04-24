@@ -1,4 +1,5 @@
 import { createButton, createDiv, createLabel, createTextarea } from "../elements.js";
+import { createMarkdownPreview } from "../fetchers.js";
 import { checkIsDirty } from "../utils.js";
 
 const ICON_SVG_STRINGS = {
@@ -81,17 +82,9 @@ function markdownFieldFactory({ formModel, apiModel, dirtyFields }) {
         function fetchMarkdownPreivew(delayMillis) {
             clearTimeout(handle);
             handle = setTimeout(async () => {
-                const response = await fetch("/md-preview", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        source: formModel[fieldName].source,
-                    }),
-                });
-                const data = await response.json();
-                html.innerHTML = data.html;
+                html.innerHTML = await createMarkdownPreview(
+                    formModel[fieldName].source
+                );
             }, delayMillis);
         }
 

@@ -2,39 +2,62 @@
 import { createButton, createDiv, createList, createListItem } from "./elements.js";
 import { clearElement } from "./utils.js";
 import { createDrawer } from "./disclosures/drawer.js";
+import { getCommitHistory } from "./fetchers.js";
+
 
 /**
  * 
- * @param {import("./api.js").Api} api 
+ * @param {import("./fetchers.js").Api} api 
  * @param {*} commitHistory 
  */
-async function setupCommitHistoryDrawer(api, commitHistory) {
+function setupCommitHistoryDrawer(context) {
 
-    commitHistory.update(
-        await api.fetchCommitHistory()
-    );
+    (async () => {
+        context.commitHistory.update(
+            await getCommitHistory(context.characterId)
+        );
+    })();
 
     const commitList = createList({ className: "space-y-3" });
 
-    commitHistory.watch(
+    context.commitHistory.watch(
         (commits) => {
             clearElement(commitList);
 
+            const commitsByDate = commits.reduce((accum, commit) => {
+                const dateCreated = new Date(commit.created);
+                const date = dateCreated.toDateString();
+                if (!accum[date]) {
+                    accum[date] = []
+                }
+                accum[date].push({
+                    time: dateCreated.toLocaleTimeString(),
+                    message: commit.message,
+                });
+                return accum;
+            }, {});
+
             commitList.append(
-                ...commits.map((commit) => createListItem({
-                    className: "flex flex-col space-y-2",
-                    children: [
-                        createDiv({
-                            style: {
-                                fontSize: "12px",
-                            },
-                            children: [
-                                new Date(commit.created).toLocaleString(),
-                            ]
-                        }),
-                        commit.message
-                    ],
-                })),
+                ...Object
+                    .keys(commitsByDate)
+                    .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+                    .map((date) => createListItem({
+                        children: [
+                            createDiv({
+                                children: [
+                                    date,
+                                ]
+                            }),
+                            createList({
+                                children: commitsByDate[date].map((commit) => createListItem({
+                                    children: [
+                                        commit.time,
+                                        commit.message,
+                                    ],
+                                })),
+                            }),
+                        ],
+                    })),
             );
         },
         { isEager: true }

@@ -318,7 +318,7 @@ button {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    transition: opacity ease-in-out .1s;
+    transition: all ease-in-out .1s;
 }
 
 .drawer--expanded .drawer-content {
