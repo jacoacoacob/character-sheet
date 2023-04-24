@@ -1,16 +1,14 @@
 import { createButton, createDiv, createHeader } from "../elements.js";
 
+const DRAWER_STATE_KEY = location.pathname + "_" + "drawer-state";
+
 /**
  * 
  * @param {{
  *  container: HTMLElement,
  *  onExpand?: (contentRoot: HTMLDivElement) => void;
  *  onCollapse?: (contentRoot: HTMLDivElement) => void;
- *  setup?: (options: {
- *      expand: () => void;
- *      collapse: () => void;
- *      isExpanded: () => boolean;
- *  }) => HTMLElement[];
+ *  setup?: () => HTMLElement[];
  * }} param0 
  */
 function createDrawer({
@@ -36,7 +34,7 @@ function createDrawer({
         className: "drawer-content",
         children: [
             createHeader(2, "History"),
-            ...setup({ expand, collapse, isExpanded }),
+            ...setup(),
    
         ],
     });
@@ -58,18 +56,25 @@ function createDrawer({
         ],
     });
 
+
     function isExpanded() {
         return drawer.classList.contains("drawer--expanded");
     }
 
     function expand() {
         drawer.classList.add("drawer--expanded");
+        localStorage[DRAWER_STATE_KEY] = "expanded";
         onExpand(drawer);
     }
     
     function collapse() {
         drawer.classList.remove("drawer--expanded");
+        localStorage[DRAWER_STATE_KEY] = "collapsed";
         onCollapse(drawer);
+    }
+
+    if (localStorage[DRAWER_STATE_KEY] === "expanded") {
+        expand();
     }
 
     container.append(drawer);

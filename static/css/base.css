@@ -313,7 +313,7 @@ button {
     position: sticky;
     top: 0;
     opacity: 0;
-    padding: 16px 8px;
+    padding: 16px 8px 8px 8px;
     z-index: 10;
     flex: 1;
     display: flex;

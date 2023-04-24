@@ -35,7 +35,6 @@ const proficiencyField = proficiencyFieldFactory(context);
 
 setupFields();
 setupSaveModal();
-// setupSaveAsImage()
 setupCommitHistoryDrawer();
 
 function setupFields() {
@@ -336,25 +335,6 @@ function createDirtyFields() {
         }
     }
 }
-
-// function setupSaveAsImage() {
-//     const btnSaveImage = document.getElementById("btn-save-image")
-    
-//     btnSaveImage.addEventListener("click", async () => {
-//         const element = document.getElementById("fields-wrapper");
-        
-//         const a = document.createElement("a");
-
-//         try {
-//             const canvas = await html2canvas(element);
-//             a.href = canvas.toDataURL();
-//             a.download = formModel.character_name + "_" + new Date().toDateString().toLowerCase().replace(/\s+/g, "_");
-//             a.click();
-//         } catch (error) {
-//             console.error(error);
-//         }
-//     });
-// }
 
 function setupSaveModal() {
     createModal({
