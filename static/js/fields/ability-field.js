@@ -1,9 +1,13 @@
 import { createDiv, createInput, createLabel } from "../elements.js";
-import { checkIsDirty } from "../utils.js";
 
-
-
-function abilityFieldFactory({ formModel, apiModel, dirtyFields }) {
+/**
+ * 
+ * @param {import("../main.js").Context} context 
+ * @returns 
+ */
+function abilityFieldFactory(context) {
+    const { formModel, apiModel, dirtyFields } = context;
+    
     return (fieldName, fieldLabelText) => {
         const fieldLabel = createLabel({
             text: fieldLabelText,
@@ -12,9 +16,6 @@ function abilityFieldFactory({ formModel, apiModel, dirtyFields }) {
 
         const scoreInput = createInput({
             className: "input input--w-2",
-            // style: {
-            //     width: "80px"
-            // },
             attrs: {
                 value: formModel[fieldName].score,
                 id: `${fieldName}-score`,
@@ -22,12 +23,11 @@ function abilityFieldFactory({ formModel, apiModel, dirtyFields }) {
             },
             onInput(ev) {
                 formModel[fieldName].score = ev.target.value.trim();
-                checkIsDirty(
+                dirtyFields.check(
                     ev.target,
                     formModel[fieldName].score,
                     apiModel[fieldName].score,
-                    dirtyFields
-                );
+                )
             }
         });
 
@@ -40,11 +40,10 @@ function abilityFieldFactory({ formModel, apiModel, dirtyFields }) {
             },
             onInput(ev) {
                 formModel[fieldName].modifier = ev.target.value.trim();
-                checkIsDirty(
+                dirtyFields.check(
                     ev.target,
                     formModel[fieldName].modifier,
                     apiModel[fieldName].modifier,
-                    dirtyFields
                 );
             }
         });

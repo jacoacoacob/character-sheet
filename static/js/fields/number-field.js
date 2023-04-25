@@ -1,6 +1,11 @@
 import { createDiv, createInput, createLabel } from "../elements.js";
-import { checkIsDirty, classify, stylize } from "../utils.js";
+import { classify, stylize } from "../utils.js";
 
+/**
+ * 
+ * @param {import("../main.js").Context} context 
+ * @returns 
+ */
 function numberFieldFactory({ formModel, apiModel, dirtyFields }) {
     return ({ className = "", style = {} } = {}) => (fieldName, fieldLabel) => {
         const input = createInput({
@@ -12,11 +17,10 @@ function numberFieldFactory({ formModel, apiModel, dirtyFields }) {
             },
             onInput(ev) {
                 formModel[fieldName] = Number.parseInt(ev.target.value);
-                checkIsDirty(
+                dirtyFields.check(
                     ev.target,
                     formModel[fieldName],
                     apiModel[fieldName],
-                    dirtyFields
                 );
             }
         });

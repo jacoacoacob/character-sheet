@@ -1,7 +1,13 @@
 import { createDiv, createInput, createLabel } from "../elements.js";
-import { checkIsDirty } from "../utils.js";
 
-function proficiencyFieldFactory({ formModel, apiModel, dirtyFields }) {
+/**
+ * 
+ * @param {import("../main.js").Context} context 
+ * @returns 
+ */
+function proficiencyFieldFactory(context) {
+    const { formModel, apiModel, dirtyFields } = context;
+
     return (fieldName, fieldLabelText) => {
         const fieldLabel = createLabel({
             className: "label label label--bold",
@@ -16,11 +22,10 @@ function proficiencyFieldFactory({ formModel, apiModel, dirtyFields }) {
             },
             onInput(ev) {
                 formModel[fieldName].proficient = ev.target.checked;
-                checkIsDirty(
+                dirtyFields.check(
                     ev.target,
                     formModel[fieldName].proficient,
                     apiModel[fieldName].proficient,
-                    dirtyFields
                 );
             }
         });
@@ -36,11 +41,10 @@ function proficiencyFieldFactory({ formModel, apiModel, dirtyFields }) {
             },
             onInput(ev) {
                 formModel[fieldName].modifier = ev.target.value.trim();
-                checkIsDirty(
+                dirtyFields.check(
                     ev.target,
                     formModel[fieldName].modifier,
                     apiModel[fieldName].modifier,
-                    dirtyFields
                 );
             }
         });

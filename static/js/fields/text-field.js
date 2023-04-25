@@ -1,6 +1,11 @@
 import { createDiv, createInput, createLabel } from "../elements.js";
-import { checkIsDirty, classify, stylize } from "../utils.js";
+import { classify, stylize } from "../utils.js";
 
+/**
+ * 
+ * @param {import("../main.js").Context} context 
+ * @returns 
+ */
 function textFieldFactory({ formModel, apiModel, dirtyFields }) {
     return ({ className = "", style = {} } = {}) => (fieldName, fieldLabelText) => {
         const input = createInput({
@@ -11,11 +16,10 @@ function textFieldFactory({ formModel, apiModel, dirtyFields }) {
             },
             onInput(ev) {
                 formModel[fieldName] = ev.target.value.trim();
-                checkIsDirty(
+                dirtyFields.check(
                     ev.target,
                     formModel[fieldName],
                     apiModel[fieldName],
-                    dirtyFields
                 );
             }
         });

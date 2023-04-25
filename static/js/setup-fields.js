@@ -23,7 +23,6 @@ function setupFields(context) {
     const numberField = numberFieldFactory(context);
     const proficiencyField = proficiencyFieldFactory(context);
 
-
     const container = document.getElementById("fields-wrapper");
 
     container.classList.add("space-y-4");

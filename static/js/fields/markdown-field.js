@@ -1,6 +1,5 @@
 import { createButton, createDiv, createLabel, createTextarea } from "../elements.js";
 import { createMarkdownPreview } from "../fetchers.js";
-import { checkIsDirty } from "../utils.js";
 
 const ICON_SVG_STRINGS = {
     noPreview: (`
@@ -33,7 +32,14 @@ const ICON_SVG_STRINGS = {
 const MIN_TEXTAREA_HEIGHT = 288;
 
 
-function markdownFieldFactory({ formModel, apiModel, dirtyFields }) {
+/**
+ * 
+ * @param {import("../main.js").Context} context 
+ * @returns 
+ */
+function markdownFieldFactory(context) {
+    const { formModel, apiModel, dirtyFields } = context;
+
     return (fieldName, fieldLabel) => {
 
         const PREVIEW_STATE_KEY = location.pathname + "-" + fieldName + "-preview-state";
@@ -52,11 +58,10 @@ function markdownFieldFactory({ formModel, apiModel, dirtyFields }) {
             onInput(ev) {
                 formModel[fieldName].source = ev.target.value.trim();
                 fetchMarkdownPreivew(500);
-                checkIsDirty(
+                dirtyFields.check(
                     ev.target,
                     formModel[fieldName].source,
                     apiModel[fieldName].source,
-                    dirtyFields
                 );
             },
         });

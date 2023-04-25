@@ -71,7 +71,7 @@ function setupSaveCommitModal(context) {
                             context.apiModel[fieldName] = value;
                         });
                 
-                        context.dirtyFields.removeAll();
+                        context.dirtyFields.clearAll();
 
                         context.commitHistory.update(
                             await getCommitHistory(context.characterId)
