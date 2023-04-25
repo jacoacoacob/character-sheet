@@ -1,35 +1,44 @@
 
-async function updateCharacter(characterId, message, new_data) {
-    const res = await fetch(`/character/${characterId}`, {
-        method: "PUT",
+async function fetchJson(method, path, body) {
+    const response = await fetch(path, {
+        method,
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-            message,
-            new_data,
-        }),
+        body: typeof body === "undefined" ? body : JSON.stringify(body),
     });
 
-    return await res.json();
+    return await response.json();
 }
 
-async function getCommitHistory(characterId) {
-    const res = await fetch(`/commits/${characterId}`);
+const createCommit = (characterId, message, new_data) =>
+    fetchJson("PUT", `/character/${characterId}`, { message, new_data });
 
-    return await res.json();
-}
 
-async function createMarkdownPreview(source) {
-    const res = await fetch("/md-preview", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ source }),
-    });
+const getCommitHistory = (characterId) =>
+    fetchJson("GET", `/commits/${characterId}`);
 
-    return await res.json();
-}
+const updateCommitMessage = (commitId, message) =>
+    fetchJson("PUT", `/commits/${commitId}`, { message });
 
-export { updateCharacter, getCommitHistory, createMarkdownPreview };
+
+const createMarkdownPreview = (source) =>
+    fetchJson("POST", "/md-preview", { source });
+
+
+const getCampaignNoteList = (characterId) =>
+    fetchJson("GET", `/notes/${characterId}`);
+
+const createCampaignNote = (characterId, message) =>
+    fetchJson("POST", `/notes/${characterId}`, { message });
+
+const updateCampaignNote = (noteId, message) =>
+    fetchJson("PUT", `/notes/${commitId}`, { message });
+
+    
+export {
+    getCampaignNoteList,
+    createCommit,
+    getCommitHistory,
+    createMarkdownPreview,
+};

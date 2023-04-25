@@ -3,6 +3,9 @@ function createDirtyFieldsManager() {
     const _dirtyFields = [];
 
     return {
+        isEmpty() {
+            return _dirtyFields.length === 0;
+        },
         clearAll() {
             while (_dirtyFields.length) {
                 document.getElementById(_dirtyFields.pop()).classList.remove("input--dirty");

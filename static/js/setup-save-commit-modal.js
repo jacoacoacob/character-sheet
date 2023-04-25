@@ -1,7 +1,7 @@
-import { createButton, createDiv, createForm, createTextarea } from "./elements.js";
+import { createButton, createDiv, createForm, createHeader, createTextarea } from "./elements.js";
 import { createModal } from "./disclosures/modal.js";
 import { isCommandS } from "./utils.js";
-import { updateCharacter, getCommitHistory } from "./fetchers.js";
+import { createCommit, getCommitHistory } from "./fetchers.js";
 
 /**
  * 
@@ -12,6 +12,19 @@ function setupSaveCommitModal(context) {
         closeOnClickOutside: true,
         onClose(contentRoot) {
             contentRoot.querySelector("#message").value = "";
+        },
+        onOpen(contentRoot) {
+            const message = contentRoot.querySelector("#commit-message");
+            const btnSave = contentRoot.querySelector("#btn-save-commit");
+            if (context.dirtyFields.isEmpty()) {
+                btnSave.disabled = true;
+                message.disabled = true;
+                message.placeholder = "No changes to save";
+            } else {
+                btnSave.disabled = false;
+                message.disabled = false;
+                message.placeholder = "Describe the changes you made (optional)";
+            }
         },
         setup({ closeModal, openModal }) {
 
@@ -25,14 +38,17 @@ function setupSaveCommitModal(context) {
             const textareaCommitMessage = createTextarea({
                 className: "flex-1 focusable",
                 attrs: {
-                    id: "message",
+                    id: "commit-message",
                     name: "message",
-                    placeholder: "Describe the changes you made (optional)"
                 },
             });
 
             const buttonCancel = createButton({
                 className: "focusable",
+                attrs: {
+                    id: "btn-cancel-commit",
+                    type: "button",
+                },
                 style: {
                     order: 1,
                     marginRight: "8px",
@@ -51,6 +67,7 @@ function setupSaveCommitModal(context) {
                 },
                 attrs: {
                     type: "submit",
+                    id: "btn-save-commit"
                 },
             });
 
@@ -59,7 +76,7 @@ function setupSaveCommitModal(context) {
                     async onSubmit(ev) {
                         ev.preventDefault();
 
-                        const res = await updateCharacter(
+                        const res = await createCommit(
                             context.characterId,
                             textareaCommitMessage.value,
                             context.formModel,
@@ -79,12 +96,13 @@ function setupSaveCommitModal(context) {
                 
                         closeModal();
                     },
-                    className: "space-y-3",
+                    className: "space-y-4",
                     attrs: {
                         tabIndex: 1,
                         id: "commit-form",
                     },
                     children: [
+                        createHeader(3, "Save your changes"),
                         textareaCommitMessage,
                         createDiv({
                             className: "flex justify-end",
