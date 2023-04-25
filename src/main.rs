@@ -6,6 +6,7 @@ mod character_detail_page;
 mod character_listing_page;
 mod commit_history;
 mod markdown;
+mod migration;
 mod models;
 mod page;
 mod queries;

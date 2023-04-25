@@ -5,6 +5,7 @@ use actix_web::{error, Error};
 use chrono::{DateTime, Utc};
 use rusqlite::{named_params, params, Connection, Result, Batch};
 
+use crate::migration;
 use crate::models::character::Character;
 use crate::models::character_data::CharacterData;
 use crate::models::character_delta::CharacterDelta;
@@ -45,6 +46,8 @@ fn get_conn() -> Result<Connection, Error> {
     DB_DATA_PATH.push_str(&DB_NAME);
 
     let conn = Connection::open(&DB_DATA_PATH).map_err(error::ErrorInternalServerError)?;
+
+    migration::run(&conn)?;
 
     match check_table_exists(&conn, "character")? && check_table_exists(&conn, "character_delta")? {
         true => Ok(conn),
