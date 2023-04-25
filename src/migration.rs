@@ -78,6 +78,12 @@ pub fn run(conn: &Connection) -> io::Result<()> {
 
     for item in read_manifest()? {
         let applied_migrations = get_applied_migrations(conn);
+
+        for migration in item.deps {
+            if !applied_migrations.contains(&migration) {
+                apply_migration(conn, &migration);
+            }
+        }
         
         if !applied_migrations.contains(&item.name) {
             apply_migration(conn, &item.name);

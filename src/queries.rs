@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use actix_web::{error, Error};
 use chrono::{DateTime, Utc};
-use rusqlite::{named_params, params, Connection, Result, Batch};
+use rusqlite::{named_params, params, Connection, Result};
 
 use crate::migration;
 use crate::models::character::Character;
