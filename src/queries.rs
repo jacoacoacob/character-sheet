@@ -5,12 +5,13 @@ use chrono::{DateTime, Utc};
 use rusqlite::{named_params, params, Connection, Result};
 
 use crate::migration;
+use crate::models::campaign_note::CampaignNote;
 use crate::models::character::Character;
 use crate::models::character_data::CharacterData;
 use crate::models::character_delta::CharacterDelta;
 use crate::models::field_diff::FieldDiffs;
 
-type DbResult<T> = Result<T>;
+type DbResult = Result<QueryResponse>;
 
 pub enum Query {
     ListCharacters,
@@ -18,17 +19,24 @@ pub enum Query {
     ListCommits(usize),
     GetCharacter(usize),
     UpdateCharacter(usize, String, CharacterData),
+    UpdateCommitMessage(usize, String),
+    CreateCampaginNote(usize, String),
+    ListCampaignNotes(usize),
+    UpdateCampaignNote(usize, String),
 }
 
 pub enum QueryResponse {
     Character(Character),
     CharacterList(Vec<Character>),
-    CommitHistory(Vec<CharacterDelta>),
+    Commit(CharacterDelta),
+    CommitList(Vec<CharacterDelta>),
+    CampaignNote(CampaignNote),
+    CampaignNoteList(Vec<CampaignNote>),
 }
 
 fn get_conn() -> Result<Connection, Error> {
     let DB_NAME = std::env::var("DB_NAME").unwrap_or("data.db".to_string());
-    
+
     let mut DB_DATA_PATH = env!("CARGO_MANIFEST_DIR").to_string();
     DB_DATA_PATH.push_str("/db/");
     DB_DATA_PATH.push_str(&DB_NAME);
@@ -44,12 +52,22 @@ pub fn execute(query: Query) -> Result<QueryResponse, Error> {
     let conn = get_conn()?;
 
     let result = match query {
+        Query::CreateCampaginNote(character_id, message) => {
+            create_campaign_note(&conn, character_id, &message)
+        }
         Query::CreateCharacter => create_character(&conn),
-        Query::ListCharacters => list_characters(&conn),
         Query::GetCharacter(character_id) => get_character(&conn, character_id),
+        Query::ListCampaignNotes(character_id) => list_campaign_notes(&conn, character_id),
+        Query::ListCharacters => list_characters(&conn),
         Query::ListCommits(character_id) => list_commits(&conn, character_id),
+        Query::UpdateCampaignNote(note_id, message) => {
+            update_campaign_note(&conn, note_id, &message)
+        }
         Query::UpdateCharacter(character_id, message, new_data) => {
             update_character(&conn, character_id, &message, new_data)
+        }
+        Query::UpdateCommitMessage(commit_id, message) => {
+            update_commit_message(&conn, commit_id, &message)
         }
     };
 
@@ -72,6 +90,15 @@ fn map_character_delta(row: &rusqlite::Row) -> rusqlite::Result<CharacterDelta> 
     })
 }
 
+fn map_campaign_note(row: &rusqlite::Row) -> rusqlite::Result<CampaignNote> {
+    Ok(CampaignNote {
+        id: row.get(0)?,
+        created: row.get(1)?,
+        character_id: row.get(2)?,
+        message: row.get(3)?,
+    })
+}
+
 fn get_most_recent_timestamp_from(deltas: &Vec<CharacterDelta>) -> DateTime<Utc> {
     let mut timestamps = deltas
         .iter()
@@ -83,7 +110,7 @@ fn get_most_recent_timestamp_from(deltas: &Vec<CharacterDelta>) -> DateTime<Utc>
     timestamps.first().unwrap().clone()
 }
 
-fn list_characters(conn: &Connection) -> DbResult<QueryResponse> {
+fn list_characters(conn: &Connection) -> DbResult {
     let mut stmt = conn.prepare(
         "SELECT * FROM character_delta
         ORDER BY created ASC",
@@ -120,7 +147,7 @@ fn list_characters(conn: &Connection) -> DbResult<QueryResponse> {
     Ok(QueryResponse::CharacterList(character_list))
 }
 
-fn get_character(conn: &Connection, character_id: usize) -> DbResult<QueryResponse> {
+fn get_character(conn: &Connection, character_id: usize) -> DbResult {
     let mut stmt = conn.prepare(
         "SELECT * FROM character_delta
         WHERE character_id = ?1
@@ -145,7 +172,7 @@ fn get_character(conn: &Connection, character_id: usize) -> DbResult<QueryRespon
     Ok(QueryResponse::Character(character))
 }
 
-fn create_character(conn: &Connection) -> DbResult<QueryResponse> {
+fn create_character(conn: &Connection) -> DbResult {
     let mut stmt_insert_character =
         conn.prepare("INSERT INTO character DEFAULT VALUES RETURNING id")?;
 
@@ -192,7 +219,7 @@ fn update_character(
     character_id: usize,
     message: &str,
     new_data: CharacterData,
-) -> DbResult<QueryResponse> {
+) -> DbResult {
     match get_character(conn, character_id)? {
         QueryResponse::Character(current) => {
             let field_diffs = FieldDiffs::from((Some(current.data.clone()), Some(new_data)));
@@ -202,8 +229,12 @@ fn update_character(
             }
 
             conn.execute(
-                "INSERT INTO character_delta (character_id, message, field_diffs)
-                VALUES (?1, ?2, ?3)",
+                "INSERT INTO character_delta (
+                                character_id,
+                                message,
+                                field_diffs
+                             )
+                      VALUES (?1, ?2, ?3)",
                 params![
                     character_id,
                     message,
@@ -217,19 +248,87 @@ fn update_character(
     }
 }
 
-fn list_commits(conn: &Connection, character_id: usize) -> DbResult<QueryResponse> {
-    let mut stmt = conn.prepare("
+fn list_commits(conn: &Connection, character_id: usize) -> DbResult {
+    let mut stmt = conn.prepare(
+        "
           SELECT *
             FROM character_delta
            WHERE character_id = ?1
         ORDER BY created
             DESC
-    ")?;
+    ",
+    )?;
 
     let rows: Vec<CharacterDelta> = stmt
         .query_map(params![character_id], map_character_delta)?
         .map(|row| row.unwrap())
         .collect();
 
-    Ok(QueryResponse::CommitHistory(rows))
+    Ok(QueryResponse::CommitList(rows))
+}
+
+fn create_campaign_note(conn: &Connection, character_id: usize, message: &str) -> DbResult {
+    let mut stmt = conn.prepare(
+        "
+        INSERT INTO campaign_note (
+                        character_id,
+                        message
+                    )
+             VALUES (?1, ?2)
+          RETURNING *
+    ",
+    )?;
+
+    let row = stmt.query_row(params![character_id, message], map_campaign_note)?;
+
+    Ok(QueryResponse::CampaignNote(row))
+}
+
+fn list_campaign_notes(conn: &Connection, character_id: usize) -> DbResult {
+    let mut stmt = conn.prepare(
+        "
+          SELECT *
+            FROM campaign_note
+           WHERE character_id = ?1
+        ORDER BY created
+            DESC
+    ",
+    )?;
+
+    let rows = stmt
+        .query_map(params![character_id], map_campaign_note)?
+        .map(|row| row.unwrap())
+        .collect();
+
+    Ok(QueryResponse::CampaignNoteList(rows))
+}
+
+fn update_campaign_note(conn: &Connection, note_id: usize, message: &str) -> DbResult {
+    let mut stmt = conn.prepare(
+        "
+           UPDATE campaign_note
+              SET message = ?1
+            WHERE id = ?2
+        RETURNING *
+    ",
+    )?;
+
+    let row = stmt.query_row(params![message, note_id], map_campaign_note)?;
+
+    Ok(QueryResponse::CampaignNote(row))
+}
+
+fn update_commit_message(conn: &Connection, commit_id: usize, message: &str) -> DbResult {
+    let mut stmt = conn.prepare(
+        "
+           UPDATE character_delta
+              SET message = ?1
+            WHERE id = ?2
+        RETURNING *
+    ",
+    )?;
+
+    let row = stmt.query_row(params![message, commit_id], map_character_delta)?;
+
+    Ok(QueryResponse::Commit(row))
 }

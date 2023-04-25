@@ -2,9 +2,10 @@
 
 use actix_web::{middleware, web, App, HttpServer};
 
+mod campaign_note;
 mod character_detail_page;
 mod character_listing_page;
-mod commit_history;
+mod commits;
 mod markdown;
 mod migration;
 mod models;
@@ -16,7 +17,8 @@ use character_detail_page::{
 };
 use character_listing_page::get_character_listing_page;
 use markdown::create_md_preview;
-use commit_history::get_commit_history;
+use campaign_note::{create_campaign_note, update_campaign_note, get_campaign_note_list};
+use commits::{get_commit_history, update_commit_message};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -44,7 +46,11 @@ async fn main() -> std::io::Result<()> {
                     .route(web::get().to(get_character_detail_page))
                     .route(web::put().to(update_character_detail_page)),
             )
+            .route("/notes/{character_id}", web::get().to(get_campaign_note_list))
+            .route("/notes/{character_id}", web::post().to(create_campaign_note))
+            .route("/notes/{note_id}", web::put().to(update_campaign_note))
             .route("/commits/{character_id}", web::get().to(get_commit_history))
+            .route("/commits/{commit_id}", web::put().to(update_commit_message))
             .route("/md-preview", web::post().to(create_md_preview))
     })
     .bind(("0.0.0.0", 8080))?

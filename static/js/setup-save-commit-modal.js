@@ -5,10 +5,9 @@ import { updateCharacter, getCommitHistory } from "./fetchers.js";
 
 /**
  * 
- * @param {*} context
- * @param {*} dirtyFields 
+ * @param {import("./main.js").Context} context
  */
-function setupSaveCommitModal(context, dirtyFields) {
+function setupSaveCommitModal(context) {
     createModal({
         closeOnClickOutside: true,
         onClose(contentRoot) {
@@ -72,7 +71,7 @@ function setupSaveCommitModal(context, dirtyFields) {
                             context.apiModel[fieldName] = value;
                         });
                 
-                        dirtyFields.removeAll();
+                        context.dirtyFields.removeAll();
 
                         context.commitHistory.update(
                             await getCommitHistory(context.characterId)
