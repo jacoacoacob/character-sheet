@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::fs;
 
 use actix_web::{error, Error};
 use chrono::{DateTime, Utc};
@@ -27,20 +26,9 @@ pub enum QueryResponse {
     CommitHistory(Vec<CharacterDelta>),
 }
 
-fn check_table_exists(conn: &Connection, table_name: &str) -> Result<bool, Error> {
-    let mut stmt = conn
-        .prepare("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name = ?1")
-        .map_err(error::ErrorInternalServerError)?;
-
-    let row_count = stmt
-        .query_row([table_name], |row| row.get::<_, usize>(0))
-        .map_err(error::ErrorInternalServerError)?;
-
-    Ok(row_count > 0)
-}
-
 fn get_conn() -> Result<Connection, Error> {
     let DB_NAME = std::env::var("DB_NAME").unwrap_or("data.db".to_string());
+    
     let mut DB_DATA_PATH = env!("CARGO_MANIFEST_DIR").to_string();
     DB_DATA_PATH.push_str("/db/");
     DB_DATA_PATH.push_str(&DB_NAME);
@@ -49,22 +37,7 @@ fn get_conn() -> Result<Connection, Error> {
 
     migration::run(&conn)?;
 
-    match check_table_exists(&conn, "character")? && check_table_exists(&conn, "character_delta")? {
-        true => Ok(conn),
-        false => {
-            let DB_SCHEMA_PATH = concat!(env!("CARGO_MANIFEST_DIR"), "/db/schema.sql");
-
-            let db_schema_sql = fs::read_to_string(&DB_SCHEMA_PATH)?;
-
-            let mut batch = Batch::new(&conn, &db_schema_sql);
-
-            while let Some(mut stmt) = batch.next().map_err(error::ErrorInternalServerError)? {
-                stmt.execute([]).map_err(error::ErrorInternalServerError)?;
-            }
-
-            Ok(conn)
-        }
-    }
+    Ok(conn)
 }
 
 pub fn execute(query: Query) -> Result<QueryResponse, Error> {

@@ -2,7 +2,9 @@ use std::env;
 use std::fs;
 use std::io;
 
+use rusqlite::Batch;
 use rusqlite::Connection;
+use rusqlite::params;
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
@@ -59,7 +61,16 @@ fn apply_migration(conn: &Connection, migration_name: &str) {
         &format!("read file {}", up_sql_path)
     );
 
-    println!("{}", up_sql);
+    let mut batch = Batch::new(conn, &up_sql);
+
+    while let Some(mut stmt) = batch.next().expect("Batch next statement") {
+        stmt.execute([]).expect("Batch execute statement");
+    }
+
+    conn.execute(
+        "INSERT INTO migrations (name) VALUES (?1)",
+        params![migration_name]
+    ).expect("Insert into migrations");
 }
 
 pub fn run(conn: &Connection) -> io::Result<()> {
