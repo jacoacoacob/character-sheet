@@ -66,8 +66,8 @@ function createDrawer({
     }
 
     function expand() {
-        drawer.classList.add("drawer--expanded");
         localStorage[DRAWER_STATE_KEY] = "expanded";
+        drawer.classList.add("drawer--expanded");
         onExpand(drawer);
     }
     
@@ -76,7 +76,7 @@ function createDrawer({
         localStorage[DRAWER_STATE_KEY] = "collapsed";
         onCollapse(drawer);
     }
-
+    
     if (localStorage[DRAWER_STATE_KEY] === "expanded") {
         expand();
     }

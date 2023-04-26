@@ -6,13 +6,14 @@ import { setupFields } from "./setup-fields.js";
 import { setupCommitHistoryDrawer } from "./setup-commit-history-drawer.js";
 import { setupSaveCommitModal } from "./setup-save-commit-modal.js";
 import { setupFancyModal } from "./setup-fancy-modal.js";
+import { createEventBus } from "./event-bus.js";
 
 let ctxCount = 0;
 export class Context {
     constructor() {
         if (ctxCount > 0) {
             // lol its a singleton...because using `class` syntax makes vscode
-            // intellisense work with /** @param {import(<path/to/main.js>).Context} */
+            // intellisense work with /** @param {import("<path/to/main.js>").Context} */
             throw new Error("ONLY ONE CONTEXT!!!");
         }
 
@@ -25,13 +26,11 @@ export class Context {
         this.apiModel = naiveDeepCopy(INITIAL_DATA.data);
         this.formModel = naiveDeepCopy(INITIAL_DATA.data);
         this.dirtyFields = createDirtyFieldsManager();
+        this.events = createEventBus();
     }
 }
 
-const context = new Context();
-
-window.apiModel = context.apiModel;
-window.formModel = context.formModel;
+const context = window.context = new Context();
 
 setupFields(context);
 setupSaveCommitModal(context);

@@ -155,10 +155,16 @@ function createTextarea({ autoSize = false, className = "", style = {}, attrs = 
     attribute(attrs, textarea);
 
     const INITIAL_HEIGHT = Number.parseInt(textarea.style.height.replace("px", "").trim());
+    const MAX_HEIGHT = typeof textarea.style.maxHeight === "undefined"
+        ? null
+        : Number.parseInt(textarea.style.maxHeight.replace("px", "").trim());
 
     textarea.addEventListener("input", (ev) => {
         if (autoSize) {
             textarea.style.overflow = "hidden";
+            if (typeof MAX_HEIGHT === "number" && textarea.scrollHeight > MAX_HEIGHT) {
+                textarea.style.overflow = "auto"
+            }
             if (textarea.scrollHeight > INITIAL_HEIGHT) {
                 const scrollLeft = window.scrollX;
                 const scrollTop = window.scrollY;

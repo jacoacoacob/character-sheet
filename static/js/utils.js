@@ -133,9 +133,14 @@ function useWatch(initialData) {
                 watcher(_data);
             });
         },
-        watch(callback, opts) {
+        /**
+         * 
+         * @param {(data) => void} callback 
+         * @param {{ isEager?: boolean }} opts 
+         */
+        watch(callback, { isEager = false } = {}) {
             _watchers.push(callback);
-            if (opts.isEager) {
+            if (isEager) {
                 callback(_data);
             }
         }

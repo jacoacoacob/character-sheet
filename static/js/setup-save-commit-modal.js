@@ -13,19 +13,27 @@ function setupSaveCommitModal(context) {
         onClose(contentRoot) {
             contentRoot.querySelector("#commit-message").value = "";
         },
-        onOpen(contentRoot) {
+        onBeforeOpen(contentRoot) {
             const message = contentRoot.querySelector("#commit-message");
             const btnSave = contentRoot.querySelector("#btn-save-commit");
-            const btnCancel = contentRoot.querySelector("#btn-cancel-commit");
             if (context.dirtyFields.isEmpty()) {
+                btnSave.classList.remove("focusable");
+                message.classList.remove("focusable");
                 btnSave.disabled = true;
                 message.disabled = true;
                 message.placeholder = "No changes to save";
-                btnCancel.focus();
             } else {
+                btnSave.classList.add("focusable");
+                message.classList.add("focusable");
                 btnSave.disabled = false;
                 message.disabled = false;
                 message.placeholder = "Describe the changes you made (optional)";
+            }
+        },
+        onAfterOpen(contentRoot) {
+            const btnCancel = contentRoot.querySelector("#btn-cancel-commit");
+            if (context.dirtyFields.isEmpty()) {
+                btnCancel.focus();
             }
         },
         setup({ closeModal, openModal }) {
@@ -36,6 +44,8 @@ function setupSaveCommitModal(context) {
                     openModal();
                 }
             });
+
+            context.events.on("open_save_modal", openModal);
 
             const textareaCommitMessage = createTextarea({
                 className: "flex-1 focusable",
@@ -104,7 +114,7 @@ function setupSaveCommitModal(context) {
                         id: "commit-form",
                     },
                     children: [
-                        createHeader(3, "Save your changes"),
+                        createHeader(4, "Save your changes"),
                         textareaCommitMessage,
                         createDiv({
                             className: "flex justify-end",

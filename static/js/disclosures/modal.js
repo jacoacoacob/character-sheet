@@ -5,8 +5,10 @@ import { isShiftKey, isTabKey } from "../utils.js";
  * 
  * @param {{
  *  closeOnClickOutside?: boolean;
- *  onClose?: (contentRoot: HTMLDivElement) => void;
- *  onOpen?: (contentRoot: HTMLDivElement) => void;
+ *  onBeforeClose?: (contentRoot: HTMLDivElement) => void;
+ *  onAfterClose?: (contentRoot: HTMLDivElement) => void;
+ *  onBeforeOpen?: (contentRoot: HTMLDivElement) => void;
+ *  onAfterOpen?: (contentRoot: HTMLDivElement) => void;
  *  setup?: (options: {
  *      openModal: () => void;
  *      closeModal: () => void;
@@ -15,8 +17,10 @@ import { isShiftKey, isTabKey } from "../utils.js";
  */
 function createModal({
     closeOnClickOutside = false,
-    onOpen = () => void 0,
-    onClose = () => void 0,
+    onBeforeOpen = () => void 0,
+    onAfterOpen = () => void 0,
+    onBeforeClose = () => void 0,
+    onAfterClose = () => void 0,
     setup = () => [],
 } = {}) {
 
@@ -97,6 +101,7 @@ function createModal({
     }
 
     function closeModal() {
+        onBeforeClose(modalContent)
         document.body.style.overflow = "auto";
         modal.classList.remove("modal--visible");
         modal.hidden = true;
@@ -107,10 +112,11 @@ function createModal({
             prevActiveNonModalElement = null;
         }
         focusableModalContentElements = null;
-        onClose(modalContent);
+        onAfterClose(modalContent);
     }
 
     function openModal() {
+        onBeforeOpen(modalContent)
         document.body.style.overflow = "hidden";
         modal.classList.add("modal--visible");
         modal.hidden = false;
@@ -123,7 +129,7 @@ function createModal({
         }
         window.addEventListener("keydown", listenKeyDown);
         modal.addEventListener("click", listenClickOutsideContent);
-        onOpen(modalContent);
+        onAfterOpen(modalContent);
     }
 
     document.body.appendChild(modal)

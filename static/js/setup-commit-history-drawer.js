@@ -86,7 +86,6 @@ function setupCommitHistoryDrawer(context) {
                     })),
             );
         },
-        { isEager: true }
     );
 
     createDrawer({
@@ -95,9 +94,16 @@ function setupCommitHistoryDrawer(context) {
             return [
                 createButton({
                     text: "Save changes",
+                    onClick(ev) {
+                        ev.preventDefault();
+                        context.events.send("open_save_modal");
+                    }
                 }),
                 createButton({
                     text: "Take note",
+                    onClick() {
+                        context.events.send("open_fancy_modal");
+                    }
                 }),
             ];
         },
@@ -123,7 +129,7 @@ function setupCommitHistoryDrawer(context) {
                         try {
                             const canvas = await html2canvas(element);
                             a.href = canvas.toDataURL();
-                            a.download = formModel.character_name + "_" + new Date().toDateString().toLowerCase().replace(/\s+/g, "_");
+                            a.download = context.formModel.character_name + "_" + new Date().toDateString().toLowerCase().replace(/\s+/g, "_");
                             a.click();
                         } catch (error) {
                             console.error(error);
