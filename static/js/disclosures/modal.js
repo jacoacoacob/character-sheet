@@ -25,6 +25,9 @@ function createModal({
 
     const modalContent = createDiv({
         className: "modal-content",
+        attrs: {
+            tabIndex: 0,
+        },
         children: setup({ closeModal, openModal }),
     });
 
@@ -61,6 +64,11 @@ function createModal({
 
     function trapFocus(ev) {
         if (!isTabKey(ev)) {
+            return;
+        }
+
+        if (focusableModalContentElements && focusableModalContentElements.length === 0) {
+            ev.preventDefault();
             return;
         }
 
@@ -110,6 +118,8 @@ function createModal({
         focusableModalContentElements = modalContent.querySelectorAll(".focusable");
         if (focusableModalContentElements.length) {
             focusableModalContentElements[0].focus();
+        } else {
+            modalContent.focus();
         }
         window.addEventListener("keydown", listenKeyDown);
         modal.addEventListener("click", listenClickOutsideContent);

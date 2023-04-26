@@ -38,10 +38,10 @@ button:disabled {
     cursor: not-allowed;
 }
 
-ul {
+/* ul {
     list-style: none;
     padding: 0;
-}
+} */
 
 
 /* Utilities */
@@ -226,9 +226,6 @@ ul {
 }
 
 
-.commit {
-    max-width: 300px;
-}
 
 .md h1 {
     font-size: 1.5rem;
@@ -298,6 +295,21 @@ ul {
     transition: all ease-in-out .1s;
 }
 
+.drawer--expanded {
+    width: 300px;
+}
+
+.drawer-content-wrapper {
+    min-height: 100vh;
+    opacity: 0;
+    transition: all ease-in-out .1s;
+}
+
+.drawer--expanded .drawer-content-wrapper {
+    opacity: 1;
+}
+
+
 .drawer-trigger {
     position: absolute;
     z-index: 100;
@@ -312,23 +324,36 @@ ul {
     align-items: center;
 }
 
-.drawer--expanded {
-    width: 300px;
+.drawer-header {
+    display: flex;
+    padding: 16px 8px 8px;
+    font-size: .9rem;
 }
 
 .drawer-content {
     position: sticky;
     top: 0;
-    opacity: 0;
     padding: 16px 8px 8px 8px;
     z-index: 10;
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
     transition: all ease-in-out .1s;
 }
 
-.drawer--expanded .drawer-content {
-    opacity: 1;
+
+.drawer-footer {
+    border-top: 1px solid #bbb;
+    padding: 8px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #ddd;
+}
+
+.commit-list ul,
+ul.commit-list {
+    list-style: none;
+    padding: 0;
 }

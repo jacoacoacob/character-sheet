@@ -79,6 +79,15 @@ function isCommandKey(ev) {
 /**
  * 
  * @param {KeyboardEvent} ev 
+ * @param {string} letter 
+ */
+function isLetterKey(ev, letter) {
+    return ev.key === letter.toLowerCase() || ev.key === letter.toUpperCase();
+}
+
+/**
+ * 
+ * @param {KeyboardEvent} ev 
  */
 function isTabKey(ev) {
     return ev.key === "Tab";
@@ -144,6 +153,7 @@ export {
     isTabKey,
     isCommandEnter,
     isCommandS,
+    isLetterKey,
     naiveDeepCopy,
     classify,
     stylize,

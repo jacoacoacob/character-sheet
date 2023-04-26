@@ -5,12 +5,14 @@ import { createDirtyFieldsManager } from "./dirty-fields-manager.js";
 import { setupFields } from "./setup-fields.js";
 import { setupCommitHistoryDrawer } from "./setup-commit-history-drawer.js";
 import { setupSaveCommitModal } from "./setup-save-commit-modal.js";
+import { setupFancyModal } from "./setup-fancy-modal.js";
 
 let ctxCount = 0;
 export class Context {
     constructor() {
         if (ctxCount > 0) {
-            // lol its a singleton...because I gots ta have a class for the auto-completes
+            // lol its a singleton...because using `class` syntax makes vscode
+            // intellisense work with /** @param {import(<path/to/main.js>).Context} */
             throw new Error("ONLY ONE CONTEXT!!!");
         }
 
@@ -33,4 +35,5 @@ window.formModel = context.formModel;
 
 setupFields(context);
 setupSaveCommitModal(context);
+setupFancyModal(context);
 setupCommitHistoryDrawer(context);

@@ -11,15 +11,17 @@ function setupSaveCommitModal(context) {
     createModal({
         closeOnClickOutside: true,
         onClose(contentRoot) {
-            contentRoot.querySelector("#message").value = "";
+            contentRoot.querySelector("#commit-message").value = "";
         },
         onOpen(contentRoot) {
             const message = contentRoot.querySelector("#commit-message");
             const btnSave = contentRoot.querySelector("#btn-save-commit");
+            const btnCancel = contentRoot.querySelector("#btn-cancel-commit");
             if (context.dirtyFields.isEmpty()) {
                 btnSave.disabled = true;
                 message.disabled = true;
                 message.placeholder = "No changes to save";
+                btnCancel.focus();
             } else {
                 btnSave.disabled = false;
                 message.disabled = false;

@@ -46,6 +46,28 @@ function createSpan({ className = "", attrs = {}, style = {}, children = [] } = 
 
 /**
  * @param {{
+ *  className?: string;
+ *  attrs: Record<string, *>;
+ *  style?: ElementCSSInlineStyle["style"];
+ *  children?: HTMLElement[];
+ * }} param0
+ */
+function createParagraph({ className = "", attrs = {}, style = {}, children = [] } = {}) {
+    const span = document.createElement("span");
+
+    classify(className, span);
+
+    stylize(style, span);
+
+    attribute(attrs, span);
+
+    span.append(...children.filter(Boolean))
+
+    return span;
+}
+
+/**
+ * @param {{
 *  className?: string;
 *  attrs: Record<string, *>;
 *  style?: ElementCSSInlineStyle["style"];
@@ -242,4 +264,4 @@ function createForm({
 }
 
 
-export { createButton, createDiv, createSpan, createList, createListItem, createForm, createHeader, createInput, createLabel, createTextarea };
+export { createButton, createParagraph, createDiv, createSpan, createList, createListItem, createForm, createHeader, createInput, createLabel, createTextarea };

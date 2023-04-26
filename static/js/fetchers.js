@@ -41,4 +41,7 @@ export {
     createCommit,
     getCommitHistory,
     createMarkdownPreview,
+    createCampaignNote,
+    updateCampaignNote,
+    updateCommitMessage,
 };
