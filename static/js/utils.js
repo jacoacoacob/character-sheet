@@ -144,6 +144,7 @@ function isCommandS(ev) {
 
 function useWatch(initialData) {
     let _data = initialData;
+    let _oldData = initialData;
 
     const _watchers = [];
 
@@ -152,90 +153,25 @@ function useWatch(initialData) {
             return _data;
         },
         update(data) {
+            _oldData = _data;
             _data = data;
             _watchers.forEach((watcher) => {
-                watcher(_data);
+                watcher(_data, _oldData);
             });
         },
         /**
          * 
-         * @param {(data) => void} callback 
+         * @param {(data, prevData) => void} callback 
          * @param {{ isEager?: boolean }} opts 
          */
         watch(callback, { isEager = false } = {}) {
             _watchers.push(callback);
             if (isEager) {
-                callback(_data);
+                callback(_data, _oldData);
             }
         }
     }
 }
-
-// /**
-//  * 
-//  * @param {HTMLElement} container 
-//  * @param {HTMLElement?} allowedExit 
-//  */
-// function createFocusTrap(container, allowedExit) {
-//     const selectors = [
-//         '[contentEditable=true]',
-//         '[tabindex]',
-//         'a[href]',
-//         'area[href]',
-//         'button',
-//         'iframe',
-//         'input',
-//         'select',
-//         'textarea',
-//       ].map((selector) => `${selector}:not([tabindex='-1'])`)
-//       .join(",")
-    
-//     const focusableElements = [
-//         allowedExit,
-//         ...container.querySelectorAll(selectors).values()
-//     ].filter(Boolean);
-
-//     function firstFocusablElement() {
-//         return focusableElements[0];
-//     }
-
-//     function lastFocusableElement() {
-//         return focusableElements[focusableElements.length - 1];
-//     }
-
-//     /**
-//      * 
-//      * @param {KeyboardEvent} ev 
-//      */
-//     function trapFocus(ev) {
-//         if (!isTabKey(ev)) {
-//             return;
-//         }
-
-//         if (focusableElements.length === 0) {
-//             ev.preventDefault();
-//             return;
-//         }
-
-//         if (isShiftKey(ev)) {
-//             if (document.activeElement === firstFocusablElement()) {
-//                 lastFocusableElement().focus();
-//                 ev.preventDefault();
-//             }
-//         } else {
-//             if (document.activeElement === lastFocusableElement()) {
-//                 firstFocusablElement().focus();
-//                 ev.preventDefault();
-//             }
-//         }
-//     }
-
-//     container.addEventListener("keydown", trapFocus);
-
-//     return () => {
-//         container.removeEventListener("keydown", trapFocus);
-//     }
-// }
 
 
 /**

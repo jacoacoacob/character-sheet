@@ -1,13 +1,16 @@
 import { createDiv } from "../elements.js"
-import { isShiftKey, isTabKey, createFocusTrap } from "../utils.js";
+import { createFocusTrap } from "../utils.js";
 
 /**
  * 
  * @param {{
  *  closeOnClickOutside?: boolean;
+ *  contentClassName?: string;
+ *  contentStyle?: ElementCSSInlineStyle["style"];
  *  setup: (options: {
  *      openModal: () => void;
  *      closeModal: () => void;
+ *      isOpen: () => boolean;
  *      onBeforeClose?: ((contentRoot: HTMLDivElement) => void) => void;
  *      onAfterClose?: ((contentRoot: HTMLDivElement) => void) => void;
  *      onBeforeOpen?: ((contentRoot: HTMLDivElement) => void) => void;
@@ -15,7 +18,12 @@ import { isShiftKey, isTabKey, createFocusTrap } from "../utils.js";
  *  }) => HTMLElement[];
  * }} param0 
  */
-function createModal({ closeOnClickOutside = false, setup = () => [] } = {}) {
+function createModal({
+    closeOnClickOutside = false,
+    contentClassName = "",
+    contentStyle = {},
+    setup = () => []
+} = {}) {
 
     const _onBeforeOpen = [];
     const _onBeforeClose = [];
@@ -36,16 +44,17 @@ function createModal({ closeOnClickOutside = false, setup = () => [] } = {}) {
     }
 
     let prevActiveNonModalElement;
-    // let focusableModalContentElements;
 
     const modalContent = createDiv({
-        className: "modal-content",
+        className: `modal-content ${contentClassName}`.trim(),
+        style: contentStyle,
         attrs: {
             tabIndex: 0,
         },
         children: setup({
             closeModal,
             openModal,
+            isOpen,
             onAfterClose,
             onAfterOpen,
             onBeforeClose,
@@ -72,49 +81,6 @@ function createModal({ closeOnClickOutside = false, setup = () => [] } = {}) {
         }
     }
 
-    // function firstFocusablModalContentElement() {
-    //     if (focusableModalContentElements) {
-    //         return focusableModalContentElements[0];
-    //     }
-    // }
-
-    // function lastFocusableModalContentElement() {
-    //     if (focusableModalContentElements) {
-    //         return focusableModalContentElements[focusableModalContentElements.length - 1];
-    //     }
-    // }
-
-    // function trapFocus(ev) {
-    //     if (!isTabKey(ev)) {
-    //         return;
-    //     }
-
- 
-    //     if (focusableModalContentElements && focusableModalContentElements.length === 0) {
-    //         ev.preventDefault();
-    //         return;
-    //     }
-
-    //     if (isShiftKey(ev)) {
-    //         if (document.activeElement === firstFocusablModalContentElement()) {
-    //             lastFocusableModalContentElement().focus();
-    //             ev.preventDefault();
-    //         }
-    //     } else {
-    //         if (document.activeElement === lastFocusableModalContentElement()) {
-    //             firstFocusablModalContentElement().focus();
-    //             ev.preventDefault();
-    //         }
-    //     }
-
-    //     console.log(
-    //         focusableModalContentElements,
-    //         Array.from(focusableModalContentElements).indexOf(document.activeElement)
-    //     )
-
-    // }
-
-
     const { trapFocus, focus } = createFocusTrap(modalContent);
 
     function closeOnEscapeKey(ev) {
@@ -126,6 +92,10 @@ function createModal({ closeOnClickOutside = false, setup = () => [] } = {}) {
     function listenKeyDown(ev) {
         closeOnEscapeKey(ev);
         trapFocus(ev);
+    }
+
+    function isOpen() {
+        return modal.classList.contains("modal--visible");
     }
 
     function closeModal() {

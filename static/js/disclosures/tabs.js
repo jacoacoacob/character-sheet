@@ -40,9 +40,11 @@ function createTabs({
     const tabButtonIds = [];
 
     const tabButtons = createDiv({
+        className: "space-x-3",
         children: tabNames.map((tabName) => {
             const btn = createButton({
                 text: tabName,
+                className: "tab-button",
                 attrs: {
                     id: getTabIdFrom(tabName),
                 },
@@ -65,7 +67,7 @@ function createTabs({
 
     const tabContent = createDiv({
         attrs: {
-            tabIndex: 1,
+            tabIndex: 0,
         },
     });
 
@@ -90,10 +92,12 @@ function createTabs({
         }
     });
 
-
-
-    tabState.watch((activeTabName) => {
+    tabState.watch((activeTabName, prev) => {
         clearElement(tabContent);
+        const activeId = getTabIdFrom(activeTabName);
+        const prevActiveId = getTabIdFrom(prev);
+        tabButtons.querySelector(`#${prevActiveId}`).classList.remove("tab-button--active");
+        tabButtons.querySelector(`#${activeId}`).classList.add("tab-button--active");
         tabContent.append(tabs[activeTabName]);
     }, { isEager: true });
 

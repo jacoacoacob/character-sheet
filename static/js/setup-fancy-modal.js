@@ -25,11 +25,14 @@ function setupFancyModal(context) {
     
     createModal({
         closeOnClickOutside: true,
-        setup({ openModal, closeModal }) {
+        contentStyle: {
+            maxWidth: "600px"
+        },
+        setup({ openModal, closeModal, onBeforeOpen, isOpen }) {
 
             const { tabButtons, tabContent, tabState } = createTabs({
                 tabs: {
-                    "save-commit": createForm({
+                    "Save Commit": createForm({
                         onSubmit(ev) {
                             ev.preventDefault();
 
@@ -61,33 +64,44 @@ function setupFancyModal(context) {
                             }),
                         ],
                     }),
-                    "save-note": createDiv({
+                    "Save Note": createDiv({
                         children: [
                             "save a note"
                         ]
                     }),
-                    "browse-history": createDiv({
+                    "Browse History": createDiv({
                         children: [
                             "browse your history of notes and commits",
                         ],
                     }),
                 },
             });
+
+            onBeforeOpen(() => {
+                tabState.update("Save Commit");
+            })
         
             
             window.addEventListener("keydown", (ev) => {
                 if (isCommandKey(ev) && isLetterKey(ev, "k")) {
                     ev.preventDefault();
-                    openModal();
+                    if (!isOpen()) {
+                        openModal();
+                    }
                 }
             });
 
             context.events.on("open_fancy_modal", openModal);
 
             return [
-                tabButtons,
-                tabContent
-            ]
+                createDiv({
+                    className: "space-y-3",
+                    children: [
+                        tabButtons,
+                        tabContent,
+                    ],
+                }),
+            ];
         },
     });
 }
