@@ -46,10 +46,30 @@ function createField(field, name, label) {
     );
 }
 
+/**
+ * 
+ * @param {HTMLElement} elem 
+ */
 function clearElement(elem) {
     while (elem.lastChild) {
         elem.removeChild(elem.lastChild);
     }
+}
+
+/**
+ * 
+ * @param {HTMLElement} elem 
+ * @param {HTMLElement} parent 
+ */
+function hasParent(elem, parent) {
+    let parent_ = elem.parentElement;
+    while (parent_.parentElement) {
+        if (parent_ === parent) {
+            return true;
+        }
+        parent_ = parent_.parentElement;
+    }
+    return false;
 }
 
 /**
@@ -83,6 +103,10 @@ function isCommandKey(ev) {
  */
 function isLetterKey(ev, letter) {
     return ev.key === letter.toLowerCase() || ev.key === letter.toUpperCase();
+}
+
+function isArrowKey(ev, direction) {
+    return ev.key === `Arrow${direction[0].toUpperCase() + direction.slice(1).toLowerCase()}`;
 }
 
 /**
@@ -147,6 +171,151 @@ function useWatch(initialData) {
     }
 }
 
+// /**
+//  * 
+//  * @param {HTMLElement} container 
+//  * @param {HTMLElement?} allowedExit 
+//  */
+// function createFocusTrap(container, allowedExit) {
+//     const selectors = [
+//         '[contentEditable=true]',
+//         '[tabindex]',
+//         'a[href]',
+//         'area[href]',
+//         'button',
+//         'iframe',
+//         'input',
+//         'select',
+//         'textarea',
+//       ].map((selector) => `${selector}:not([tabindex='-1'])`)
+//       .join(",")
+    
+//     const focusableElements = [
+//         allowedExit,
+//         ...container.querySelectorAll(selectors).values()
+//     ].filter(Boolean);
+
+//     function firstFocusablElement() {
+//         return focusableElements[0];
+//     }
+
+//     function lastFocusableElement() {
+//         return focusableElements[focusableElements.length - 1];
+//     }
+
+//     /**
+//      * 
+//      * @param {KeyboardEvent} ev 
+//      */
+//     function trapFocus(ev) {
+//         if (!isTabKey(ev)) {
+//             return;
+//         }
+
+//         if (focusableElements.length === 0) {
+//             ev.preventDefault();
+//             return;
+//         }
+
+//         if (isShiftKey(ev)) {
+//             if (document.activeElement === firstFocusablElement()) {
+//                 lastFocusableElement().focus();
+//                 ev.preventDefault();
+//             }
+//         } else {
+//             if (document.activeElement === lastFocusableElement()) {
+//                 firstFocusablElement().focus();
+//                 ev.preventDefault();
+//             }
+//         }
+//     }
+
+//     container.addEventListener("keydown", trapFocus);
+
+//     return () => {
+//         container.removeEventListener("keydown", trapFocus);
+//     }
+// }
+
+
+/**
+ * 
+ * @param {HTMLElement} container 
+ */
+function createFocusTrap(container) {
+    const selectors = [
+        "[tabindex]",
+        "a[href]",
+        "button",
+        "input",
+        "select",
+        "textarea",
+    ]
+    .map((selector) => `${selector}:not([tabindex="-1"])`)
+    .join(",");
+
+    const focusableElements = [];
+    
+    for (let elem of container.querySelectorAll(selectors)) {
+        focusableElements.push(elem);
+    }
+
+    function cursor() {
+        return focusableElements.indexOf(document.activeElement);
+    }
+
+    function focusNext() {
+        const cur = cursor();
+        if (cur === -1) {
+            return;
+        }
+        if (cur === focusableElements.length - 1) {
+            focusableElements[0].focus();
+        } else {
+            focusableElements[cur + 1].focus();
+        }
+    }
+
+    function focusPrev() {
+        const cur = cursor();
+        if (cur === -1) {
+            return;
+        }
+        if (cur === 0) {
+            focusableElements[focusableElements.length - 1].focus();
+        } else {
+            focusableElements[cur - 1].focus();
+        }
+    }
+
+    function focus(index) {
+        if (focusableElements[index]) {
+            focusableElements[index].focus();
+        }
+    }
+
+    /**
+     * 
+     * @param {KeyboardEvent} ev 
+     */
+    function trapFocus(ev) {
+        if (!isTabKey(ev)) {
+            return;
+        }
+
+        if (isShiftKey(ev)) {
+            focusPrev();
+            ev.preventDefault();
+        } else {
+            focusNext();
+            ev.preventDefault();
+        }
+    }
+
+    return { trapFocus, focus };
+}
+
+
 export {
     clearElement,
     createField,
@@ -159,8 +328,11 @@ export {
     isCommandEnter,
     isCommandS,
     isLetterKey,
+    isArrowKey,
     naiveDeepCopy,
     classify,
     stylize,
+    hasParent,
     useWatch,
+    createFocusTrap,
 };

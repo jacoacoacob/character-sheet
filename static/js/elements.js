@@ -225,7 +225,7 @@ function createHeader(level, text) {
 function createButton({ text = "", innerHTML = "", attrs = {}, className = "", style = {}, onClick = () => void 0 } = {}) {
     const button = document.createElement("button");
 
-    attribute(attrs, button);
+    attribute({ type: "button", ...attrs }, button);
     classify(className, button);
     stylize(style, button);
 

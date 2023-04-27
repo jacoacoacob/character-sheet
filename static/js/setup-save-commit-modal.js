@@ -10,33 +10,36 @@ import { createCommit, getCommitHistory } from "./fetchers.js";
 function setupSaveCommitModal(context) {
     createModal({
         closeOnClickOutside: true,
-        onClose(contentRoot) {
-            contentRoot.querySelector("#commit-message").value = "";
-        },
-        onBeforeOpen(contentRoot) {
-            const message = contentRoot.querySelector("#commit-message");
-            const btnSave = contentRoot.querySelector("#btn-save-commit");
-            if (context.dirtyFields.isEmpty()) {
-                btnSave.classList.remove("focusable");
-                message.classList.remove("focusable");
-                btnSave.disabled = true;
-                message.disabled = true;
-                message.placeholder = "No changes to save";
-            } else {
-                btnSave.classList.add("focusable");
-                message.classList.add("focusable");
-                btnSave.disabled = false;
-                message.disabled = false;
-                message.placeholder = "Describe the changes you made (optional)";
-            }
-        },
-        onAfterOpen(contentRoot) {
-            const btnCancel = contentRoot.querySelector("#btn-cancel-commit");
-            if (context.dirtyFields.isEmpty()) {
-                btnCancel.focus();
-            }
-        },
-        setup({ closeModal, openModal }) {
+        setup({ closeModal, openModal, onAfterClose, onAfterOpen, onBeforeOpen }) {
+
+            onAfterClose((contentRoot) => {
+                contentRoot.querySelector("#commit-message").value = "";
+            });
+
+            onBeforeOpen((contentRoot) => {
+                const message = contentRoot.querySelector("#commit-message");
+                const btnSave = contentRoot.querySelector("#btn-save-commit");
+                if (context.dirtyFields.isEmpty()) {
+                    btnSave.classList.remove("focusable");
+                    message.classList.remove("focusable");
+                    btnSave.disabled = true;
+                    message.disabled = true;
+                    message.placeholder = "No changes to save";
+                } else {
+                    btnSave.classList.add("focusable");
+                    message.classList.add("focusable");
+                    btnSave.disabled = false;
+                    message.disabled = false;
+                    message.placeholder = "Describe the changes you made (optional)";
+                }
+            });
+
+            onAfterOpen((contentRoot) => {
+                const btnCancel = contentRoot.querySelector("#btn-cancel-commit");
+                if (context.dirtyFields.isEmpty()) {
+                    btnCancel.focus();
+                }
+            });
 
             window.addEventListener("keydown", (ev) => {
                 if (isCommandS(ev)) {

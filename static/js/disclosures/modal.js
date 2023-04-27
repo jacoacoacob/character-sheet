@@ -1,38 +1,56 @@
 import { createDiv } from "../elements.js"
-import { isShiftKey, isTabKey } from "../utils.js";
+import { isShiftKey, isTabKey, createFocusTrap } from "../utils.js";
 
 /**
  * 
  * @param {{
  *  closeOnClickOutside?: boolean;
- *  onBeforeClose?: (contentRoot: HTMLDivElement) => void;
- *  onAfterClose?: (contentRoot: HTMLDivElement) => void;
- *  onBeforeOpen?: (contentRoot: HTMLDivElement) => void;
- *  onAfterOpen?: (contentRoot: HTMLDivElement) => void;
- *  setup?: (options: {
+ *  setup: (options: {
  *      openModal: () => void;
  *      closeModal: () => void;
+ *      onBeforeClose?: ((contentRoot: HTMLDivElement) => void) => void;
+ *      onAfterClose?: ((contentRoot: HTMLDivElement) => void) => void;
+ *      onBeforeOpen?: ((contentRoot: HTMLDivElement) => void) => void;
+ *      onAfterOpen?: ((contentRoot: HTMLDivElement) => void) => void;
  *  }) => HTMLElement[];
  * }} param0 
  */
-function createModal({
-    closeOnClickOutside = false,
-    onBeforeOpen = () => void 0,
-    onAfterOpen = () => void 0,
-    onBeforeClose = () => void 0,
-    onAfterClose = () => void 0,
-    setup = () => [],
-} = {}) {
+function createModal({ closeOnClickOutside = false, setup = () => [] } = {}) {
+
+    const _onBeforeOpen = [];
+    const _onBeforeClose = [];
+    const _onAfterOpen = [];
+    const _onAfterClose = [];
+
+    function onAfterClose(callback) {
+        _onAfterClose.push(callback);
+    }
+    function onBeforeClose(callback) {
+        _onBeforeClose.push(callback);
+    }
+    function onAfterOpen(callback) {
+        _onAfterOpen.push(callback);
+    }
+    function onBeforeOpen(callback) {
+        _onBeforeOpen.push(callback);
+    }
 
     let prevActiveNonModalElement;
-    let focusableModalContentElements;
+    // let focusableModalContentElements;
 
     const modalContent = createDiv({
         className: "modal-content",
         attrs: {
             tabIndex: 0,
         },
-        children: setup({ closeModal, openModal }),
+        children: setup({
+            closeModal,
+            openModal,
+            onAfterClose,
+            onAfterOpen,
+            onBeforeClose,
+            onBeforeOpen,
+        }),
     });
 
     const modal = createDiv({
@@ -54,40 +72,50 @@ function createModal({
         }
     }
 
-    function firstFocusablModalContentElement() {
-        if (focusableModalContentElements) {
-            return focusableModalContentElements[0];
-        }
-    }
+    // function firstFocusablModalContentElement() {
+    //     if (focusableModalContentElements) {
+    //         return focusableModalContentElements[0];
+    //     }
+    // }
 
-    function lastFocusableModalContentElement() {
-        if (focusableModalContentElements) {
-            return focusableModalContentElements[focusableModalContentElements.length - 1];
-        }
-    }
+    // function lastFocusableModalContentElement() {
+    //     if (focusableModalContentElements) {
+    //         return focusableModalContentElements[focusableModalContentElements.length - 1];
+    //     }
+    // }
 
-    function trapFocus(ev) {
-        if (!isTabKey(ev)) {
-            return;
-        }
+    // function trapFocus(ev) {
+    //     if (!isTabKey(ev)) {
+    //         return;
+    //     }
 
-        if (focusableModalContentElements && focusableModalContentElements.length === 0) {
-            ev.preventDefault();
-            return;
-        }
+ 
+    //     if (focusableModalContentElements && focusableModalContentElements.length === 0) {
+    //         ev.preventDefault();
+    //         return;
+    //     }
 
-        if (isShiftKey(ev)) {
-            if (document.activeElement === firstFocusablModalContentElement()) {
-                lastFocusableModalContentElement().focus();
-                ev.preventDefault();
-            }
-        } else {
-            if (document.activeElement === lastFocusableModalContentElement()) {
-                firstFocusablModalContentElement().focus();
-                ev.preventDefault();
-            }
-        }
-    }
+    //     if (isShiftKey(ev)) {
+    //         if (document.activeElement === firstFocusablModalContentElement()) {
+    //             lastFocusableModalContentElement().focus();
+    //             ev.preventDefault();
+    //         }
+    //     } else {
+    //         if (document.activeElement === lastFocusableModalContentElement()) {
+    //             firstFocusablModalContentElement().focus();
+    //             ev.preventDefault();
+    //         }
+    //     }
+
+    //     console.log(
+    //         focusableModalContentElements,
+    //         Array.from(focusableModalContentElements).indexOf(document.activeElement)
+    //     )
+
+    // }
+
+
+    const { trapFocus, focus } = createFocusTrap(modalContent);
 
     function closeOnEscapeKey(ev) {
         if (ev.key === "Escape") {
@@ -101,7 +129,7 @@ function createModal({
     }
 
     function closeModal() {
-        onBeforeClose(modalContent)
+        _onBeforeClose.forEach(cb => cb(modalContent));
         document.body.style.overflow = "auto";
         modal.classList.remove("modal--visible");
         modal.hidden = true;
@@ -111,25 +139,19 @@ function createModal({
             prevActiveNonModalElement.focus();
             prevActiveNonModalElement = null;
         }
-        focusableModalContentElements = null;
-        onAfterClose(modalContent);
+        _onAfterClose.forEach(cb => cb(modalContent));
     }
 
     function openModal() {
-        onBeforeOpen(modalContent)
+        _onBeforeOpen.forEach(cb => cb(modalContent));
         document.body.style.overflow = "hidden";
         modal.classList.add("modal--visible");
         modal.hidden = false;
         prevActiveNonModalElement = document.activeElement;
-        focusableModalContentElements = modalContent.querySelectorAll(".focusable");
-        if (focusableModalContentElements.length) {
-            focusableModalContentElements[0].focus();
-        } else {
-            modalContent.focus();
-        }
+        focus(0);
         window.addEventListener("keydown", listenKeyDown);
         modal.addEventListener("click", listenClickOutsideContent);
-        onAfterOpen(modalContent);
+        _onAfterOpen.forEach(cb => cb(modalContent));
     }
 
     document.body.appendChild(modal)
