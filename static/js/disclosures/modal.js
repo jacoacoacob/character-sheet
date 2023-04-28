@@ -133,7 +133,6 @@ function createModal({
         modal.classList.add("modal--visible");
         modal.hidden = false;
         prevActiveNonModalElement = document.activeElement;
-        // focusAt(0);
         window.addEventListener("keydown", listenKeyDown);
         modal.addEventListener("click", listenClickOutsideContent);
         _onAfterOpen.forEach(cb => cb(modalContent));

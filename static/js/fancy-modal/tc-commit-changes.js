@@ -1,15 +1,14 @@
 import { createDiv, createButton, createTextarea, createForm, createHeading } from "../elements.js";
 import { createCommit, getCommitHistory } from "../fetchers.js";
 
-const TAB_COMMIT_CHANGES = "Commit Changes";
+const TAB_SAVE_CHANGES = "Save Changes";
 
 /**
  * 
  * @param {import("../main.js").Context} appContext 
  * @param {import("../disclosures/modal.js").ModalContext} modalContext
  */
-function tcCommitChanges(appContext, modalContext) {
-
+function tcSaveChanges(appContext, modalContext) {
 
     const textareaCommitMessage = createTextarea({
         className: "flex-1 focusable",
@@ -19,25 +18,6 @@ function tcCommitChanges(appContext, modalContext) {
         },
     });
 
-    // const buttonCancel = createButton({
-    //     className: "focusable",
-    //     attrs: {
-    //         id: "btn-cancel-commit",
-    //         type: "button",
-    //     },
-    //     style: {
-    //         order: 1,
-    //         marginRight: "8px",
-    //         backgroundColor: "transparent",
-    //         border: "none",
-    //     },
-    //     text: "cancel",
-    //     onClick: () => {
-    //         textareaCommitMessage.value = "";
-    //         appContext.events.send("fancy_modal:close");
-    //     }
-    // });
-    
     const buttonSubmit = createButton({
         text: "Save",
         className: "focusable",
@@ -66,7 +46,7 @@ function tcCommitChanges(appContext, modalContext) {
     appContext.events.on("fancy_modal:before_open", ({ currentTab }) => {
         setTimeout(() => {
             if (
-                currentTab === TAB_COMMIT_CHANGES &&
+                currentTab === TAB_SAVE_CHANGES &&
                 !appContext.dirtyFields.isEmpty()
             ) {
                 textareaCommitMessage.focus();
@@ -116,11 +96,10 @@ function tcCommitChanges(appContext, modalContext) {
                 className: "flex justify-end",
                 children: [
                     buttonSubmit,
-                    // buttonCancel,
                 ],
             }),
         ],
     });
 }
 
-export { tcCommitChanges, TAB_COMMIT_CHANGES };
+export { tcSaveChanges, TAB_SAVE_CHANGES };

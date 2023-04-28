@@ -3,6 +3,8 @@ import { createButton, createDiv, createHeading, createList, createListItem, cre
 import { clearElement } from "./utils.js";
 import { createDrawer } from "./disclosures/drawer.js";
 import { getCommitHistory } from "./fetchers.js";
+import { TAB_SAVE_CHANGES } from "./fancy-modal/tc-commit-changes.js";
+import { TAB_CAMPAIGN_NOTE } from "./fancy-modal/tc-campaign-note.js";
 
 
 /**
@@ -96,13 +98,13 @@ function setupCommitHistoryDrawer(context) {
                     text: "Save changes",
                     onClick(ev) {
                         ev.preventDefault();
-                        context.events.send("open_save_modal");
+                        context.events.send("fancy_modal:open", TAB_SAVE_CHANGES);
                     }
                 }),
                 createButton({
-                    text: "Take note",
+                    text: "Campaign note",
                     onClick() {
-                        context.events.send("fancy_modal:open");
+                        context.events.send("fancy_modal:open", TAB_CAMPAIGN_NOTE);
                     }
                 }),
             ];

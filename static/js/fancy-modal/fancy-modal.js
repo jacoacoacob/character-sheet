@@ -2,11 +2,8 @@ import { createModal } from "../disclosures/modal.js";
 import { createTabs } from "../disclosures/tabs.js";
 import { createDiv } from "../elements.js";
 import { isCommandKey, isLetterKey } from "../utils.js";
-import { tcCommitChanges, TAB_COMMIT_CHANGES } from "./tc-commit-changes.js";
-import { tcSaveNote } from "./tc-save-note.js";
-
-
-const TAB_SAVE_NOTE = "Save Note";
+import { tcSaveChanges, TAB_SAVE_CHANGES } from "./tc-commit-changes.js";
+import { tcCampaignNote, TAB_CAMPAIGN_NOTE } from "./tc-campaign-note.js";
 
 /**
  * 
@@ -17,11 +14,11 @@ function setupFancyModal(appContext) {
     window.addEventListener("keydown", (ev) => {
         if (isCommandKey(ev) && isLetterKey(ev, "k")) {
             ev.preventDefault();
-            appContext.events.send("fancy_modal:open", TAB_SAVE_NOTE);
+            appContext.events.send("fancy_modal:open", TAB_CAMPAIGN_NOTE);
         }
         if (isCommandKey(ev) && isLetterKey(ev, "s")) {
             ev.preventDefault();
-            appContext.events.send("fancy_modal:open", TAB_COMMIT_CHANGES)
+            appContext.events.send("fancy_modal:open", TAB_SAVE_CHANGES)
         }
     });
 
@@ -35,14 +32,14 @@ function setupFancyModal(appContext) {
                     appContext.events.send("fancy_modal_tabs:after_update", { current, prev });
                 },
                 tabs: {
-                    [TAB_COMMIT_CHANGES]: tcCommitChanges(appContext, modalContext),
-                    [TAB_SAVE_NOTE]: tcSaveNote(appContext, modalContext),
+                    [TAB_SAVE_CHANGES]: tcSaveChanges(appContext, modalContext),
+                    [TAB_CAMPAIGN_NOTE]: tcCampaignNote(appContext, modalContext),
                 },
             });
 
             onBeforeOpen(() => {
                 appContext.events.send("fancy_modal:before_open", {
-                    currentTab: tabState.data
+                    currentTab: tabState.data,
                 });
             });
 

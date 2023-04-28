@@ -179,29 +179,31 @@ function useWatch(initialData) {
  * @param {HTMLElement} container 
  */
 function createFocusTrap(container) {
-    const selectors = [
-        "[tabindex]",
-        "a[href]",
-        "button",
-        "input",
-        "select",
-        "textarea",
-    ]
-    .map((selector) => `${selector}:not([tabindex="-1"])`)
-    .join(",");
 
-    const focusableElements = [];
-    
-    for (let elem of container.querySelectorAll(selectors)) {
-        focusableElements.push(elem);
+
+    function focusableElements() {
+        return container.querySelectorAll(
+            [
+                "[tabindex]",
+                "a[href]:not([disabled])",
+                "button:not([disabled])",
+                "input:not([disabled])",
+                "select:not([disabled])",
+                "textarea:not([disabled])",
+            ]
+            .map((selector) => `${selector}:not([tabindex="-1"])`)
+            .join(",")
+        )
     }
 
     function lastFocusableElement() {
-        return focusableElements[focusableElements.length - 1];
+        const elements = focusableElements();
+        return elements[elements.length - 1];
     }
 
     function firstFocusableElement() {
-        return focusableElements[0];
+        const elements = focusableElements();
+        return elements[0];
     }
 
     /**
@@ -214,15 +216,11 @@ function createFocusTrap(container) {
         }
 
         if (isShiftKey(ev)) {
-            // focusPrev();
-            // ev.preventDefault();
             if (document.activeElement === firstFocusableElement()) {
                 lastFocusableElement().focus();
                 ev.preventDefault()
             }
         } else {
-            // focusNext();
-            // ev.preventDefault();
             if (document.activeElement === lastFocusableElement()) {
                 firstFocusableElement().focus();
                 ev.preventDefault();
