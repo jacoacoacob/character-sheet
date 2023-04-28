@@ -18,6 +18,15 @@ function createTabs({
     
     const tabState = useWatch(tabNames[0]);
 
+    function doUpdate(newTabState) {
+        const prev = tabState.data;
+        if (prev === newTabState) {
+            return;
+        }
+        onBeforeUpdate(prev, newTabState);
+        tabState.update(newTabState);
+        onAfterUpdate(newTabState, prev);
+    }
 
     const getPrevTabName = () => {
         const indexOfActiveTab = tabNames.indexOf(tabState.data);
@@ -49,10 +58,7 @@ function createTabs({
                     id: getTabIdFrom(tabName),
                 },
                 onClick() {
-                    const prevTab = tabState.data;
-                    onBeforeUpdate(tabState.data, tabName);
-                    tabState.update(tabName);
-                    onAfterUpdate(tabName, prevTab);
+                    doUpdate(tabName)
                 },
             });
             btn.addEventListener("focus", (ev) => {
@@ -81,12 +87,12 @@ function createTabs({
         if (tabButtonIds.includes(ev.target.id)) {
             if (isArrowKey(ev, "left")) {
                 const tabName = getPrevTabName()
-                tabState.update(tabName);
+                doUpdate(tabName);
                 tabButtons.querySelector(`#${getTabIdFrom(tabName)}`).focus();
             }
             if (isArrowKey(ev, "right")) {
                 const tabName = getNextTabName()
-                tabState.update(tabName);
+                doUpdate(tabName)
                 tabButtons.querySelector(`#${getTabIdFrom(tabName)}`).focus();
             }
         }
@@ -98,7 +104,9 @@ function createTabs({
         const prevActiveId = getTabIdFrom(prev);
         tabButtons.querySelector(`#${prevActiveId}`).classList.remove("tab-button--active");
         tabButtons.querySelector(`#${activeId}`).classList.add("tab-button--active");
+        tabButtons.querySelector(`#${activeId}`).focus();
         tabContent.append(tabs[activeTabName]);
+        onAfterUpdate(activeTabName, prev);
     }, { isEager: true });
 
     return {

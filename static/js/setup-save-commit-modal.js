@@ -1,4 +1,4 @@
-import { createButton, createDiv, createForm, createHeader, createTextarea } from "./elements.js";
+import { createButton, createDiv, createForm, createHeading, createTextarea } from "./elements.js";
 import { createModal } from "./disclosures/modal.js";
 import { isCommandS } from "./utils.js";
 import { createCommit, getCommitHistory } from "./fetchers.js";
@@ -117,7 +117,7 @@ function setupSaveCommitModal(context) {
                         id: "commit-form",
                     },
                     children: [
-                        createHeader(4, "Save your changes"),
+                        createHeading(4, "Save your changes"),
                         textareaCommitMessage,
                         createDiv({
                             className: "flex justify-end",

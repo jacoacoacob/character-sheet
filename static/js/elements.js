@@ -204,7 +204,7 @@ function createLabel({ className = "", style = {}, text = "", forId = "" } = {})
     return label;
 }
 
-function createHeader(level, text) {
+function createHeading(level, text) {
     const header = document.createElement("h" + level);
 
     header.textContent = text;
@@ -270,4 +270,4 @@ function createForm({
 }
 
 
-export { createButton, createParagraph, createDiv, createSpan, createList, createListItem, createForm, createHeader, createInput, createLabel, createTextarea };
+export { createButton, createParagraph, createDiv, createSpan, createList, createListItem, createForm, createHeading, createInput, createLabel, createTextarea };

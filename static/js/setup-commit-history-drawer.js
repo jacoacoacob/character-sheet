@@ -1,5 +1,5 @@
 
-import { createButton, createDiv, createHeader, createList, createListItem, createSpan } from "./elements.js";
+import { createButton, createDiv, createHeading, createList, createListItem, createSpan } from "./elements.js";
 import { clearElement } from "./utils.js";
 import { createDrawer } from "./disclosures/drawer.js";
 import { getCommitHistory } from "./fetchers.js";
@@ -102,7 +102,7 @@ function setupCommitHistoryDrawer(context) {
                 createButton({
                     text: "Take note",
                     onClick() {
-                        context.events.send("open_fancy_modal");
+                        context.events.send("fancy_modal:open");
                     }
                 }),
             ];
@@ -111,7 +111,7 @@ function setupCommitHistoryDrawer(context) {
             return [
                 createDiv({
                     children: [
-                        createHeader(4, "History")
+                        createHeading(4, "History")
                     ]
                 }),
                 commitList,

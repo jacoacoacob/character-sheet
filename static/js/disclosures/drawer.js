@@ -1,4 +1,4 @@
-import { createButton, createDiv, createHeader } from "../elements.js";
+import { createButton, createDiv, createHeading } from "../elements.js";
 
 const DRAWER_STATE_KEY = location.pathname + "_" + "drawer-state";
 

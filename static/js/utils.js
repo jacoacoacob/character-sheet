@@ -196,38 +196,12 @@ function createFocusTrap(container) {
         focusableElements.push(elem);
     }
 
-    function cursor() {
-        return focusableElements.indexOf(document.activeElement);
+    function lastFocusableElement() {
+        return focusableElements[focusableElements.length - 1];
     }
 
-    function focusNext() {
-        const cur = cursor();
-        if (cur === -1) {
-            return;
-        }
-        if (cur === focusableElements.length - 1) {
-            focusableElements[0].focus();
-        } else {
-            focusableElements[cur + 1].focus();
-        }
-    }
-
-    function focusPrev() {
-        const cur = cursor();
-        if (cur === -1) {
-            return;
-        }
-        if (cur === 0) {
-            focusableElements[focusableElements.length - 1].focus();
-        } else {
-            focusableElements[cur - 1].focus();
-        }
-    }
-
-    function focus(index) {
-        if (focusableElements[index]) {
-            focusableElements[index].focus();
-        }
+    function firstFocusableElement() {
+        return focusableElements[0];
     }
 
     /**
@@ -240,15 +214,23 @@ function createFocusTrap(container) {
         }
 
         if (isShiftKey(ev)) {
-            focusPrev();
-            ev.preventDefault();
+            // focusPrev();
+            // ev.preventDefault();
+            if (document.activeElement === firstFocusableElement()) {
+                lastFocusableElement().focus();
+                ev.preventDefault()
+            }
         } else {
-            focusNext();
-            ev.preventDefault();
+            // focusNext();
+            // ev.preventDefault();
+            if (document.activeElement === lastFocusableElement()) {
+                firstFocusableElement().focus();
+                ev.preventDefault();
+            }
         }
     }
 
-    return { trapFocus, focus };
+    return { trapFocus };
 }
 
 

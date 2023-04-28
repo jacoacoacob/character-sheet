@@ -38,7 +38,6 @@ function setupFancyModal(context) {
 
                             const data = new FormData(ev.target);
 
-
                             console.log("SAVING COMMIT!", data)
                         },
                         className: "space-y-3",
@@ -91,7 +90,7 @@ function setupFancyModal(context) {
                 }
             });
 
-            context.events.on("open_fancy_modal", openModal);
+            context.events.on("fancy_modal:open", openModal);
 
             return [
                 createDiv({

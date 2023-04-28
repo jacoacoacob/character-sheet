@@ -4,9 +4,10 @@ import { naiveDeepCopy, useWatch } from "./utils.js";
 import { createDirtyFieldsManager } from "./dirty-fields-manager.js";
 import { setupFields } from "./setup-fields.js";
 import { setupCommitHistoryDrawer } from "./setup-commit-history-drawer.js";
-import { setupSaveCommitModal } from "./setup-save-commit-modal.js";
-import { setupFancyModal } from "./setup-fancy-modal.js";
+// import { setupSaveCommitModal } from "./setup-save-commit-modal.js";
+// import { setupFancyModal } from "./setup-fancy-modal.js";
 import { createEventBus } from "./event-bus.js";
+import { setupFancyModal } from "./fancy-modal/fancy-modal.js";
 
 let ctxCount = 0;
 export class Context {
@@ -33,6 +34,7 @@ export class Context {
 const context = window.context = new Context();
 
 setupFields(context);
-setupSaveCommitModal(context);
+// setupSaveCommitModal(context);
+// setupFancyModal(context);
 setupFancyModal(context);
 setupCommitHistoryDrawer(context);

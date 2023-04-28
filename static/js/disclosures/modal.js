@@ -2,20 +2,29 @@ import { createDiv } from "../elements.js"
 import { createFocusTrap } from "../utils.js";
 
 /**
+ * @callback OnOpenOrClose
+ * @param {(contentRoot: HTMLDivElement) => void} param0
+ */
+
+/**
+ * @typedef ModalContext
+ * @property {() => void} openModal
+ * @property {() => void} closeModal
+ * @property {() => boolean} isOpen
+ * @property {OnOpenOrClose} onBeforeClose
+ * @property {OnOpenOrClose} onAfterClose
+ * @property {OnOpenOrClose} onBeforeOpen
+ * @property {OnOpenOrClose} onAfterOpen
+ */
+
+
+/**
  * 
  * @param {{
  *  closeOnClickOutside?: boolean;
  *  contentClassName?: string;
  *  contentStyle?: ElementCSSInlineStyle["style"];
- *  setup: (options: {
- *      openModal: () => void;
- *      closeModal: () => void;
- *      isOpen: () => boolean;
- *      onBeforeClose?: ((contentRoot: HTMLDivElement) => void) => void;
- *      onAfterClose?: ((contentRoot: HTMLDivElement) => void) => void;
- *      onBeforeOpen?: ((contentRoot: HTMLDivElement) => void) => void;
- *      onAfterOpen?: ((contentRoot: HTMLDivElement) => void) => void;
- *  }) => HTMLElement[];
+ *  setup: (modalContext: ModalContext) => HTMLElement[];
  * }} param0 
  */
 function createModal({
@@ -81,7 +90,7 @@ function createModal({
         }
     }
 
-    const { trapFocus, focus } = createFocusTrap(modalContent);
+    const { trapFocus, focusAt } = createFocusTrap(modalContent);
 
     function closeOnEscapeKey(ev) {
         if (ev.key === "Escape") {
@@ -99,6 +108,9 @@ function createModal({
     }
 
     function closeModal() {
+        if (!isOpen()) {
+            return;
+        }
         _onBeforeClose.forEach(cb => cb(modalContent));
         document.body.style.overflow = "auto";
         modal.classList.remove("modal--visible");
@@ -113,12 +125,15 @@ function createModal({
     }
 
     function openModal() {
+        if (isOpen()) {
+            return;
+        }
         _onBeforeOpen.forEach(cb => cb(modalContent));
         document.body.style.overflow = "hidden";
         modal.classList.add("modal--visible");
         modal.hidden = false;
         prevActiveNonModalElement = document.activeElement;
-        focus(0);
+        // focusAt(0);
         window.addEventListener("keydown", listenKeyDown);
         modal.addEventListener("click", listenClickOutsideContent);
         _onAfterOpen.forEach(cb => cb(modalContent));

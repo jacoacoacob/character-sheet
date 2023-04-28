@@ -1,4 +1,4 @@
-import { createDiv, createHeader } from "./elements.js";
+import { createDiv, createHeading } from "./elements.js";
 
 import {
     abilityFieldFactory,
@@ -54,7 +54,7 @@ function setupFields(context) {
     const abilityScores = createDiv({
         className: "space-y-3",
         children: [
-            createHeader(6, "ABILITY SCORES"),
+            createHeading(6, "ABILITY SCORES"),
             createField(abilityField, "ability_strength", "Strength"),
             createField(abilityField, "ability_dexterity", "Dexterity"),
             createField(abilityField, "ability_constitution", "Constitution"),
@@ -67,7 +67,7 @@ function setupFields(context) {
     const abilitySavingThrows = createDiv({
         className: "space-y-3",
         children: [
-            createHeader(6, "SV THRW (ABILITY)"),
+            createHeading(6, "SV THRW (ABILITY)"),
             createField(proficiencyField, "saving_throw_strength", "Strength"),
             createField(proficiencyField, "saving_throw_dexterity", "Dexterity"),
             createField(proficiencyField, "saving_throw_constitution", "Constitution"),
@@ -79,7 +79,7 @@ function setupFields(context) {
 
     const skillSavingThrows = createDiv({
         children: [
-            createHeader(6, "SV THRW (SKILL)"),
+            createHeading(6, "SV THRW (SKILL)"),
             createDiv({
                 className: "flex space-x-4",
                 children: [
@@ -147,7 +147,7 @@ function setupFields(context) {
     const hitDice = createDiv({
         className: "space-y-3",
         children: [
-            createHeader(6, "HIT DICE"),
+            createHeading(6, "HIT DICE"),
             createDiv({
                 className: "space-y-3",
                 children: [
@@ -167,7 +167,7 @@ function setupFields(context) {
     const hitPoints = createDiv({
         className: "space-y-3",
         children: [
-            createHeader(6, "HIT POINTS"),
+            createHeading(6, "HIT POINTS"),
             createDiv({
                 className: "flex space-x-4",
                 children: [
@@ -181,7 +181,7 @@ function setupFields(context) {
     const deathSaves = createDiv({
         className: "space-y-3",
         children: [
-            createHeader(6, "DEATH SAVES"),
+            createHeading(6, "DEATH SAVES"),
             createDiv({
                 className: "flex space-x-4",
                 children: [
@@ -195,7 +195,7 @@ function setupFields(context) {
     const money = createDiv({
         className: "space-y-3",
         children: [
-            createHeader(6, "MONEY"),
+            createHeading(6, "MONEY"),
             createDiv({
                 className: "flex space-x-4",
                 children: [
