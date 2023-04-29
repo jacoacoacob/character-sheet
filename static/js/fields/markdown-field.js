@@ -222,6 +222,9 @@ function markdownFieldFactory(context) {
         updateCollapseState(btnToggleCollapse);
 
         return createDiv({
+            // style: {
+            //     maxWidth: "100%",
+            // },
             children: [
                 createDiv({
                     className: "flex justify-between",

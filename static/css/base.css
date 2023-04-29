@@ -39,6 +39,11 @@ button:disabled {
 }
 
 
+#fields-wrapper {
+    max-width: 852px;
+}
+
+
 /* Utilities */
 
 .text-start {
