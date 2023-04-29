@@ -46,11 +46,15 @@ function setupCommitHistoryDrawer(context) {
     })();
 
     const commitList = createList({
-        className: "commit-list space-y-3",
+        className: "commit-list space-y-4",
         style: {
             position: "relative",
+            border: "1px solid black",
+            borderRadius: "4px",
+            padding: "8px",
+            backgroundColor: "white",
             overflowY: "scroll",
-            height: "500px",
+            height: "600px",
             paddingRight: "12px",
         }
     });
@@ -78,24 +82,28 @@ function setupCommitHistoryDrawer(context) {
 
         commitList.append(
             ...listGroups.map(({ date, items }) => createListItem({
+                className: "space-y-3",
                 children: [
                     createSpan({
                         style: {
+                            display: "inline-block",
                             position: "sticky",
                             top: 0,
-                            backgroundColor: "white",
+                            backgroundColor: "black",
+                            color: "whitesmoke",
                             padding: "4px",
-                            border: "1px solid #aaa",
                             borderRadius: "4px",
                         },
                         children: [
-                            date
-                        ]
+                            date,
+                        ],
                     }),
                     createList({
+                        className: "space-y-3",
                         children: items.map((item) => createListItem({
                             style: {
-                                paddingTop: "12px",
+                                padding: "12px",
+                                backgroundColor: "whitesmoke",
                             },
                             children: [
                                 createDiv({
