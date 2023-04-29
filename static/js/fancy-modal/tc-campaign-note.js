@@ -50,9 +50,9 @@ function tcCampaignNote(appContext, modalContext) {
                 appContext.campaignNotes.update(
                     await getCampaignNoteList(appContext.characterId)
                 );
-
-                appContext.events.send("fancy_modal:close");
             }
+
+            appContext.events.send("fancy_modal:close");
         },
         children: [
             createHeading(4, "Campaign Note"),
