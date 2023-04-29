@@ -62,8 +62,8 @@ function createTabs({
                 },
             });
             btn.addEventListener("focus", (ev) => {
-                if (ev.relatedTarget?.dataset.tabId) {
-                    tabButtons.querySelector(`#${ev.relatedTarget.dataset.tabId}`).focus();
+                if (ev.relatedTarget && !ev.relatedTarget.classList.contains("tab-button")) {
+                    tabButtons.querySelector(`#${getTabIdFrom(tabState.data)}`).focus();
                 }
             })
             tabButtonIds.push(btn.id);

@@ -1,6 +1,6 @@
 import { createModal } from "../disclosures/modal.js";
 import { createTabs } from "../disclosures/tabs.js";
-import { createDiv } from "../elements.js";
+import { createButton, createDiv, createSpan } from "../elements.js";
 import { isCommandKey, isLetterKey } from "../utils.js";
 import { tcSaveChanges, TAB_SAVE_CHANGES } from "./tc-commit-changes.js";
 import { tcCampaignNote, TAB_CAMPAIGN_NOTE } from "./tc-campaign-note.js";
@@ -24,6 +24,9 @@ function setupFancyModal(appContext) {
 
     createModal({
         closeOnClickOutside: true,
+        contentStyle: {
+            paddingTop: "8px",
+        },
         setup(modalContext) {
             const { openModal, closeModal, onBeforeOpen } = modalContext;
 
@@ -47,14 +50,43 @@ function setupFancyModal(appContext) {
                 openModal();
                 tabState.update(tab);
             });
+            
             appContext.events.on("fancy_modal:close", closeModal);
 
             return [
                 createDiv({
-                    className: "space-y-4",
+                    className: "space-y-6",
                     children: [
-                        tabButtons,
-                        tabContent,
+                        createDiv({
+                            className: "flex justify-end align-center space-x-3",
+                            style: {
+                                position: "relative",
+                                right: "-24px"
+                            },
+                            children: [
+                                createSpan({
+                                    children: [
+                                        "[Esc] to close or",
+                                    ]
+                                }),
+                                createButton({
+                                    text: "x",
+                                    attrs: {
+                                        title: "Close modal",
+                                    },
+                                    onClick() {
+                                        appContext.events.send("fancy_modal:close");
+                                    },
+                                }),
+                            ],
+                        }),
+                        createDiv({
+                            className: "space-y-4",
+                            children: [
+                                tabButtons,
+                                tabContent,
+                            ]
+                        })
                     ],
                 }),
             ];
