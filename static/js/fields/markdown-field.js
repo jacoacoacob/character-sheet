@@ -1,5 +1,6 @@
 import { createButton, createDiv, createLabel, createTextarea } from "../elements.js";
 import { createMarkdownPreview } from "../fetchers.js";
+import { isCommandKey, isTabKey } from "../utils.js";
 
 const ICON_SVG_STRINGS = {
     noPreview: (`
@@ -66,8 +67,17 @@ function markdownFieldFactory(context) {
             },
         });
 
+        let tabCount = 0;
         source.addEventListener("keydown", (ev) => {
-            if (ev.key === "Tab") {
+            if (isTabKey(ev)) {
+                tabCount += 1;
+                if (tabCount > 2) {
+                    tabCount = 0;
+                    return;
+                }
+                setTimeout(() => {
+                    tabCount = 0;
+                }, 750);
                 ev.preventDefault();
                 const SPACES = "\t";
                 const start = source.selectionStart;
