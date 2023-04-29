@@ -8,15 +8,16 @@ import { TAB_CAMPAIGN_NOTE } from "./fancy-modal/tc-campaign-note.js";
 
 function groupByDate(items) {
     const groups = items.reduce((accum, item) => {
-        const dateCreated = new Date(item.created);
-        const date = dateCreated.toDateString();
+        const dateTime = new Date(item.created);
+        const date = dateTime.toDateString();
         if (!accum[date]) {
             accum[date] = []
         }
         accum[date].push({
-            time: dateCreated.toLocaleTimeString().replace(/:\d{2}\s/, " "),
+            dateTime,
+            time: dateTime.toLocaleTimeString().replace(/:\d{2}\s/, " "),
             message: item.message,
-            tag: item.tag
+            tag: item.tag,
         });
         return accum;
     }, {});
@@ -25,7 +26,10 @@ function groupByDate(items) {
         .keys(groups)
         .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
-    return sorted.map((date) => ({ date, items: groups[date] }));
+    return sorted.map((date) => ({
+        date,
+        items: groups[date].sort((a, b) => b.dateTime - a.dateTime),
+    }));
 }
 
 
