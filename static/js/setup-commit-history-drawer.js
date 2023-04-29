@@ -58,7 +58,7 @@ function setupCommitHistoryDrawer(context) {
             padding: "8px",
             backgroundColor: "white",
             overflowY: "scroll",
-            height: "600px",
+            height: "550px",
             paddingRight: "12px",
         }
     });
