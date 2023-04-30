@@ -113,6 +113,9 @@ function markdownFieldFactory(context) {
 
         const btnNoPreview = createButton({
             innerHTML: ICON_SVG_STRINGS.noPreview,
+            attrs: {
+                title: "Show editor only",
+            },
             style: {
                 padding: "2px",
                 paddingBottom: 0,
@@ -124,6 +127,9 @@ function markdownFieldFactory(context) {
 
         const btnSplitPreview = createButton({
             innerHTML: ICON_SVG_STRINGS.splitPreview,
+            attrs: {
+                title: "Show split editor and preview",
+            },
             style: {
                 padding: "2px",
                 paddingBottom: 0,
@@ -135,6 +141,9 @@ function markdownFieldFactory(context) {
 
         const btnFullPreview = createButton({
             innerHTML: ICON_SVG_STRINGS.fullPreview,
+            attrs: {
+                title: "Show preview only",
+            },
             style: {
                 padding: "2px",
                 paddingBottom: 0,
@@ -206,6 +215,9 @@ function markdownFieldFactory(context) {
 
         let isCollapsed = JSON.parse(localStorage[COLLAPSE_STATE_KEY] || false);
         const btnToggleCollapse = createButton({
+            attrs: {
+                title: `Expand or collapse the ${fieldLabel} section`,
+            },
             style: {
                 padding: "2px",
                 paddingBottom: 0,

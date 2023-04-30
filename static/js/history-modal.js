@@ -27,7 +27,11 @@ function setupHistoryModal(appContext) {
         closeOnClickOutside: true,
         setup({ openModal, closeModal }) {
 
-            const dataDiv = createDiv();
+            const dataDiv = createDiv({
+                attrs: {
+                    tabindex: 0,
+                },
+            });
 
             viewedHistoryItem.watch((data) => {
                 dataDiv.textContent = JSON.stringify(data);
