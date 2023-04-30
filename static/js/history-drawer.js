@@ -54,7 +54,7 @@ function setupHistoryDrawer(appContext) {
                         item: {
                             messageMaxLength: 80,
                             onClick(_, data) {
-                                appContext.notifications.requestOpen("history_modal", data);
+                                appContext.notifications.requestOpen("history_modal", { payload: data, force: true });
                             },
                         },
                     }

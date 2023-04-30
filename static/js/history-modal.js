@@ -1,6 +1,7 @@
-import { createDiv } from "./elements.js";
+import { createButton, createDiv, createSpan } from "./elements.js";
 import { createModal } from "./disclosures/modal.js";
 import { useWatch } from "./utils.js";
+import { createHistoryList } from "./history-list.js";
 
 /**
  * 
@@ -8,16 +9,9 @@ import { useWatch } from "./utils.js";
  */
 function setupHistoryModal(appContext) {
 
-    appContext.events.on("notification:open", (options) => {
-        const { status, notification, activeNotification, payload } = options;
-        if (notification === "history_modal") {
-            if (status === "success") {
-                appContext.events.send("history_modal:open", payload);
-            }
-            if (status === "fail") {
-                appContext.notifications.close(activeNotification);
-                appContext.notifications.requestOpen(notification, payload);
-            }
+    appContext.notifications.onOpen("history_modal", ({ status, payload }) => {
+        if (status === "success") {
+            appContext.events.send("history_modal:open", payload);
         }
     });
 
@@ -31,11 +25,19 @@ function setupHistoryModal(appContext) {
                 attrs: {
                     tabindex: 0,
                 },
+                style: {
+                    position: "relative",
+                    height: "400px",
+                    width: "300px",
+                    overflow: "scroll"
+                }
             });
 
-            viewedHistoryItem.watch((data) => {
-                dataDiv.textContent = JSON.stringify(data);
-            });
+            function updateModalContent(data) {
+                dataDiv.innerHTML = "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
+            }
+
+            viewedHistoryItem.watch(updateModalContent);
 
             appContext.events.on("history_modal:open", (payload) => {
                 viewedHistoryItem.update(payload);
@@ -45,7 +47,24 @@ function setupHistoryModal(appContext) {
             appContext.events.on("history_modal:close", closeModal);
 
             return [
-                dataDiv
+                createDiv({
+                    className: "flex space-x-4",
+                    children: [
+                        createHistoryList(appContext, {
+                            listStyles: {
+                                width: "300px",
+                                maxHeight: "400px"
+                            },
+                            item: {
+                                
+                                onClick(_, data) {
+                                    viewedHistoryItem.update(data);
+                                },
+                            },
+                        }),
+                        dataDiv
+                    ]
+                })
             ];
         },
     });

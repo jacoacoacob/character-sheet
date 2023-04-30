@@ -9,26 +9,43 @@ function createNotificationManager(events) {
     let activeNotification = null;
 
     return {
-        requestOpen(notification, payload) {
+        requestOpen(type, { payload, force = false } = {}) {
             if (
                 typeof activeNotification === "string" &&
-                activeNotification !== notification
+                activeNotification !== type
             ) {
-                events.send("notification:open", {
-                    notification,
-                    activeNotification,
-                    payload,
-                    status: "fail",
-                });
+                if (force) {
+                    events.send(activeNotification + ":close");
+                    events.send("notification:open", {
+                        type,
+                        payload,
+                        status: "success",
+                    });
+                    activeNotification = type;
+                } else {
+                    events.send("notification:open", {
+                        type,
+                        activeNotification,
+                        payload,
+                        status: "fail",
+                    });
+                }
             } else {
-                activeNotification = notification;
-                events.send("notification:open", { payload, notification, status: "success" })
+                activeNotification = type;
+                events.send("notification:open", { payload, type, status: "success" })
             }
         },
-        close(notification) {
+        close(type) {
             activeNotification = null;
-            events.send("notification:close", { notification });
+            events.send("notification:close", { type });
         },
+        onOpen(notificationType, cb) {
+            events.on("notification:open", ({ type, status, activeNotification, payload }) => {
+                if (notificationType === type) {
+                    cb({ status, activeNotification, payload });
+                } 
+            });
+        }
     }
 }
 

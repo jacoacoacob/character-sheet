@@ -1,4 +1,4 @@
-import { createDiv } from "../elements.js"
+import { createButton, createDiv, createSpan } from "../elements.js"
 import { createFocusTrap } from "../utils.js";
 
 /**
@@ -60,15 +60,42 @@ function createModal({
         attrs: {
             tabIndex: 0,
         },
-        children: setup({
-            closeModal,
-            openModal,
-            isOpen,
-            onAfterClose,
-            onAfterOpen,
-            onBeforeClose,
-            onBeforeOpen,
-        }),
+        children: [
+            createDiv({
+                className: "flex justify-end align-center space-x-3",
+                style: {
+                    position: "relative",
+                    right: "-24px",
+                    top: "-24px",
+                    marginBottom: "24px",
+                },
+                children: [
+                    createSpan({
+                        children: [
+                            "[Esc] to close or",
+                        ]
+                    }),
+                    createButton({
+                        text: "x",
+                        attrs: {
+                            title: "Close modal",
+                        },
+                        onClick() {
+                            closeModal();
+                        },
+                    }),
+                ],
+            }),
+            ...setup({
+                closeModal,
+                openModal,
+                isOpen,
+                onAfterClose,
+                onAfterOpen,
+                onBeforeClose,
+                onBeforeOpen,
+            }),
+        ]
     });
 
     const modal = createDiv({
@@ -90,7 +117,7 @@ function createModal({
         }
     }
 
-    const { trapFocus, focusAt } = createFocusTrap(modalContent);
+    const { trapFocus } = createFocusTrap(modalContent);
 
     function closeOnEscapeKey(ev) {
         if (ev.key === "Escape") {

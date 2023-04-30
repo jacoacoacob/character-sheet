@@ -16,12 +16,14 @@ class FieldDiff {
 class HistoryListItemData {
     /**
      * 
+     * @param {number} id
      * @param {"note" | "commit"} kind 
      * @param {string} message 
      * @param {string} created 
      * @param {any[]} diffs
      */
-    constructor(kind, message, created, diffs) {
+    constructor(id, kind, message, created, diffs) {
+        this.id = id;
         this.kind = kind;
         this.message = message;
         this.created = new Date(created);
@@ -37,6 +39,7 @@ function groupByDate(items) {
      */
     const groups = items.reduce((accum, x) => {
         const item = new HistoryListItemData(
+            x.id,
             x.kind,
             x.message,
             x.created,
@@ -61,6 +64,7 @@ function groupByDate(items) {
 /**
  * @typedef HistoryListItemOptions
  * @property {((ev: MouseEvent, data: HistoryListItemData) => void) | undefined} onClick
+ * @property {(isSelected: boolean) => CSSStyleDeclaration} itemStyle
  * @property {number | undefined} messageMaxLength 
  */
 
@@ -88,6 +92,9 @@ function mapHistoryListItem(data, options = {}) {
             padding: isButton ? "0" : "12px",
             backgroundColor: "whitesmoke",
         },
+        attrs: {
+            id: date.kind + "_" + data.id,
+        },
         children: isButton
             ? [
                 createButton({
@@ -97,7 +104,7 @@ function mapHistoryListItem(data, options = {}) {
                         display: "block",
                         border: "none",
                         textAlign: "start",
-                        padding: "12px"
+                        padding: "12px",
                     },
                     children: [
                         createDiv({
@@ -135,7 +142,8 @@ function mapHistoryListItem(data, options = {}) {
  * 
  * @param {import("./main.js").Context} appContext 
  * @param {{
- *  item?: HistoryListItemOptions
+ *  item?: HistoryListItemOptions;
+ *  listStyles?: CSSStyleDeclaration;
  * }} options
  */
 function createHistoryList(appContext, options = {}) {
@@ -151,6 +159,7 @@ function createHistoryList(appContext, options = {}) {
             overflowY: "scroll",
             maxHeight: "550px",
             paddingRight: "12px",
+            ...(options.listStyles || {})
         }
     });
 
