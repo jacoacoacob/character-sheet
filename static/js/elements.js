@@ -216,13 +216,22 @@ function createHeading(level, text) {
  * @param {{
  *  text?: string;
  *  innerHTML?: string;
+ *  children?: HTMLElement[];
  *  className?: string;
  *  style?: ElementCSSInlineStyle["style"];
  *  attrs?: Record<string, *>;
  *  onClick: (ev: MouseEvent, self: HTMLButtonElement) => void;
  * }} param0
  */
-function createButton({ text = "", innerHTML = "", attrs = {}, className = "", style = {}, onClick = () => void 0 } = {}) {
+function createButton({
+    text = "",
+    innerHTML = "",
+    children = [],
+    attrs = {},
+    className = "",
+    style = {},
+    onClick = () => void 0
+} = {}) {
     const button = document.createElement("button");
 
     attribute({ type: "button", ...attrs }, button);
@@ -231,8 +240,10 @@ function createButton({ text = "", innerHTML = "", attrs = {}, className = "", s
 
     if (innerHTML) {
         button.innerHTML = innerHTML;
-    } else {
+    } else if (text) {
         button.textContent = text;
+    } else if (children) {
+        button.append(...children);
     }
 
     button.addEventListener("click", (ev) => onClick(ev, button));

@@ -7,6 +7,7 @@ import { setupHistoryDrawer } from "./history-drawer.js";
 import { createEventBus } from "./event-bus.js";
 import { setupFancyModal } from "./fancy-modal/fancy-modal.js";
 import { createNotificationManager } from "./notification-manager.js";
+import { setupHistoryModal } from "./history-modal.js";
 
 let ctxCount = 0;
 export class Context {
@@ -37,3 +38,4 @@ const context = window.context = new Context();
 setupFields(context);
 setupFancyModal(context);
 setupHistoryDrawer(context);
+setupHistoryModal(context)

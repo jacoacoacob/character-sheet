@@ -19,10 +19,7 @@ function createEventBus() {
             }
         },
         send(type, payload) {
-            if (typeof _listeners[type] === "undefined") {
-                return;
-            }
-            _listeners[type].forEach((listener) => {
+            (_listeners[type] || []).forEach((listener) => {
                 listener(payload);
             });
         },

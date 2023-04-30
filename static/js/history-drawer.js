@@ -8,17 +8,17 @@ import { createHistoryList } from "./history-list.js";
 
 /**
  * 
- * @param {import("./main.js").Context} context
+ * @param {import("./main.js").Context} appContext
  */
-function setupHistoryDrawer(context) {
+function setupHistoryDrawer(appContext) {
 
     (async () => {
-        context.commitHistory.update(
-            await getCommitHistory(context.characterId)
+        appContext.commitHistory.update(
+            await getCommitHistory(appContext.characterId)
         );
 
-        context.campaignNotes.update(
-            await getCampaignNoteList(context.characterId)
+        appContext.campaignNotes.update(
+            await getCampaignNoteList(appContext.characterId)
         );
     })();
 
@@ -30,13 +30,13 @@ function setupHistoryDrawer(context) {
                     text: "Save changes",
                     onClick(ev) {
                         ev.preventDefault();
-                        context.events.send("fancy_modal:open", TAB_SAVE_CHANGES);
+                        appContext.events.send("fancy_modal:open", TAB_SAVE_CHANGES);
                     }
                 }),
                 createButton({
                     text: "Campaign note",
                     onClick() {
-                        context.events.send("fancy_modal:open", TAB_CAMPAIGN_NOTE);
+                        appContext.events.send("fancy_modal:open", TAB_CAMPAIGN_NOTE);
                     }
                 }),
             ];
@@ -48,7 +48,17 @@ function setupHistoryDrawer(context) {
                         createHeading(4, "History")
                     ]
                 }),
-                createHistoryList(context),
+                createHistoryList(
+                    appContext,
+                    {
+                        item: {
+                            messageMaxLength: 80,
+                            onClick(_, data) {
+                                appContext.notifications.requestOpen("history_modal", data);
+                            },
+                        },
+                    }
+                ),
             ];
         },
         setupFooter() {
@@ -63,7 +73,7 @@ function setupHistoryDrawer(context) {
                         try {
                             const canvas = await html2canvas(element);
                             a.href = canvas.toDataURL();
-                            a.download = context.formModel.character_name + "_" + new Date().toDateString().toLowerCase().replace(/\s+/g, "_");
+                            a.download = appContext.formModel.character_name + "_" + new Date().toDateString().toLowerCase().replace(/\s+/g, "_");
                             a.click();
                         } catch (error) {
                             console.error(error);

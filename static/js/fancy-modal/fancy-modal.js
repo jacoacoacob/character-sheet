@@ -14,11 +14,24 @@ function setupFancyModal(appContext) {
     window.addEventListener("keydown", (ev) => {
         if (isCommandKey(ev) && isLetterKey(ev, "k")) {
             ev.preventDefault();
-            appContext.events.send("fancy_modal:open", TAB_CAMPAIGN_NOTE);
+            appContext.notifications.requestOpen("fancy_modal", TAB_CAMPAIGN_NOTE);
         }
         if (isCommandKey(ev) && isLetterKey(ev, "s")) {
             ev.preventDefault();
-            appContext.events.send("fancy_modal:open", TAB_SAVE_CHANGES)
+            appContext.notifications.requestOpen("fancy_modal", TAB_SAVE_CHANGES);
+        }
+    });
+
+    appContext.events.on("notification:open", (options) => {
+        const { notification, activeNotification, status, payload } = options;
+        if (notification === "fancy_modal") {
+            if (status === "success") {
+                appContext.events.send("fancy_modal:open", payload);
+            }
+            if (status === "fail") {
+                appContext.notifications.close(activeNotification);
+                appContext.notifications.requestOpen(notification, payload);
+            }
         }
     });
 

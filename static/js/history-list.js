@@ -1,19 +1,51 @@
 
-import { createDiv, createList, createListItem, createSpan } from "./elements.js";
+import { createButton, createDiv, createList, createListItem, createSpan } from "./elements.js";
 import { clearElement } from "./utils.js";
 
+const ITEM_KIND_COMMIT = "commit";
+const ITEM_KIND_NOTE = "note";
+
+class FieldDiff {
+    constructor(oldValue, newValue, fieldName) {
+        this.oldValue = oldValue;
+        this.newValue = newValue;
+        this.fieldName = fieldName;
+    }
+}
+
+class HistoryListItemData {
+    /**
+     * 
+     * @param {"note" | "commit"} kind 
+     * @param {string} message 
+     * @param {string} created 
+     * @param {any[]} diffs
+     */
+    constructor(kind, message, created, diffs) {
+        this.kind = kind;
+        this.message = message;
+        this.created = new Date(created);
+        this.dateCreated = this.created.toDateString();
+        this.timeCreated = this.created.toLocaleTimeString().replace(/:\d{2}\s/, " ");
+        this.diffs = (diffs || []).map((diff) => new FieldDiff(diff.old, diff.new, diff.field_name));
+    }
+}
+
 function groupByDate(items) {
-    const groups = items.reduce((accum, item) => {
-        const dateTime = new Date(item.created);
-        const date = dateTime.toDateString();
-        if (!accum[date]) {
-            accum[date] = []
+    /**
+     * @type {Record<string, HistoryListItemData[]>}
+     */
+    const groups = items.reduce((accum, x) => {
+        const item = new HistoryListItemData(
+            x.kind,
+            x.message,
+            x.created,
+            (x.field_diffs && x.field_diffs.data || [])
+        );
+        if (!accum[item.dateCreated]) {
+            accum[item.dateCreated] = []
         }
-        accum[date].push({
-            ...item,
-            dateTime,
-            time: dateTime.toLocaleTimeString().replace(/:\d{2}\s/, " "),
-        });
+        accum[item.dateCreated].push(item);
         return accum;
     }, {});
     
@@ -22,15 +54,91 @@ function groupByDate(items) {
         .sort((a, b) => new Date(b) - new Date(a))
         .map((date) => ({
             date,
-            items: groups[date].sort((a, b) => b.dateTime - a.dateTime),
+            items: groups[date].sort((a, b) => b.created - a.created),
         }));
 }
 
 /**
+ * @typedef HistoryListItemOptions
+ * @property {((ev: MouseEvent, data: HistoryListItemData) => void) | undefined} onClick
+ * @property {number | undefined} messageMaxLength 
+ */
+
+
+/**
+ * @param {HistoryListItemData} data
+ * @param {HistoryListItemOptions} options
+ */
+function mapHistoryListItem(data, options = {}) {
+    const isButton = typeof options.onClick === "function";
+
+    function getMessage() {
+        if (
+            typeof options.messageMaxLength === "number" &&
+            data.message.length > options.messageMaxLength
+        ) {
+            return data.message.slice(0, options.messageMaxLength) + "...";
+        }
+        return data.message;
+    }
+
+    return createListItem({
+        className: isButton ? "flex" : "",
+        style: {
+            padding: isButton ? "0" : "12px",
+            backgroundColor: "whitesmoke",
+        },
+        children: isButton
+            ? [
+                createButton({
+                    className: "flex-1",
+                    style: {
+                        backgroundColor: "transparent",
+                        display: "block",
+                        border: "none",
+                        textAlign: "start",
+                        padding: "12px"
+                    },
+                    children: [
+                        createDiv({
+                            style: {
+                                fontSize: "12px",
+                            },
+                            children: [
+                                data.kind.toUpperCase() + " @ " + data.timeCreated,
+                            ]
+                        }),
+                        getMessage(),
+                    ],
+                    onClick(ev) {
+                        options.onClick(ev, data);
+                    },
+                })
+            ]
+            : [
+            createDiv({
+                style: {
+                    fontSize: "12px",
+                },
+                children: [
+                    data.kind.toUpperCase() + " @ " + data.timeCreated,
+                ]
+            }),
+            getMessage(),
+        ],
+    });
+}
+
+
+
+/**
  * 
  * @param {import("./main.js").Context} appContext 
+ * @param {{
+ *  item?: HistoryListItemOptions
+ * }} options
  */
-function createHistoryList(appContext) {
+function createHistoryList(appContext, options = {}) {
 
     const historyList = createList({
         className: "commit-list space-y-4",
@@ -61,8 +169,8 @@ function createHistoryList(appContext) {
 
     function updateHistoryList() {
         const listGroups = groupByDate([
-            ...commits ? commits.map((commit) => ({ ...commit, tag: "commit" })) : [],
-            ...notes ? notes.map((note) => ({ ...note, tag: "note" })) : [],
+            ...commits ? commits.map((commit) => ({ ...commit, kind: ITEM_KIND_COMMIT })) : [],
+            ...notes ? notes.map((note) => ({ ...note, kind: ITEM_KIND_NOTE })) : [],
         ]);
 
         clearElement(historyList);
@@ -87,23 +195,7 @@ function createHistoryList(appContext) {
                     }),
                     createList({
                         className: "space-y-3",
-                        children: items.map((item) => createListItem({
-                            style: {
-                                padding: "12px",
-                                backgroundColor: "whitesmoke",
-                            },
-                            children: [
-                                createDiv({
-                                    style: {
-                                        fontSize: "12px",
-                                    },
-                                    children: [
-                                        item.tag.toUpperCase() + " @ " + item.time,
-                                    ]
-                                }),
-                                item.message,
-                            ],
-                        })),
+                        children: items.map((data) => mapHistoryListItem(data, options.item)),
                     }),
                 ],
             })),

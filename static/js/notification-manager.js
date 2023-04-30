@@ -9,24 +9,25 @@ function createNotificationManager(events) {
     let activeNotification = null;
 
     return {
-        show(notification) {
+        requestOpen(notification, payload) {
             if (
                 typeof activeNotification === "string" &&
                 activeNotification !== notification
             ) {
-                events.send("notification:show", {
+                events.send("notification:open", {
                     notification,
                     activeNotification,
-                    success: false,
+                    payload,
+                    status: "fail",
                 });
             } else {
                 activeNotification = notification;
-                events.send("notification:show", { notification, success: true })
+                events.send("notification:open", { payload, notification, status: "success" })
             }
         },
-        hide(notification) {
+        close(notification) {
             activeNotification = null;
-            events.send("notification:hide", { notification });
+            events.send("notification:close", { notification });
         },
     }
 }
