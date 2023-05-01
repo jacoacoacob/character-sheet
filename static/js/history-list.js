@@ -93,7 +93,7 @@ function mapHistoryListItem(data, options = {}) {
             backgroundColor: "whitesmoke",
         },
         attrs: {
-            id: date.kind + "_" + data.id,
+            id: data.kind + "_" + data.id,
         },
         children: isButton
             ? [

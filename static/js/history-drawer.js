@@ -5,6 +5,7 @@ import { getCampaignNoteList, getCommitHistory } from "./fetchers.js";
 import { TAB_SAVE_CHANGES } from "./fancy-modal/tc-commit-changes.js";
 import { TAB_CAMPAIGN_NOTE } from "./fancy-modal/tc-campaign-note.js";
 import { createHistoryList } from "./history-list.js";
+import { HISTORY_MODAL } from "./history-modal.js";
 
 /**
  * 
@@ -54,7 +55,7 @@ function setupHistoryDrawer(appContext) {
                         item: {
                             messageMaxLength: 80,
                             onClick(_, data) {
-                                appContext.notifications.requestOpen("history_modal", { payload: data, force: true });
+                                appContext.notifications.open(HISTORY_MODAL, data);
                             },
                         },
                     }

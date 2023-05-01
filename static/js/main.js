@@ -4,10 +4,10 @@ import { naiveDeepCopy, useWatch } from "./utils.js";
 import { createDirtyFieldsManager } from "./dirty-fields-manager.js";
 import { setupFields } from "./setup-fields.js";
 import { setupHistoryDrawer } from "./history-drawer.js";
-import { createEventBus } from "./event-bus.js";
-import { setupFancyModal } from "./fancy-modal/fancy-modal.js";
 import { createNotificationManager } from "./notification-manager.js";
 import { setupHistoryModal } from "./history-modal.js";
+import { setupCommitChangesModal } from "./commit-changes-modal.js";
+import { setupCampaignNoteModal } from "./campaign-note-modal.js";
 
 let ctxCount = 0;
 export class Context {
@@ -28,14 +28,14 @@ export class Context {
         this.apiModel = naiveDeepCopy(INITIAL_DATA.data);
         this.formModel = naiveDeepCopy(INITIAL_DATA.data);
         this.dirtyFields = createDirtyFieldsManager();
-        this.events = createEventBus();
-        this.notifications = createNotificationManager(this.events);
+        this.notifications = createNotificationManager();
     }
 }
 
 const context = window.context = new Context();
 
 setupFields(context);
-setupFancyModal(context);
 setupHistoryDrawer(context);
-setupHistoryModal(context)
+setupHistoryModal(context);
+setupCampaignNoteModal(context);
+setupCommitChangesModal(context);

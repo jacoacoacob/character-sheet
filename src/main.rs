@@ -29,7 +29,7 @@ async fn main() -> std::io::Result<()> {
 
     let tera = tera::Tera::new(TEMPLATES_DIR).expect("Create Tera instance");
 
-    println!("Character Sheet available at http://localhost:8080");
+    println!("\nCharacter Sheet available at http://localhost:8080");
 
     HttpServer::new(move || {
         App::new()

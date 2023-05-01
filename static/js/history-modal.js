@@ -1,7 +1,8 @@
-import { createButton, createDiv, createSpan } from "./elements.js";
+import { createDiv } from "./elements.js";
 import { createModal } from "./disclosures/modal.js";
 import { useWatch } from "./utils.js";
-import { createHistoryList } from "./history-list.js";
+
+const HISTORY_MODAL = "history_modal";
 
 /**
  * 
@@ -9,16 +10,11 @@ import { createHistoryList } from "./history-list.js";
  */
 function setupHistoryModal(appContext) {
 
-    appContext.notifications.onOpen("history_modal", ({ status, payload }) => {
-        if (status === "success") {
-            appContext.events.send("history_modal:open", payload);
-        }
-    });
-
     const viewedHistoryItem = useWatch(null);
 
     createModal({
-        closeOnClickOutside: true,
+        appContext,
+        modalName: HISTORY_MODAL,
         setup({ openModal, closeModal }) {
 
             const dataDiv = createDiv({
@@ -33,41 +29,27 @@ function setupHistoryModal(appContext) {
                 }
             });
 
-            function updateModalContent(data) {
+            viewedHistoryItem.watch((data) => {
                 dataDiv.innerHTML = "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
-            }
+            });
 
-            viewedHistoryItem.watch(updateModalContent);
-
-            appContext.events.on("history_modal:open", (payload) => {
+            appContext.notifications.onOpen(HISTORY_MODAL, (payload) => {
                 viewedHistoryItem.update(payload);
                 openModal();
             });
 
-            appContext.events.on("history_modal:close", closeModal);
+            appContext.notifications.onClose(HISTORY_MODAL, closeModal)
 
             return [
                 createDiv({
                     className: "flex space-x-4",
                     children: [
-                        createHistoryList(appContext, {
-                            listStyles: {
-                                width: "300px",
-                                maxHeight: "400px"
-                            },
-                            item: {
-                                
-                                onClick(_, data) {
-                                    viewedHistoryItem.update(data);
-                                },
-                            },
-                        }),
-                        dataDiv
-                    ]
-                })
+                        dataDiv,
+                    ],
+                }),
             ];
         },
     });
 }
 
-export { setupHistoryModal };
+export { setupHistoryModal, HISTORY_MODAL };

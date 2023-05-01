@@ -1,50 +1,40 @@
 
-
-/**
- * 
- * @param {import("./main.js").Context["events"]} events 
- */
-function createNotificationManager(events) {
+function createNotificationManager() {
 
     let activeNotification = null;
 
+    const onOpenListeners = {};
+    const onCloseListeners = {}
+
     return {
-        requestOpen(type, { payload, force = false } = {}) {
-            if (
-                typeof activeNotification === "string" &&
-                activeNotification !== type
-            ) {
-                if (force) {
-                    events.send(activeNotification + ":close");
-                    events.send("notification:open", {
-                        type,
-                        payload,
-                        status: "success",
-                    });
-                    activeNotification = type;
-                } else {
-                    events.send("notification:open", {
-                        type,
-                        activeNotification,
-                        payload,
-                        status: "fail",
-                    });
-                }
-            } else {
-                activeNotification = type;
-                events.send("notification:open", { payload, type, status: "success" })
+        open(type, payload) {
+            const isActiveNotification = typeof activeNotification === "string";
+            if (isActiveNotification && activeNotification !== type) {
+                this.close(activeNotification);
+            }
+            const listeners = onOpenListeners[type] || [];
+            for (let i = 0; i < listeners.length; i++) {
+                listeners[i](payload);
             }
         },
         close(type) {
             activeNotification = null;
-            events.send("notification:close", { type });
+            const listeners = onCloseListeners[type] || [];
+            for (let i = 0; i < listeners.length; i++) {
+                listeners[i]();
+            }
         },
-        onOpen(notificationType, cb) {
-            events.on("notification:open", ({ type, status, activeNotification, payload }) => {
-                if (notificationType === type) {
-                    cb({ status, activeNotification, payload });
-                } 
-            });
+        onOpen(type, listener) {
+            if (!onOpenListeners[type]) {
+                onOpenListeners[type] = []
+            }
+            onOpenListeners[type].push(listener);
+        },
+        onClose(type, listener) {
+            if (!onCloseListeners[type]) {
+                onCloseListeners[type] = []
+            }
+            onCloseListeners[type].push(listener);
         }
     }
 }

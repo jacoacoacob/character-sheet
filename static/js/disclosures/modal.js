@@ -21,6 +21,8 @@ import { createFocusTrap } from "../utils.js";
 /**
  * 
  * @param {{
+ *  appContext: import('../main.js').Context
+ *  modalName: string;
  *  closeOnClickOutside?: boolean;
  *  contentClassName?: string;
  *  contentStyle?: ElementCSSInlineStyle["style"];
@@ -28,11 +30,17 @@ import { createFocusTrap } from "../utils.js";
  * }} param0 
  */
 function createModal({
-    closeOnClickOutside = false,
+    appContext,
+    modalName,
+    closeOnClickOutside = true,
     contentClassName = "",
     contentStyle = {},
     setup = () => []
 } = {}) {
+
+    if (typeof modalName !== "string") {
+        throw new Error("No name provided for modal");
+    }
 
     const _onBeforeOpen = [];
     const _onBeforeClose = [];
@@ -53,6 +61,17 @@ function createModal({
     }
 
     let prevActiveNonModalElement;
+
+    const closeButton = createButton({
+        text: "x",
+        attrs: {
+            title: "Close modal",
+            id: modalName + "-close",
+        },
+        onClick() {
+            appContext.notifications.close(modalName)
+        },
+    });
 
     const modalContent = createDiv({
         className: `modal-content ${contentClassName}`.trim(),
@@ -75,15 +94,7 @@ function createModal({
                             "[Esc] to close or",
                         ]
                     }),
-                    createButton({
-                        text: "x",
-                        attrs: {
-                            title: "Close modal",
-                        },
-                        onClick() {
-                            closeModal();
-                        },
-                    }),
+                    closeButton,
                 ],
             }),
             ...setup({
@@ -113,7 +124,7 @@ function createModal({
      */
     function listenClickOutsideContent(ev) {
         if (closeOnClickOutside && ev.target === modal) {
-            closeModal();
+            appContext.notifications.close(modalName);
         }
     }
 
@@ -121,7 +132,7 @@ function createModal({
 
     function closeOnEscapeKey(ev) {
         if (ev.key === "Escape") {
-            closeModal();
+            appContext.notifications.close(modalName);
         }
     }
 
@@ -160,6 +171,7 @@ function createModal({
         modal.classList.add("modal--visible");
         modal.hidden = false;
         prevActiveNonModalElement = document.activeElement;
+        closeButton.focus();
         window.addEventListener("keydown", listenKeyDown);
         modal.addEventListener("click", listenClickOutsideContent);
         _onAfterOpen.forEach(cb => cb(modalContent));
