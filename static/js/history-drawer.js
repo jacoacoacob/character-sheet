@@ -29,6 +29,9 @@ function setupHistoryDrawer(appContext) {
             return [
                 createButton({
                     text: "Save changes",
+                    attrs: {
+                        title: "Ctrl + S"
+                    },
                     onClick(ev) {
                         ev.preventDefault();
                         appContext.notifications.open(COMMIT_CHANGES_MODAL);
@@ -36,6 +39,9 @@ function setupHistoryDrawer(appContext) {
                 }),
                 createButton({
                     text: "Campaign note",
+                    attrs: {
+                        title: "Ctrl + K"
+                    },
                     onClick() {
                         appContext.notifications.open(CAMPAIGN_NOTE_MODAL);
                     }
