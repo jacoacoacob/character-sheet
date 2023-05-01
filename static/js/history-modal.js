@@ -23,8 +23,7 @@ function setupHistoryModal(appContext) {
                 },
                 style: {
                     position: "relative",
-                    height: "400px",
-                    width: "300px",
+                    maxHeight: "600px",
                     overflow: "scroll"
                 }
             });

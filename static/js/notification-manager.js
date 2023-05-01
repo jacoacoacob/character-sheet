@@ -16,6 +16,7 @@ function createNotificationManager() {
             for (let i = 0; i < listeners.length; i++) {
                 listeners[i](payload);
             }
+            activeNotification = type;
         },
         close(type) {
             activeNotification = null;

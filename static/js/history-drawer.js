@@ -1,11 +1,11 @@
 
 import { createButton, createDiv, createHeading } from "./elements.js";
 import { createDrawer } from "./disclosures/drawer.js";
-import { getCampaignNoteList, getCommitHistory } from "./fetchers.js";
-import { TAB_SAVE_CHANGES } from "./fancy-modal/tc-commit-changes.js";
-import { TAB_CAMPAIGN_NOTE } from "./fancy-modal/tc-campaign-note.js";
+import { getCampaignNoteList, getCommitHistory } from "./fetchers.js";;
 import { createHistoryList } from "./history-list.js";
 import { HISTORY_MODAL } from "./history-modal.js";
+import { COMMIT_CHANGES_MODAL } from "./commit-changes-modal.js";
+import { CAMPAIGN_NOTE_MODAL } from "./campaign-note-modal.js";
 
 /**
  * 
@@ -31,13 +31,13 @@ function setupHistoryDrawer(appContext) {
                     text: "Save changes",
                     onClick(ev) {
                         ev.preventDefault();
-                        appContext.events.send("fancy_modal:open", TAB_SAVE_CHANGES);
+                        appContext.notifications.open(COMMIT_CHANGES_MODAL);
                     }
                 }),
                 createButton({
                     text: "Campaign note",
                     onClick() {
-                        appContext.events.send("fancy_modal:open", TAB_CAMPAIGN_NOTE);
+                        appContext.notifications.open(CAMPAIGN_NOTE_MODAL);
                     }
                 }),
             ];
