@@ -3,9 +3,9 @@ import { createButton, createDiv, createHeading } from "./elements.js";
 import { createDrawer } from "./disclosures/drawer.js";
 import { getCampaignNoteList, getCommitHistory } from "./fetchers.js";;
 import { createHistoryList } from "./history-list.js";
-import { HISTORY_MODAL } from "./history-modal.js";
-import { COMMIT_CHANGES_MODAL } from "./commit-changes-modal.js";
-import { CAMPAIGN_NOTE_MODAL } from "./campaign-note-modal.js";
+import { HISTORY_MODAL } from "./setup-history-modal.js";
+import { COMMIT_CHANGES_MODAL } from "./setup-commit-changes-modal.js";
+import { CAMPAIGN_NOTE_MODAL } from "./setup-campaign-note-modal.js";
 
 /**
  * 
