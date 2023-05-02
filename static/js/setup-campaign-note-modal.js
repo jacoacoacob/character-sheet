@@ -20,6 +20,10 @@ function setupCampaignNoteModal(appContext) {
 
     const message = createTextarea({
         className: "flex-1",
+        autoSize: true,
+        style: {
+            maxHeight: "300px",
+        },
         attrs: {
             id: CAMPAIGN_NOTE_MODAL + "-message",
             name: "message",

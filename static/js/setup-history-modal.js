@@ -1,8 +1,28 @@
-import { createDiv } from "./elements.js";
+import { createDiv, createParagraph, createSpan } from "./elements.js";
 import { createModal } from "./disclosures/modal.js";
-import { useWatch } from "./utils.js";
+import { clearElement, useWatch } from "./utils.js";
 
 const HISTORY_MODAL = "history_modal";
+
+function badge(text) {
+    return createSpan({
+        style: {
+            display: "inline-block",
+            fontSize: ".875rem",
+            fontWeight: 600,
+            padding: "4px",
+            backgroundColor: "#ddd",
+            borderRadius: "4px",
+        },
+        children: [
+            text.toUpperCase(),
+        ],
+    });
+}
+
+function bold(text) {
+    return createSpan({ style: { fontWeight: 600 }, children: [text] });
+}
 
 /**
  * 
@@ -10,14 +30,17 @@ const HISTORY_MODAL = "history_modal";
  */
 function setupHistoryModal(appContext) {
 
-    const viewedHistoryItem = useWatch(null);
-
     createModal({
         appContext,
         modalName: HISTORY_MODAL,
         setup({ openModal, closeModal }) {
 
+            const viewedHistoryItem = useWatch(null);
+            
+            viewedHistoryItem.watch(updateUI);
+
             const dataDiv = createDiv({
+                className: "space-y-4",
                 attrs: {
                     tabindex: 0,
                 },
@@ -25,12 +48,47 @@ function setupHistoryModal(appContext) {
                     position: "relative",
                     maxHeight: "600px",
                     overflow: "scroll"
-                }
+                },
             });
 
-            viewedHistoryItem.watch((data) => {
-                dataDiv.innerHTML = "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
-            });
+            function updateUI(data) {
+                clearElement(dataDiv);
+
+                const header = createDiv({
+                    children: [
+                        badge(data.kind),
+                        " ",
+                        bold(`${data.dateCreated}, ${data.timeCreated}`),
+                    ],
+                });
+
+                const message = createDiv({
+                    className: "space-y-4",
+                    children: data.message.split("\n").map((text) => createParagraph({
+                        children: [text]
+                    }))
+                });
+
+                const diffs = data.diffs.length && createDiv({
+                    style: {
+                        position: "relative",
+                        overflow: "scroll",
+                        maxHeight: "400px", 
+                        whiteSpace: "pre"
+                    },
+                    children: [
+                        JSON.stringify(data.diffs, null, 2)
+                    ]
+                });
+
+                const children = [
+                    header,
+                    message,
+                    diffs
+                ];
+
+                dataDiv.append(...children.filter(Boolean));
+            }
 
             appContext.notifications.onOpen(HISTORY_MODAL, (payload) => {
                 viewedHistoryItem.update(payload);

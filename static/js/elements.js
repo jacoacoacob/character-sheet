@@ -53,17 +53,17 @@ function createSpan({ className = "", attrs = {}, style = {}, children = [] } = 
  * }} param0
  */
 function createParagraph({ className = "", attrs = {}, style = {}, children = [] } = {}) {
-    const span = document.createElement("span");
+    const p = document.createElement("p");
 
-    classify(className, span);
+    classify(className, p);
 
-    stylize(style, span);
+    stylize(style, p);
 
-    attribute(attrs, span);
+    attribute(attrs, p);
 
-    span.append(...children.filter(Boolean))
+    p.append(...children.filter(Boolean))
 
-    return span;
+    return p;
 }
 
 /**
