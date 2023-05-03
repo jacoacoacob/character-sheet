@@ -138,12 +138,13 @@ function createInput({ className = "", style = {}, attrs = {}, onInput = () => v
  * @param {{
  *  autoSize?: boolean; 
  *  className: string;
+ *  initialValue?: string;
  *  style: ElementCSSInlineStyle["style"];
  *  attrs: Record<string, *>;
  *  onInput: (ev: InputEvent) => void;
  * }} param0
  */
-function createTextarea({ autoSize = false, className = "", style = {}, attrs = {}, onInput = () => void 0 } = {}) {
+function createTextarea({ initialValue, autoSize = false, className = "", style = {}, attrs = {}, onInput = () => void 0 } = {}) {
     const textarea = document.createElement("textarea");
 
     const DEFAULT_HEIGHT = 64;
@@ -159,25 +160,38 @@ function createTextarea({ autoSize = false, className = "", style = {}, attrs = 
         ? null
         : Number.parseInt(textarea.style.maxHeight.replace("px", "").trim());
 
+    if (typeof initialValue === "string") {
+        textarea.value = initialValue;
+        setTimeout(() => {
+            if (autoSize) {
+                doAutoSize();
+            }
+        });
+    }
+
     textarea.addEventListener("input", (ev) => {
         if (autoSize) {
-            textarea.style.overflow = "hidden";
-            if (typeof MAX_HEIGHT === "number" && textarea.scrollHeight > MAX_HEIGHT) {
-                textarea.style.overflow = "auto"
-            }
-            if (textarea.scrollHeight > INITIAL_HEIGHT) {
-                const scrollLeft = window.scrollX;
-                const scrollTop = window.scrollY;
-                textarea.style.height = 0;
-                textarea.style.height = textarea.scrollHeight + 10 + "px";
-                window.scrollTo(0, 0);
-                window.scrollTo(scrollLeft, scrollTop);
-            } else {
-                textarea.style.height = INITIAL_HEIGHT + "px";
-            }
+            doAutoSize();
         }
         onInput(ev);
     });
+
+    function doAutoSize() {
+        textarea.style.overflow = "hidden";
+        if (typeof MAX_HEIGHT === "number" && textarea.scrollHeight > MAX_HEIGHT) {
+            textarea.style.overflow = "auto"
+        }
+        if (textarea.scrollHeight > INITIAL_HEIGHT) {
+            const scrollLeft = window.scrollX;
+            const scrollTop = window.scrollY;
+            textarea.style.height = 0;
+            textarea.style.height = textarea.scrollHeight + 10 + "px";
+            window.scrollTo(0, 0);
+            window.scrollTo(scrollLeft, scrollTop);
+        } else {
+            textarea.style.height = INITIAL_HEIGHT + "px";
+        }
+    }
 
     return textarea;
 }

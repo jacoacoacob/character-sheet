@@ -1,6 +1,8 @@
-import { createDiv, createParagraph, createSpan } from "./elements.js";
+import { createButton, createDiv, createForm, createParagraph, createSpan, createTextarea } from "./elements.js";
 import { createModal } from "./disclosures/modal.js";
 import { clearElement, useWatch } from "./utils.js";
+import { getCampaignNoteList, getCommitHistory, updateCampaignNote, updateCommitMessage } from "./fetchers.js";
+import { HistoryListItemData } from "./history-list.js";
 
 const HISTORY_MODAL = "history_modal";
 
@@ -27,6 +29,121 @@ function bold(text) {
 /**
  * 
  * @param {import("./main.js").Context} appContext
+ * @param {import("./history-list.js").HistoryListItemData} data 
+ */
+function editableMessage(appContext, data) {
+    const container = createDiv({ className: "space-y-3" });
+    
+    const isEditing = useWatch(false);
+
+    isEditing.watch((current) => {
+        clearElement(container);
+
+        if (current) {
+            let formMessage = data.message;
+
+            const isDirty = useWatch(data.message.trim() !== formMessage.trim());
+
+            const submitButton = createButton({
+                text: "save",
+                attrs: {
+                    type: "submit"
+                },
+            });
+
+            const message = createTextarea({
+                autoSize: true,
+                initialValue: formMessage,
+                style: {
+                    maxHeight: "400px",
+                },
+                onInput(ev) {
+                    formMessage = ev.target.value;
+                    isDirty.update(data.message.trim() !== formMessage.trim());
+                },
+            });
+
+            isDirty.watch((isDirty_) => {
+                if (isDirty_) {
+                    submitButton.disabled = false;
+                    message.classList.add("input--dirty");
+                } else {
+                    submitButton.disabled = true;
+                    message.classList.remove("input--dirty");
+                }
+            }, { isEager: true });
+
+            container.append(
+                createForm({
+                    className: "space-y-3",
+                    async onSubmit(ev) {
+                        ev.preventDefault();
+                        
+                        if (!isDirty.data) {
+                            return;
+                        }
+
+                        if (data.kind === "commit") {
+                            await updateCommitMessage(data.id, formMessage);
+                            appContext.commitHistory.update(
+                                await getCommitHistory(appContext.characterId)
+                            );
+                        }
+                        
+                        if (data.kind === "note") {
+                            await updateCampaignNote(data.id, formMessage);
+                            appContext.campaignNotes.update(
+                                await getCampaignNoteList(appContext.characterId)
+                            );
+                        }
+
+                        isEditing.update(false);
+                    },
+                    children: [
+                        createDiv({
+                            className: "flex justify-end space-x-3",
+                            children: [
+                                createButton({
+                                    text: "cancel",
+                                    onClick() {
+                                        isEditing.update(false);
+                                    },
+                                }),
+                               submitButton,
+                            ]
+                        }),
+                        message,
+                    ],
+                }),
+            );
+        } else {
+            container.append(
+                createDiv({
+                    className: "flex justify-end",
+                    children: [
+                        createButton({
+                            text: "edit message",
+                            onClick() {
+                                isEditing.update(true);
+                            },
+                        }),
+                    ],
+                }),
+                ...data.message.split("\n").filter(Boolean).map((line) => createParagraph({
+                    children: [
+                        line
+                    ],
+                })),
+            );
+        }
+    }, { isEager: true });
+
+    return container;
+}
+
+/**
+ * 
+ * @param {import("./main.js").Context} appContext
  */
 function setupHistoryModal(appContext) {
 
@@ -39,6 +156,46 @@ function setupHistoryModal(appContext) {
             
             viewedHistoryItem.watch(updateUI);
 
+            appContext.campaignNotes.watch((notes) => {
+                if (viewedHistoryItem.data) {
+                    notes.forEach((note) => {
+                        if (viewedHistoryItem.data.kind === "note" && note.id === viewedHistoryItem.data.id) {
+                            viewedHistoryItem.update(new HistoryListItemData(
+                                note.id,
+                                note.character_id,
+                                "note",
+                                note.message,
+                                note.created
+                            ));
+                        }
+                    });
+                }
+            });
+            
+            appContext.commitHistory.watch((commits) => {
+                if (viewedHistoryItem.data) {
+                    commits.forEach((commit) => {
+                        if (viewedHistoryItem.data.kind === "commit" && commit.id === viewedHistoryItem.data.id) {
+                            viewedHistoryItem.update(new HistoryListItemData(
+                                commit.id,
+                                commit.character_id,
+                                "commit",
+                                commit.message,
+                                commit.created,
+                                commit.diffs
+                            ));
+                        }
+                    });
+                }
+            });
+
+            appContext.notifications.onOpen(HISTORY_MODAL, (payload) => {
+                viewedHistoryItem.update(payload);
+                openModal();
+            });
+
+            appContext.notifications.onClose(HISTORY_MODAL, closeModal)
+
             const dataDiv = createDiv({
                 className: "space-y-4",
                 attrs: {
@@ -47,7 +204,8 @@ function setupHistoryModal(appContext) {
                 style: {
                     position: "relative",
                     maxHeight: "600px",
-                    overflow: "scroll"
+                    width: "100%",
+                    overflowY: "scroll"
                 },
             });
 
@@ -62,12 +220,7 @@ function setupHistoryModal(appContext) {
                     ],
                 });
 
-                const message = createDiv({
-                    className: "space-y-4",
-                    children: data.message.split("\n").map((text) => createParagraph({
-                        children: [text]
-                    }))
-                });
+                const message = editableMessage(appContext, data);
 
                 const diffs = data.diffs.length && createDiv({
                     style: {
@@ -89,14 +242,7 @@ function setupHistoryModal(appContext) {
 
                 dataDiv.append(...children.filter(Boolean));
             }
-
-            appContext.notifications.onOpen(HISTORY_MODAL, (payload) => {
-                viewedHistoryItem.update(payload);
-                openModal();
-            });
-
-            appContext.notifications.onClose(HISTORY_MODAL, closeModal)
-
+  
             return [
                 createDiv({
                     className: "flex space-x-4",

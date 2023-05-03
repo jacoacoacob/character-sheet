@@ -33,7 +33,7 @@ const createCampaignNote = (characterId, message) =>
     fetchJson("POST", `/notes/${characterId}`, { message });
 
 const updateCampaignNote = (noteId, message) =>
-    fetchJson("PUT", `/notes/${commitId}`, { message });
+    fetchJson("PUT", `/notes/${noteId}`, { message });
 
     
 export {

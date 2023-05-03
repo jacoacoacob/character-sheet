@@ -13,17 +13,19 @@ class FieldDiff {
     }
 }
 
-class HistoryListItemData {
+export class HistoryListItemData {
     /**
      * 
      * @param {number} id
+     * @param {string} characterId
      * @param {"note" | "commit"} kind 
      * @param {string} message 
      * @param {string} created 
      * @param {any[]} diffs
      */
-    constructor(id, kind, message, created, diffs) {
+    constructor(id, characterId, kind, message, created, diffs) {
         this.id = id;
+        this.characterId = characterId;
         this.kind = kind;
         this.message = message;
         this.created = new Date(created);
@@ -40,6 +42,7 @@ function groupByDate(items) {
     const groups = items.reduce((accum, x) => {
         const item = new HistoryListItemData(
             x.id,
+            x.character_id,
             x.kind,
             x.message,
             x.created,
