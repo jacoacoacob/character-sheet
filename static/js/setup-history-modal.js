@@ -156,37 +156,29 @@ function setupHistoryModal(appContext) {
             
             viewedHistoryItem.watch(updateUI);
 
-            appContext.campaignNotes.watch((notes) => {
+            function updateViewedHistoryItem(kind, items) {
                 if (viewedHistoryItem.data) {
-                    notes.forEach((note) => {
-                        if (viewedHistoryItem.data.kind === "note" && note.id === viewedHistoryItem.data.id) {
+                    items.forEach((item) => {
+                        if (kind === viewedHistoryItem.data.kind && item.id === viewedHistoryItem.data.id) {
                             viewedHistoryItem.update(new HistoryListItemData(
-                                note.id,
-                                note.character_id,
-                                "note",
-                                note.message,
-                                note.created
-                            ));
+                                item.id,
+                                item.character_id,
+                                kind,
+                                item.message,
+                                item.created,
+                                (item.field_diffs && item.field_diffs.data || [])
+                            ))
                         }
-                    });
+                    })
                 }
+            }
+
+            appContext.campaignNotes.watch((notes) => {
+                updateViewedHistoryItem("note", notes);
             });
             
             appContext.commitHistory.watch((commits) => {
-                if (viewedHistoryItem.data) {
-                    commits.forEach((commit) => {
-                        if (viewedHistoryItem.data.kind === "commit" && commit.id === viewedHistoryItem.data.id) {
-                            viewedHistoryItem.update(new HistoryListItemData(
-                                commit.id,
-                                commit.character_id,
-                                "commit",
-                                commit.message,
-                                commit.created,
-                                commit.diffs
-                            ));
-                        }
-                    });
-                }
+                updateViewedHistoryItem("commit", commits);
             });
 
             appContext.notifications.onOpen(HISTORY_MODAL, (payload) => {
