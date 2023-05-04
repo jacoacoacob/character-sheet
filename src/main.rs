@@ -29,9 +29,7 @@ async fn main() -> std::io::Result<()> {
 
     let tera = tera::Tera::new(TEMPLATES_DIR).expect("Create Tera instance");
 
-    println!("\nCharacter Sheet available at http://localhost:8080");
-
-    HttpServer::new(move || {
+    let server = HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(tera.clone()))
             .wrap(middleware::Logger::default())
@@ -53,7 +51,9 @@ async fn main() -> std::io::Result<()> {
             .route("/commits/{commit_id}", web::put().to(update_commit_message))
             .route("/md-preview", web::post().to(create_md_preview))
     })
-    .bind(("0.0.0.0", 8080))?
-    .run()
-    .await
+    .bind(("0.0.0.0", 8080))?;
+
+    println!("\nCharacter Sheet available at http://localhost:8080");
+
+    server.run().await
 }
